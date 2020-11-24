@@ -1,0 +1,23 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        
+        {
+            "type": "extendscript-debug",
+            "request": "launch",
+            "name": "Debug in PPro ATC",
+            "program": "${workspaceFolder}/jsx/PPRO/Premiere.jsx",
+            "stopOnEntry": false,
+            "trace": true,
+            "logFile" : "${workspaceFolder}/PProPanel_Log.txt",
+            "selectTargetColor": "blue"
+        },
+        {
+            "type": "chrome",
+            "request": "attach",
+            "name": "Attach to Chrome ATC",
+            "port": 7777,
+            "webRoot": "${workspaceRoot}"
+        }
+    ]
+}

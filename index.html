@@ -1,0 +1,376 @@
+<!doctype html>
+<!--
+/*************************************************************************
+* ADOBE CONFIDENTIAL
+* ___________________
+*
+* Copyright 2020 Adobe
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe. 
+**************************************************************************/
+-->
+<html>
+<title>PProPanel</title>
+<head>
+	<meta charset="utf-8">
+	<script src="./ext.js"></script>
+	<script src="./lib/CSInterface.js"></script>
+	<script src="./lib/jquery-1.9.1.js"></script>
+	<script src="./lib/Vulcan.js"></script>
+	<link id="ppstyle" href="css/style.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript">
+		$(document).ready(function () {
+
+			// For functions which require interaction at the JavaScript level, we provide these JQuery-based
+			// handlers, instead of directly invoking ExtendScript .This gives the JavaScript layer a chance
+			// to pass data into the ExtendScript layer, and process the results.
+
+			$("#copypresets").on("click", function (e) {
+				e.preventDefault();
+
+				var csInterface = new CSInterface();
+				var OSVersion = csInterface.getOSInformation();
+				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+				csInterface.evalScript('$._PPP_.getUserName()', myUserNameFunction);
+
+				if (OSVersion) {
+
+					// The path always comes back with '/' path separators. Windows needs '\\'.
+
+					if (OSVersion.indexOf("Windows") >= 0) {
+						var initPath = 'C:\\Users\\' + username.innerHTML;
+						var sep = '\\\\';
+						path = path.replace(/\//g, sep);
+					} else {
+						var initPath = '/Users/' + username.innerHTML;
+						var sep = '/';
+					}
+
+					path = path + sep + 'payloads' + sep + 'Effect\ Presets\ and\ Custom\ Items.prfpset';
+
+					var readResult = window.cep.fs.readFile(path);
+
+					if (0 == readResult.err) {
+
+						// We build a path to the preset, based on the OS user's name.
+
+						var addOutPath = '/Documents/Adobe/Premiere\ Pro/13.0/Profile-' + username.innerHTML +
+							'/Effect\ Presets\ and\ Custom\ Items.prfpset';
+						var fullOutPath = initPath + addOutPath;
+						var writeResult = window.cep.fs.writeFile(fullOutPath, readResult.data);
+						var resultMsg = "";
+
+						if (0 == writeResult.err) {
+							resultMsg = "Successfully copied effect presets from panel to current user configuration.";
+						} else {
+							resultMsg = "Failed to copy effect presets.";
+						}
+
+						var postToEventPanel = '$._PPP_.updateEventPanel(\'';
+						postToEventPanel += resultMsg;
+						postToEventPanel += '\'';
+						postToEventPanel += ')';
+
+						csInterface.evalScript(postToEventPanel);
+					}
+				}
+			});
+
+			$("#toggleproxy").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				csInterface.evalScript('$._PPP_.toggleProxyState()', mySetProxyFunction);
+				csInterface.evalScript('$._PPP_.getProjectProxySetting()', myGetProxyFunction);
+			});
+
+			$("#checkforums").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				csInterface.openURLInDefaultBrowser("https://forums.adobe.com/community/premiere/sdk");
+			});
+
+			$("#openfolder").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				var OSVersion = csInterface.getOSInformation();
+				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+				if (OSVersion) {
+					// The path always comes back with '/' path separators. Windows needs '\\'.
+					if (OSVersion.indexOf("Windows") >= 0) {
+						var sep = '\\';
+						path = path.replace(/\//g, sep);
+						window.cep.process.createProcess('C:\\Windows\\explorer.exe', path);
+					} else {
+						window.cep.process.createProcess('/usr/bin/open', path);
+					}
+				}
+			});
+			
+			$("#openlogfilefolder").on("click", function (e) { 
+				e.preventDefault();
+				var csInterface 			=	new CSInterface();
+				var OSVersion 				=	csInterface.getOSInformation();
+				var userDataPath 			=	csInterface.getSystemPath(SystemPath.USER_DATA); 
+				var justTheFirstBit 		=	userDataPath.split('A');
+				var actualDestinationPath 	=	justTheFirstBit[0];
+				
+				if (OSVersion) {
+					// The path always comes back with '/' path separators. Windows needs '\\'.
+					if (OSVersion.indexOf("Windows") >= 0) {
+						actualDestinationPath =  actualDestinationPath + "AppData/Roaming/Adobe/Premiere Pro/13.0/logs";
+						var sep = '\\';
+						actualDestinationPath = actualDestinationPath.replace(/\//g, sep);
+						window.cep.process.createProcess('C:\\Windows\\explorer.exe', actualDestinationPath);
+					} else {
+						actualDestinationPath =  actualDestinationPath + "Preferences/Adobe/Premiere Pro/13.0/logs";
+						window.cep.process.createProcess('/usr/bin/open', actualDestinationPath);
+					}
+				}
+			});
+
+			$("#readAPIdocs").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				csInterface.openURLInDefaultBrowser("http://ppro.aenhancers.com");
+			});
+
+			$("#newseqfrompreset").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				var OSVersion = csInterface.getOSInformation();
+				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+				if (OSVersion) {
+					// The path always comes back with '/' path separators. Windows needs '\\'.
+					if (OSVersion.indexOf("Windows") >= 0) {
+						var sep = '\\\\';
+						path = path.replace(/\//g, sep);
+					} else {
+						var sep = '/';
+					}
+
+					// Build a String to pass the path to the script.
+					// (Sounds more complicated than it is.)
+
+					path = path + sep + 'payloads' + sep + 'PProPanel.sqpreset';
+
+					var pre = '$._PPP_.createSequenceFromPreset(\'';
+					var post = '\'';
+					var postpost = ')';
+
+					var whole_megillah = pre + path + post + postpost;
+
+					csInterface.evalScript(whole_megillah);
+				}
+			});
+
+			$("#renderusingdefaultpreset").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				var OSVersion = csInterface.getOSInformation();
+				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+				if (OSVersion) {
+					// The path always comes back with '/' path separators. Windows needs '\\'.
+					if (OSVersion.indexOf("Windows") >= 0) {
+						var sep = '\\\\';
+						path = path.replace(/\//g, sep);
+					} else {
+						var sep = '/';
+					}
+
+					// Build a String to pass the path to the script.
+					// (Sounds more complicated than it is.)
+
+					path = path + sep + 'payloads' + sep + 'example.epr';
+
+					var pre = '$._PPP_.render(\'';
+					var post = '\'';
+					var postpost = ')';
+
+					var whole_megillah = pre + path + post + postpost;
+
+					csInterface.evalScript(whole_megillah);
+				}
+			});
+
+			$("#stitchusingdefaultpreset").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				var OSVersion = csInterface.getOSInformation();
+				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+				if (OSVersion) {
+					// The path always comes back with '/' path separators. Windows needs '\\'.
+					if (OSVersion.indexOf("Windows") >= 0) {
+						var sep = '\\\\';
+						path = path.replace(/\//g, sep);
+					} else {
+						var sep = '/';
+					}
+
+					// Build a String to pass the path to the script.
+					// (Sounds more complicated than it is.)
+
+					path = path + sep + 'payloads' + sep + 'example.epr';
+
+					var pre = '$._PPP_.stitch(\'';
+					var post = '\'';
+					var postpost = ')';
+
+					var whole_megillah = pre + path + post + postpost;
+
+					csInterface.evalScript(whole_megillah);
+				}
+			});
+
+			$("#transcodeexternal").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				var OSVersion = csInterface.getOSInformation();
+				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+				if (OSVersion) {
+					// The path always comes back with '/' path separators. Windows needs '\\'.
+					if (OSVersion.indexOf("Windows") >= 0) {
+						var sep = '\\\\';
+						path = path.replace(/\//g, sep);
+					} else {
+						var sep = '/';
+					}
+
+					// Build a String to pass the path to the script.
+					// (Sounds more complicated than it is.)
+
+					path = path + sep + 'payloads' + sep + 'example.epr';
+
+					var pre = '$._PPP_.transcodeExternal(\'';
+					var post = '\'';
+					var postpost = ')';
+
+					var whole_megillah = pre + path + post + postpost;
+
+					csInterface.evalScript(whole_megillah);
+				}
+			});
+
+			$("#ingest").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				var OSVersion = csInterface.getOSInformation();
+				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+				if (OSVersion) {
+					// The path always comes back with '/' path separators. Windows needs '\\'.
+					if (OSVersion.indexOf("Windows") >= 0) {
+						var sep = '\\\\';
+						path = path.replace(/\//g, sep);
+					} else {
+						var sep = '/';
+					}
+
+					// Build a String to pass the path to the script.
+					// (Sounds more complicated than it is.)
+
+					path = path + sep + 'payloads' + sep + 'example.epr';
+
+					var pre = '$._PPP_.ingestFiles(\'';
+					var post = '\'';
+					var postpost = ');';
+
+					var whole_megillah = pre + path + post + postpost;
+
+					csInterface.evalScript(whole_megillah);
+				}
+			});
+
+			$("#transcodeusingdefaultpreset").on("click", function (e) {
+				e.preventDefault();
+				var csInterface = new CSInterface();
+				var OSVersion = csInterface.getOSInformation();
+				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
+
+				if (OSVersion) {
+					// The path always comes back with '/' path separators. Windows needs '\\'.
+					if (OSVersion.indexOf("Windows") >= 0) {
+						var sep = '\\\\';
+						path = path.replace(/\//g, sep);
+					} else {
+						var sep = '/';
+					}
+
+					// Build a String to pass the path to the script.
+					// (Sounds more complicated than it is.)
+
+					path = path + sep + 'payloads' + sep + 'example.epr';
+
+					var pre = '$._PPP_.transcode(\'';
+					var post = '\'';
+					var postpost = ')';
+
+					var whole_megillah = pre + path + post + postpost;
+
+					csInterface.evalScript(whole_megillah);
+				}
+			});
+		});
+	</script>
+</head>
+
+<body onLoad="onLoaded()">
+	<a href="javascript:history.go(0)">Refresh panel</a>
+	<p id="username">[uninitialized]</p>
+	<p id="version_string">[uninitialized]</p>
+	<p id="active_seq">[uninitialized]</p>
+	<p id="proxies_on">Proxies enabled for sequence: </p>
+		
+	<div>
+		<h2>Metadata and Project manipulation</h2>
+	</div>
+	<div id="section3" class="sectionID">
+		<button class="controlBg textStyle" id="btn_PPRO15" onClick="evalScript('$._PPP_.modifyProjectMetadata()')">Modify project metadata</button>
+	</div>
+</body>
+<script>
+	document.body.onbeforeunload = function () {
+		var csInterface 	= new CSInterface();
+		var OSVersion 		= csInterface.getOSInformation();
+		var appVersion 		= csInterface.hostEnvironment.appVersion;
+		var versionAsFloat	= parseFloat(appVersion);
+		
+		csInterface.evalScript('$._PPP_.closeLog()');
+
+		if (versionAsFloat < 10.3) {
+			var path = "file:///Library/Application Support/Adobe/CEP/extensions/PProPanel/payloads/onbeforeunload.html";
+
+			if (OSVersion.indexOf("Windows") >= 0) {
+				path = "file:///C:/Program%20Files%20(x86)/Common%20Files/Adobe/CEP/extensions/PProPanel/payloads/onbeforeunload.html"
+			}
+			csInterface.openURLInDefaultBrowser(path);
+		}
+	};
+
+	var createFolders = function () {
+		var csInterface = new CSInterface();
+		csInterface.callScript(
+			'$._PPP_',
+			'createDeepFolderStructure',
+			function (res) {
+				console.log('Successfully created folders!');
+			},
+			function (err) {
+				console.error(err);
+				alert(err.message);
+			}, ['This', 'is', 'a', 'very', 'deep', 'folder', 'structure'], // 1st argument
+			6 // 2nd argument
+		);
+	};
+</script>
+</html>
