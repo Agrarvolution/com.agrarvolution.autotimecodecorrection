@@ -201,66 +201,6 @@
 				}
 			});
 
-			$("#stitchusingdefaultpreset").on("click", function (e) {
-				e.preventDefault();
-				var csInterface = new CSInterface();
-				var OSVersion = csInterface.getOSInformation();
-				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
-
-				if (OSVersion) {
-					// The path always comes back with '/' path separators. Windows needs '\\'.
-					if (OSVersion.indexOf("Windows") >= 0) {
-						var sep = '\\\\';
-						path = path.replace(/\//g, sep);
-					} else {
-						var sep = '/';
-					}
-
-					// Build a String to pass the path to the script.
-					// (Sounds more complicated than it is.)
-
-					path = path + sep + 'payloads' + sep + 'example.epr';
-
-					var pre = '$._PPP_.stitch(\'';
-					var post = '\'';
-					var postpost = ')';
-
-					var whole_megillah = pre + path + post + postpost;
-
-					csInterface.evalScript(whole_megillah);
-				}
-			});
-
-			$("#transcodeexternal").on("click", function (e) {
-				e.preventDefault();
-				var csInterface = new CSInterface();
-				var OSVersion = csInterface.getOSInformation();
-				var path = csInterface.getSystemPath(SystemPath.EXTENSION);
-
-				if (OSVersion) {
-					// The path always comes back with '/' path separators. Windows needs '\\'.
-					if (OSVersion.indexOf("Windows") >= 0) {
-						var sep = '\\\\';
-						path = path.replace(/\//g, sep);
-					} else {
-						var sep = '/';
-					}
-
-					// Build a String to pass the path to the script.
-					// (Sounds more complicated than it is.)
-
-					path = path + sep + 'payloads' + sep + 'example.epr';
-
-					var pre = '$._PPP_.transcodeExternal(\'';
-					var post = '\'';
-					var postpost = ')';
-
-					var whole_megillah = pre + path + post + postpost;
-
-					csInterface.evalScript(whole_megillah);
-				}
-			});
-
 			$("#ingest").on("click", function (e) {
 				e.preventDefault();
 				var csInterface = new CSInterface();
