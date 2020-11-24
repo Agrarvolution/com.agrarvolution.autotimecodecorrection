@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionManifest Version="5.0" ExtensionBundleId="com.agrarvolution.autoTimecodeCorrection" ExtensionBundleVersion="11.1"
-ExtensionBundleName="Premiere Pro automatic timecode correction" 
+ExtensionBundleName="Premiere Pro Automatic Timecode Correction" 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<ExtensionList>
-		<Extension Id="com.agrarvolution.autoTimecodeCorrection.Panel" Version="0.0.1" />
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection" Version="0.0.1" />
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
@@ -38,7 +38,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 					<Geometry>
 						<Size>
 							<Height>500</Height>
-							<Width>300</Width>
+							<Width>380</Width>
 						</Size>
 					</Geometry>
 				</UI>

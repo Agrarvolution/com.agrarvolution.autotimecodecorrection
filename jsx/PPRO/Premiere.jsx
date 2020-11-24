@@ -674,7 +674,6 @@ $._PPP_={
 					xmp.setProperty(kPProPrivateProjectMetadataURI, desc, "***DESCRIPTION***");
 					xmp.setProperty(kPProPrivateProjectMetadataURI, nameField, "***NEWNAME***");
 					xmp.setProperty(kPProPrivateProjectMetadataURI, newField, "PProPanel set this, using addPropertyToProjectMetadataSchema().");
-					var test = xmp.getProperty(kPProPrivateProjectMetadataURI, mediastart);
 
 					var array = [];
 					array[0] = tapeName;
