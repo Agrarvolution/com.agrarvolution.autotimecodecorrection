@@ -3,7 +3,7 @@
 ExtensionBundleName="Premiere Pro automatic timecode correction" 
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<ExtensionList>
-		<Extension Id="com.agrarvolution.autoTimecodeCorrection" Version="0.0.1" />
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection.Panel" Version="0.0.1" />
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
@@ -18,7 +18,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	</ExecutionEnvironment>
 
 	<DispatchInfoList>
-		<Extension Id="com.adobe.PProPanel">
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection">
 			<DispatchInfo >
 				<Resources>
 					<MainPath>./index.html</MainPath>

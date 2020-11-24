@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionList>
-    <Extension Id="com.adobe.PProPanel">
+    <Extension Id="com.agrarvolution.autoTimecodeCorrection">
         <HostList>
-            <Host Name="PPRO" Port="7777"/>
+            <Host Name="PPRO" Port="7780"/>
         </HostList>
     </Extension>
 </ExtensionList>

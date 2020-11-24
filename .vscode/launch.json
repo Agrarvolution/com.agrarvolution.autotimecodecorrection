@@ -16,7 +16,7 @@
             "type": "chrome",
             "request": "attach",
             "name": "Attach to Chrome ATC",
-            "port": 7777,
+            "port": 7780,
             "webRoot": "${workspaceRoot}"
         }
     ]
