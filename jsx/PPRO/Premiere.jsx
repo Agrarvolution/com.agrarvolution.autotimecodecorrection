@@ -647,7 +647,7 @@ $._PPP_={
 		var logNote							= "Column.Intrinsic.LogNote";
 		var newField						= "ExampleFieldName";
 		var desc							= "Column.PropertyText.Description";
-
+		var test = "init";
 		if (app.isDocumentOpen()) {
 			var projectItem = app.project.rootItem.children[0]; // just grabs first projectItem.
 			if (projectItem) {
@@ -674,6 +674,21 @@ $._PPP_={
 					xmp.setProperty(kPProPrivateProjectMetadataURI, desc, "***DESCRIPTION***");
 					xmp.setProperty(kPProPrivateProjectMetadataURI, nameField, "***NEWNAME***");
 					xmp.setProperty(kPProPrivateProjectMetadataURI, newField, "PProPanel set this, using addPropertyToProjectMetadataSchema().");
+					test = xmp.getProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.MediaStart");
+					xmp.setProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.MediaStart", "00:00:00:00");
+					test = xmp.getProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.MediaStart");
+
+					var test2 =  xmp.getProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.MediaEnd");
+					xmp.setProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.MediaEnd", "00:00:05:09");
+					xmp.setProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.VideoOutPoint", "00:00:05:09");
+					xmp.setProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.VideoInPoint", "00:00:00:00");
+					xmp.setProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.AudioOutPoint", "00:00:05:19199");
+					xmp.setProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.AudioInPoint", "00:00:00:00000");
+					xmp.setProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.SoundTimeCode", "00:00:00:00");
+					test2 =  xmp.getProperty(kPProPrivateProjectMetadataURI, "Column.Intrinsic.MediaEnd");
+					var startTime = projectItem.startTime();
+					projectItem.setStartTime("0");
+					var namespaceps = XMPMeta.dumpNamespaces();
 
 					var array = [];
 					array[0] = tapeName;

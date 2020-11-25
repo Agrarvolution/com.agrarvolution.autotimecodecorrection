@@ -1,0 +1,75 @@
+<?xpacket begin="﻿" id="W5M0MpCehiHzreSzNTczkc9d"?>
+<x:xmpmeta
+	xmlns:x="adobe:ns:meta/" x:xmptk="Adobe XMP Core 6.0-c003 79.164527, 2020/10/15-17:48:32        ">
+	<rdf:RDF
+		xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+		<rdf:Description rdf:about=""
+			xmlns:premierePrivateProjectMetaData="http://ns.adobe.com/premierePrivateProjectMetaData/1.0/">
+			<premierePrivateProjectMetaData:Column.Intrinsic.Name>***NEWNAME***</premierePrivateProjectMetaData:Column.Intrinsic.Name>
+			<premierePrivateProjectMetaData:Column.PropertyText.Label>BE.Prefs.LabelColors.1</premierePrivateProjectMetaData:Column.PropertyText.Label>
+			<premierePrivateProjectMetaData:Column.Intrinsic.MediaType>Film</premierePrivateProjectMetaData:Column.Intrinsic.MediaType>
+			<premierePrivateProjectMetaData:Column.Intrinsic.MediaTimebase>25,00 fps</premierePrivateProjectMetaData:Column.Intrinsic.MediaTimebase>
+			<premierePrivateProjectMetaData:Column.Intrinsic.MediaStart>00:00:00:00</premierePrivateProjectMetaData:Column.Intrinsic.MediaStart>
+			<premierePrivateProjectMetaData:Column.Intrinsic.MediaEnd>00:00:05:09</premierePrivateProjectMetaData:Column.Intrinsic.MediaEnd>
+			<premierePrivateProjectMetaData:Column.Intrinsic.MediaDuration>00:00:05:10</premierePrivateProjectMetaData:Column.Intrinsic.MediaDuration>
+			<premierePrivateProjectMetaData:Column.Intrinsic.VideoInPoint rdf:parseType="Resource">
+				<rdf:value>00:00:00:00</rdf:value>
+				<premierePrivateProjectMetaData:min>0</premierePrivateProjectMetaData:min>
+				<premierePrivateProjectMetaData:max>1361525760000</premierePrivateProjectMetaData:max>
+				<premierePrivateProjectMetaData:offset>14038519380480000</premierePrivateProjectMetaData:offset>
+				<premierePrivateProjectMetaData:time_display>101</premierePrivateProjectMetaData:time_display>
+				<premierePrivateProjectMetaData:frame_rate>10160640000</premierePrivateProjectMetaData:frame_rate>
+			</premierePrivateProjectMetaData:Column.Intrinsic.VideoInPoint>
+			<premierePrivateProjectMetaData:Column.Intrinsic.VideoOutPoint rdf:parseType="Resource">
+				<rdf:value>00:00:05:09</rdf:value>
+				<premierePrivateProjectMetaData:min>10160640000</premierePrivateProjectMetaData:min>
+				<premierePrivateProjectMetaData:max>1371686400000</premierePrivateProjectMetaData:max>
+				<premierePrivateProjectMetaData:offset>14038519380480000</premierePrivateProjectMetaData:offset>
+				<premierePrivateProjectMetaData:time_display>101</premierePrivateProjectMetaData:time_display>
+				<premierePrivateProjectMetaData:frame_rate>10160640000</premierePrivateProjectMetaData:frame_rate>
+			</premierePrivateProjectMetaData:Column.Intrinsic.VideoOutPoint>
+			<premierePrivateProjectMetaData:Column.Intrinsic.VideoDuration>00:00:05:10</premierePrivateProjectMetaData:Column.Intrinsic.VideoDuration>
+			<premierePrivateProjectMetaData:Column.Intrinsic.AudioInPoint rdf:parseType="Resource">
+				<rdf:value>00:00:00:00000</rdf:value>
+				<premierePrivateProjectMetaData:min>0</premierePrivateProjectMetaData:min>
+				<premierePrivateProjectMetaData:max>1361525760000</premierePrivateProjectMetaData:max>
+				<premierePrivateProjectMetaData:offset>14038519380480000</premierePrivateProjectMetaData:offset>
+				<premierePrivateProjectMetaData:time_display>101</premierePrivateProjectMetaData:time_display>
+				<premierePrivateProjectMetaData:frame_rate>10160640000</premierePrivateProjectMetaData:frame_rate>
+			</premierePrivateProjectMetaData:Column.Intrinsic.AudioInPoint>
+			<premierePrivateProjectMetaData:Column.Intrinsic.AudioOutPoint rdf:parseType="Resource">
+				<rdf:value>00:00:05:19199</rdf:value>
+				<premierePrivateProjectMetaData:min>10160640000</premierePrivateProjectMetaData:min>
+				<premierePrivateProjectMetaData:max>1371686400000</premierePrivateProjectMetaData:max>
+				<premierePrivateProjectMetaData:offset>14038519380480000</premierePrivateProjectMetaData:offset>
+				<premierePrivateProjectMetaData:time_display>101</premierePrivateProjectMetaData:time_display>
+				<premierePrivateProjectMetaData:frame_rate>10160640000</premierePrivateProjectMetaData:frame_rate>
+			</premierePrivateProjectMetaData:Column.Intrinsic.AudioOutPoint>
+			<premierePrivateProjectMetaData:Column.Intrinsic.AudioDuration>00:00:05:19200</premierePrivateProjectMetaData:Column.Intrinsic.AudioDuration>
+			<premierePrivateProjectMetaData:Column.Intrinsic.VideoInfo>3840 x 2160 (1,0)</premierePrivateProjectMetaData:Column.Intrinsic.VideoInfo>
+			<premierePrivateProjectMetaData:Column.Intrinsic.AudioInfo>48000 Hz - 16-Bit - Stereo</premierePrivateProjectMetaData:Column.Intrinsic.AudioInfo>
+			<premierePrivateProjectMetaData:Column.Intrinsic.TapeName>***TAPENAME***</premierePrivateProjectMetaData:Column.Intrinsic.TapeName>
+			<premierePrivateProjectMetaData:Column.PropertyText.Description>***DESCRIPTION***</premierePrivateProjectMetaData:Column.PropertyText.Description>
+			<premierePrivateProjectMetaData:Column.Intrinsic.LogNote>This log note inserted by PProPanel.</premierePrivateProjectMetaData:Column.Intrinsic.LogNote>
+			<premierePrivateProjectMetaData:Column.Intrinsic.FilePath>E:\Programme\Premiere Pro CEP\NZ6_0394.MOV</premierePrivateProjectMetaData:Column.Intrinsic.FilePath>
+			<premierePrivateProjectMetaData:Column.Intrinsic.FileName>NZ6_0394.MOV</premierePrivateProjectMetaData:Column.Intrinsic.FileName>
+			<premierePrivateProjectMetaData:Column.PropertyText.Status>Online</premierePrivateProjectMetaData:Column.PropertyText.Status>
+			<premierePrivateProjectMetaData:Column.PropertyBool.Good>False</premierePrivateProjectMetaData:Column.PropertyBool.Good>
+			<premierePrivateProjectMetaData:Column.PropertyBool.Hide>False</premierePrivateProjectMetaData:Column.PropertyBool.Hide>
+			<premierePrivateProjectMetaData:Column.PropertyBool.PropagatedHide>False</premierePrivateProjectMetaData:Column.PropertyBool.PropagatedHide>
+			<premierePrivateProjectMetaData:Column.Intrinsic.SoundTimeCode rdf:parseType="Resource">
+				<rdf:value>00:00:00:00</rdf:value>
+				<premierePrivateProjectMetaData:min>0</premierePrivateProjectMetaData:min>
+				<premierePrivateProjectMetaData:max>1361525760000</premierePrivateProjectMetaData:max>
+				<premierePrivateProjectMetaData:offset>14038519380480000</premierePrivateProjectMetaData:offset>
+				<premierePrivateProjectMetaData:time_display>101</premierePrivateProjectMetaData:time_display>
+				<premierePrivateProjectMetaData:frame_rate>10160640000</premierePrivateProjectMetaData:frame_rate>
+			</premierePrivateProjectMetaData:Column.Intrinsic.SoundTimeCode>
+			<premierePrivateProjectMetaData:Column.PropertyText.SyncOffset>0</premierePrivateProjectMetaData:Column.PropertyText.SyncOffset>
+			<premierePrivateProjectMetaData:Column.PropertyText.Codec>H.264</premierePrivateProjectMetaData:Column.PropertyText.Codec>
+			<premierePrivateProjectMetaData:Column.PropertyText.FieldOrder>Keine Felder (Progressive-Scan)</premierePrivateProjectMetaData:Column.PropertyText.FieldOrder>
+			<premierePrivateProjectMetaData:ExampleFieldName>PProPanel set this, using addPropertyToProjectMetadataSchema().</premierePrivateProjectMetaData:ExampleFieldName>
+		</rdf:Description>
+	</rdf:RDF>
+</x:xmpmeta>
+<?xpacket end="w"?>
