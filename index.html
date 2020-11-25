@@ -22,6 +22,7 @@
 	<script src="./lib/CSInterface.js"></script>
 	<script src="./lib/jquery-1.9.1.js"></script>
 	<script src="./lib/Vulcan.js"></script>
+	<script src="./js/script.js"></script>
 	<link id="ppstyle" href="css/style.css" rel="stylesheet" type="text/css">
 	<script type="text/javascript">
 		$(document).ready(function () {
@@ -265,18 +266,37 @@
 </head>
 
 <body onLoad="onLoaded()">
-	<a href="javascript:history.go(0)">Refresh panel</a>
-	<p id="username">[uninitialized]</p>
-	<p id="version_string">[uninitialized]</p>
-	<p id="active_seq">[uninitialized]</p>
-	<p id="proxies_on">Proxies enabled for sequence: </p>
+	<header>Automated Timecode Correction</header>
+	<main>
+		<a href="javascript:history.go(0)">Refresh panel</a>
+		<form name="atc" onsubmit="return 0" method="post">
+			<section>
+				<p>Select a file (.csv) containing timecode data:</p>
+				<input type="file" id="source">
+			</section>
+
+			<section>
+				<p>Select which files should be updated.</p>
+				<input type="radio" id="all" name="target" value="all">
+				<label for="all">All</label>
+				<input type="radio" id="selection" name="target" value="selection" checked>
+				<label for="selection">Selection</label>
+			</section>
+			<section>
+				<input type="checkbox" id="logging" name="logging">
+				<label for="logging">Enable verbose logging</label>
+			</section>
+
+			
+			<button type="button" onclick="">Start</button>
 		
-	<div>
-		<h2>Metadata and Project manipulation</h2>
-	</div>
-	<div id="section3" class="sectionID">
-		<button class="controlBg textStyle" id="btn_PPRO15" onClick="evalScript('$._PPP_.modifyProjectMetadata()')">Modify project metadata</button>
-	</div>
+		</form>
+		<section class="hidden">
+			<h3>Log</h3>
+			<textarea></textarea>
+		</section>
+	</main>
+	<footer></footer>
 </body>
 <script>
 	document.body.onbeforeunload = function () {
