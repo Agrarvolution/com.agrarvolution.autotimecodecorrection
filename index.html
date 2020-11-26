@@ -269,6 +269,7 @@
 	<header>Automated Timecode Correction</header>
 	<main>
 		<a href="javascript:history.go(0)">Refresh panel</a>
+		<p id="errorDisplay"></p>
 		<form name="atc" onsubmit="return 0" method="post">
 			<section>
 				<p>Select a file (.csv) containing timecode data:</p>
@@ -276,24 +277,26 @@
 			</section>
 
 			<section>
-				<p>Select which files should be updated.</p>
+				<p>Select which media files should be updated.</p>
 				<input type="radio" id="all" name="target" value="all">
-				<label for="all">All</label>
+				<label for="all">Start in Project bin</label>
 				<input type="radio" id="selection" name="target" value="selection" checked>
 				<label for="selection">Selection</label>
 			</section>
 			<section>
+				<input type="checkbox" id="recursion" name="recursion">
+				<label for="recursion">Search in sub bins</label>
 				<input type="checkbox" id="logging" name="logging">
 				<label for="logging">Enable verbose logging</label>
 			</section>
 
 			
-			<button type="button" onclick="">Start</button>
+			<input type="submit" id="start" value="Start">
 		
 		</form>
-		<section class="hidden">
+		<section id="log" class="hidden">
 			<h3>Log</h3>
-			<textarea></textarea>
+			<textarea id='loggingArea'></textarea>
 		</section>
 	</main>
 	<footer></footer>
