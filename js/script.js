@@ -22,13 +22,11 @@ const defaultSettings = {
     searchRecursive: true,
     searchTarget: 1,
 }
-alert("Fuck you");
 
 $(document).ready(function () {
     log = $('#log');
     error = $('#errorDisplay');
 
-    alert("Fuck you less");
     let settings = defaultSettings;
     settings = loadSettings();
     changeSettings(settings);
