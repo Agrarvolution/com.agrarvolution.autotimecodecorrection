@@ -23,7 +23,7 @@ const defaultSettings = {
     searchTarget: 1,
 }
 const csvVersion = {
-    ttc116 = 'tentacletimecodetool_1.16'
+    ttc116: 'tentacletimecodetool_1.16'
 };
 
 $(document).ready(function () {
@@ -91,9 +91,9 @@ function processFile(file) {
 
 function checkCSV(csv, version) {
     if (version === csvVersion.ttc116) {
-
-        if (!(csv[0] === 'File Name' && csv[1] === 'Duration' && csv[2] === 'File TC' &&
-            csv[3] === 'Audio TC' && csv[4] === 'Framerate')) {
+        if (!(csv[0] !== undefined && csv[0] === 'File Name' && csv[1] !== undefined && csv[1] === 'Duration' && 
+            csv[2] !== undefined && csv[2] === 'File TC' && csv[3] !== undefined &&
+            csv[3] === 'Audio TC' && csv[4] !== undefined && csv[4] === 'Framerate')) {
             addLog("CSV Headers don't match [TTCT_1.16]", logLevels.status);
             return false;
         }
