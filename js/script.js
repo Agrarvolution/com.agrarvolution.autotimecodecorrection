@@ -26,7 +26,7 @@ const csvVersion = {
     ttc116: 'tentacletimecodetool_1.16'
 };
 
-$(document).ready(function () {
+$(function () {
     log = $('#log');
     error = $('#errorDisplay');
 
@@ -55,14 +55,14 @@ $(document).ready(function () {
     $('#start').on("click", function(e){
         e.preventDefault();
         let form = document.forms[formId];
-        let timeCodeInput = {};
+        let timeCodes = [];
 
         let validation = validateForm(form);
 
         if (!validation) {
             addLog('Process canceled. Inputs are invalid. See logs above.', logLevels.info);
         } else {
-            timeCodeInput = processFile(validation);
+            timeCodes = processFile(validation);
         }
         
     })    
@@ -82,35 +82,118 @@ function processFile(file) {
             addLog("Failed to parse CSV.", logLevels.status);
             return false;
         }
-
-        //check array columns
-
     });
     reader.readAsText(file);
 }
 
 function checkCSV(csv, version) {
+    let timeCodes = [];
+
     if (version === csvVersion.ttc116) {
-        if (!(csv[0] !== undefined && csv[0] === 'File Name' && csv[1] !== undefined && csv[1] === 'Duration' && 
-            csv[2] !== undefined && csv[2] === 'File TC' && csv[3] !== undefined &&
-            csv[3] === 'Audio TC' && csv[4] !== undefined && csv[4] === 'Framerate')) {
+        //check first row
+        if (!(csv[0][0] !== undefined && csv[0][0] === 'File Name' && csv[0][1] !== undefined && csv[0][1] === 'Duration' && 
+            csv[0][2] !== undefined && csv[0][2] === 'File TC' && csv[0][3] !== undefined &&
+            csv[0][3] === 'Audio TC' && csv[0][4] !== undefined && csv[0][4] === 'Framerate')) {
             addLog("CSV Headers don't match [TTCT_1.16]", logLevels.status);
             return false;
         }
-        /*
-        @ToDo
-        check rows, check if inputs are valid add input to overall object if valid
-        :: ;; fsp validity
-        create media object
-        */
+
+        //check rows + copy data
+        for (let i = 1; i < csv.length; i++) {
+            let rowResult = checkCSVrow(csv[i], version, i);
+            if (rowResult !== false) {
+                timeCodes.push(rowResult);
+                addLog("Parsed and staged" + rowResult-fileName + " at " + rowResult.framerate/100 + ". [" + rowResult.fileTC + " -> " + rowResult.audioTC + "]");
+            }
+            
+        }
+        return timeCodes;
+    } else {
+        addLog("CSV version is unsupported.", logLevels.status);
+        return false;
     }
+}
+
+function checkCSVrow (row, version, rowNumber) {
+    let tcMediaElement = {};
+
+    if (version === csvVersion.ttc116) {
+        for (let i = 0; i < row.length; i++) {
+            if (row[i] === undefined) {
+                addLog("CSV row " + rowNumber + " is incomplete.", logLevels.error);
+                return false;
+            }
+        }
+
+        tcMediaElement.fileName = row[0];
+        
+        //@todo check if no match - check if values are valid in new function
+        
+        tcMediaElement.framerate = Number(row[4])*100;
+        switch (framerate) {
+            case 2400:
+            case 2500:
+            case 5000:
+            case 2397:
+            case 2997:
+            case 3000:
+            case 5994:
+            case 6000:
+            break;
+            default: 
+                addLog(tcMediaElement.fileName + "at row " + rowNumber + " - Framerate (" + audioTC + ") is unexpected.", logLevels.error);
+                return false;
+        }
+        
+        tcMediaElement.duration = row[1].match("/^(\d\d?)[:;](\d\d?)[:;](\d\d?)$/g");
+        if (!validateTime(duration, framerate)) {
+            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - duration (" + duration + ") is invalid.", logLevels.error);
+            return false;
+        }
+        tcMediaElement.fileTC = row[2].match("/^(\d\d?)[:;](\d\d?)[:;](\d\d?)[:;](\d\d?)$/g");
+        if (!validateTime(fileTC, framerate)) {
+            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - File TC (" + fileTC + ") is invalid.", logLevels.error);
+            return false;
+        }
+        tcMediaElement.audioTC = row[3].match("/^(\d\d?)[:;](\d\d?)[:;](\d\d?)[:;](\d\d?)$/g");
+        if (!validateTime(audioTC, framerate)) {
+            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - Audio TC (" + audioTC + ") is invalid.", logLevels.error);
+            return false;
+        } 
+        
+        return tcMediaElement;
+    }  
+}
+
+
+function validateTime (time, framerate) {
+    framerate = framerate / 100;
+    if (time.length < 3) {
+        return false;
+    }
+
+    if (time[0] > 24) {
+        return false
+    }
+
+    for (let i = 1; i < 2; i++) {
+        if (time[i] > 60) {
+            return false
+        }
+    }
+
+    if (time.length === 4 && time[3] > framerate) {
+        return false
+    }
+
+    return true;
 }
 
 //@source https://www.bennadel.com/blog/1504-ask-ben-parsing-csv-strings-with-javascript-exec-regular-expression-command.htm
 // This will parse a delimited string into an array of
 // arrays. The default delimiter is the comma, but this
 // can be overriden in the second argument.
-function CSVToArray( strData, strDelimiter ){
+function CSVToArray (strData, strDelimiter){
 
     strDelimiter = (strDelimiter || ",");
 
