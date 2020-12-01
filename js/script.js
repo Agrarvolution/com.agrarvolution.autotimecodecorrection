@@ -11,7 +11,7 @@ const logLevels = {
     critical: "CRIT",
     status: "STAT",
     info: "INFO",
-    error: "ERR"
+    error: "ERR "
 }
 let log = null;
 let error = null;
@@ -141,7 +141,7 @@ function checkCSVrow (row, version, rowNumber) {
         //@todo check if no match - check if values are valid in new function
         
         tcMediaElement.framerate = Number(row[4])*100;
-        if (tcMediaElement.framerate) {
+        if (Number.isNaN(tcMediaElement.framerate)) {
             addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
             row[4] + ") is invalid.", logLevels.error);
             return false;
