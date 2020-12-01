@@ -26,6 +26,9 @@ const csvVersion = {
     ttc116: 'tentacletimecodetool_1.16'
 };
 
+let fileLoadedEvent = document.createEvent('Event');
+fileLoadedEvent.initEvent('fileLoaded', true, true);
+
 $(function () {
     log = $('#log');
     error = $('#errorDisplay');
@@ -50,6 +53,7 @@ $(function () {
 
     $('#logging').on('click', function(){
         verboseLogging = this.checked;
+        log.toggleClass('hidden');
     });
 
     $('#start').on("click", function(e){
@@ -62,7 +66,14 @@ $(function () {
         if (!validation) {
             addLog('Process canceled. Inputs are invalid. See logs above.', logLevels.info);
         } else {
-            timeCodes = processFile(validation);
+            processFile(validation);
+            document.addEventListener('fileLoaded', function (e){
+                timeCodes = checkCSV(e.file, csvVersion.ttc116);
+                1;
+            });
+            
+
+            
         }
         
     })    
@@ -75,9 +86,9 @@ $(function () {
 function processFile(file) {
     const reader = new FileReader();
     reader.addEventListener('load', (reader) => {
-        let result = reader.target.result;
         try {
-            result = CSVToArray(result);
+            fileLoadedEvent.file = CSVToArray(reader.target.result);
+            document.dispatchEvent(fileLoadedEvent);
         } catch {
             addLog("Failed to parse CSV.", logLevels.status);
             return false;
@@ -130,7 +141,7 @@ function checkCSVrow (row, version, rowNumber) {
         //@todo check if no match - check if values are valid in new function
         
         tcMediaElement.framerate = Number(row[4])*100;
-        switch (framerate) {
+        switch ( tcMediaElement.framerate) {
             case 2400:
             case 2500:
             case 5000:
@@ -141,23 +152,29 @@ function checkCSVrow (row, version, rowNumber) {
             case 6000:
             break;
             default: 
-                addLog(tcMediaElement.fileName + "at row " + rowNumber + " - Framerate (" + audioTC + ") is unexpected.", logLevels.error);
-                return false;
+                addLog(tcMediaElement.fileName + "at row " + rowNumber + " - Framerate (" + 
+                audioTC + ") is unexpected.", logLevels.error);
         }
-        
-        tcMediaElement.duration = row[1].match("/^(\d\d?)[:;](\d\d?)[:;](\d\d?)$/g");
-        if (!validateTime(duration, framerate)) {
-            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - duration (" + duration + ") is invalid.", logLevels.error);
+
+        let hmsPattern = /^(?<hours>\d\d?)[:;](?<minutes>\d\d?)[:;](?<seconds>\d\d?)$/g;
+        let hmsfPattern = /^(?<hours>\d\d?)[:;](?<minutes>\d\d?)[:;](?<seconds>[:;](?<frames>\d\d?)\d\d?)$/g;
+
+        tcMediaElement.duration = hmsPattern.exec(row[1]);
+        if (!validateTime(tcMediaElement.duration, framerate)) {
+            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - duration (" + 
+            duration + ") is invalid.", logLevels.error);
             return false;
         }
         tcMediaElement.fileTC = row[2].match("/^(\d\d?)[:;](\d\d?)[:;](\d\d?)[:;](\d\d?)$/g");
-        if (!validateTime(fileTC, framerate)) {
-            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - File TC (" + fileTC + ") is invalid.", logLevels.error);
+        if (!validateTime(tcMediaElement.fileTC, framerate)) {
+            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - File TC (" + 
+            fileTC + ") is invalid.", logLevels.error);
             return false;
         }
         tcMediaElement.audioTC = row[3].match("/^(\d\d?)[:;](\d\d?)[:;](\d\d?)[:;](\d\d?)$/g");
-        if (!validateTime(audioTC, framerate)) {
-            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - Audio TC (" + audioTC + ") is invalid.", logLevels.error);
+        if (!validateTime(tcMediaElement.audioTC, framerate)) {
+            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - Audio TC (" + 
+            audioTC + ") is invalid.", logLevels.error);
             return false;
         } 
         
@@ -167,22 +184,18 @@ function checkCSVrow (row, version, rowNumber) {
 
 
 function validateTime (time, framerate) {
+    time.hours = Number(time.hours);
+    time.minutes = Number(time.minutes);
+    time.seconds = Number(time.seconds);
+    time.frames = Number(time.frames);
+
     framerate = framerate / 100;
-    if (time.length < 3) {
+    if (time.length < 4 || time.length > 6) {
         return false;
     }
 
-    if (time[0] > 24) {
-        return false
-    }
-
-    for (let i = 1; i < 2; i++) {
-        if (time[i] > 60) {
-            return false
-        }
-    }
-
-    if (time.length === 4 && time[3] > framerate) {
+    if (time.hour > 24 && time.minutes > 60 && time.seconds > 60 && 
+        time.frames !== NaN && time.frames > framerate) {
         return false
     }
 
@@ -309,7 +322,7 @@ function validateForm(form) {
     } else if (form[sourceId].files[0].size === 0) {
         addLog('Selection is not a file.', logLevels.status);
         return false;
-    } else if (form[sourceId].files[0].type !== 'text/csv') {
+    } else if (!(form[sourceId].files[0].type === 'text/csv' || form[sourceId].files[0].type === 'application/vnd.ms-excel')) {
         addLog('File type does not match.', logLevels.info);
     }
     return form[sourceId].files[0];
