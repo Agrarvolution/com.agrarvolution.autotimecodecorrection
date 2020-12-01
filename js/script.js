@@ -152,50 +152,67 @@ function checkCSVrow (row, version, rowNumber) {
             case 6000:
             break;
             default: 
-                addLog(tcMediaElement.fileName + "at row " + rowNumber + " - Framerate (" + 
-                audioTC + ") is unexpected.", logLevels.error);
+                addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
+                tcMediaElement.audioTC + ") is unexpected.", logLevels.error);
         }
 
         let hmsPattern = /^(?<hours>\d\d?)[:;](?<minutes>\d\d?)[:;](?<seconds>\d\d?)$/g;
-        let hmsfPattern = /^(?<hours>\d\d?)[:;](?<minutes>\d\d?)[:;](?<seconds>[:;](?<frames>\d\d?)\d\d?)$/g;
+        let hmsfPattern = /^(?<hours>\d\d?)[:;](?<minutes>\d\d?)[:;](?<seconds>\d\d?)[:;](?<frames>\d\d?)$/g;
 
         tcMediaElement.duration = hmsPattern.exec(row[1]);
-        if (!validateTime(tcMediaElement.duration, framerate)) {
-            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - duration (" + 
-            duration + ") is invalid.", logLevels.error);
+        if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
+            addLog(tcMediaElement.fileName + " at row " + rowNumber + " - duration (" + 
+            tcMediaElement.duration + ") is invalid.", logLevels.error);
             return false;
         }
-        tcMediaElement.fileTC = row[2].match("/^(\d\d?)[:;](\d\d?)[:;](\d\d?)[:;](\d\d?)$/g");
-        if (!validateTime(tcMediaElement.fileTC, framerate)) {
-            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - File TC (" + 
-            fileTC + ") is invalid.", logLevels.error);
+        tcMediaElement.duration = compressMatch(tcMediaElement.duration);
+
+        tcMediaElement.fileTC = hmsfPattern.exec(row[2]);
+        if (!validateTime(tcMediaElement.fileTC, tcMediaElement.framerate)) {
+            addLog(tcMediaElement.fileName + " at row " + rowNumber + " - File TC (" + 
+            tcMediaElement.fileTC + ") is invalid.", logLevels.error);
             return false;
         }
-        tcMediaElement.audioTC = row[3].match("/^(\d\d?)[:;](\d\d?)[:;](\d\d?)[:;](\d\d?)$/g");
-        if (!validateTime(tcMediaElement.audioTC, framerate)) {
-            addLog(tcMediaElement.fileName + "at row " + rowNumber + " - Audio TC (" + 
-            audioTC + ") is invalid.", logLevels.error);
+        tcMediaElement.fileTC = compressMatch(tcMediaElement.fileTC);
+        
+        tcMediaElement.audioTC = hmsfPattern.exec(row[3]);
+        if (!validateTime(tcMediaElement.audioTC, tcMediaElement.framerate)) {
+            addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Audio TC (" + 
+            tcMediaElement.audioTC + ") is invalid.", logLevels.error);
             return false;
         } 
-        
+        tcMediaElement.audioTC = compressMatch(tcMediaElement.audioTC);
+
         return tcMediaElement;
     }  
 }
 
+function compressMatch (timeMatched) {
+    if (timeMatched !== undefined) {
+        return {
+            text: timeMatched[0],
+            groups: timeMatched.groups
+        }
+    }
+}
 
 function validateTime (time, framerate) {
-    time.hours = Number(time.hours);
-    time.minutes = Number(time.minutes);
-    time.seconds = Number(time.seconds);
-    time.frames = Number(time.frames);
+    if (time === undefined || time == null || time.groups === undefined || time.groups == null) {
+        return false;
+    }
+
+    time.groups.hours = Number(time.groups.hours);
+    time.groups.minutes = Number(time.groups.minutes);
+    time.groups.seconds = Number(time.groups.seconds);
+    time.groups.frames = Number(time.groups.frames);
 
     framerate = framerate / 100;
     if (time.length < 4 || time.length > 6) {
         return false;
     }
 
-    if (time.hour > 24 && time.minutes > 60 && time.seconds > 60 && 
-        time.frames !== NaN && time.frames > framerate) {
+    if (time.groups.hour > 24 && time.groups.minutes > 60 && time.groups.seconds > 60 && 
+        time.groups.frames !== NaN && time.groups.frames > framerate) {
         return false
     }
 
