@@ -22,6 +22,8 @@ const defaultSettings = {
     searchRecursive: true,
     searchTarget: 1,
 }
+let settings = defaultSettings;
+
 const csvVersion = {
     ttc116: 'tentacletimecodetool_1.16'
 };
@@ -69,11 +71,17 @@ $(function () {
             processFile(validation);
             document.addEventListener('fileLoaded', function (e){
                 timeCodes = checkCSV(e.file, csvVersion.ttc116);
-                1;
-            });
-            
+                
+                let tcObject = {
+                    timeCodes: timeCodes,
+                    searchRecursive: settings.searchRecursive,
+                    searchTarget: settings.searchTarget
+                };
 
-            
+                tcObject;
+
+
+            });            
         }
         
     })    
@@ -310,7 +318,7 @@ function changeSettings(settings) {
     }
 }
 
-function storeSettings(settings) {
+function storeSettings(newSettings) {
     let settingsTxt = "";
     try {
         settingsTxt = JSON.stringify(settings);
@@ -318,6 +326,8 @@ function storeSettings(settings) {
         addLog("Failed to create settings string.", logLevels.critical);
         return false;
     }
+
+    settings = newSettings;
     localStorage.setItem(settingsKey, settingsTxt);
     return true;
 }
