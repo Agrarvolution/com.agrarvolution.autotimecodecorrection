@@ -114,7 +114,7 @@ function checkCSV(csv, version) {
             let rowResult = checkCSVrow(csv[i], version, i);
             if (rowResult !== false) {
                 timeCodes.push(rowResult);
-                addLog("Parsed and staged" + rowResult-fileName + " at " + rowResult.framerate/100 + ". [" + rowResult.fileTC + " -> " + rowResult.audioTC + "]");
+                addLog(rowResult.fileName + " - Parsed and staged at " + rowResult.framerate/100 + " fps. [" + rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);
             }
             
         }
@@ -141,6 +141,11 @@ function checkCSVrow (row, version, rowNumber) {
         //@todo check if no match - check if values are valid in new function
         
         tcMediaElement.framerate = Number(row[4])*100;
+        if (tcMediaElement.framerate) {
+            addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
+            row[4] + ") is invalid.", logLevels.error);
+            return false;
+        }
         switch ( tcMediaElement.framerate) {
             case 2400:
             case 2500:
@@ -153,7 +158,7 @@ function checkCSVrow (row, version, rowNumber) {
             break;
             default: 
                 addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
-                tcMediaElement.audioTC + ") is unexpected.", logLevels.error);
+                row[4] + ") is unexpected.", logLevels.info);
         }
 
         let hmsPattern = /^(?<hours>\d\d?)[:;](?<minutes>\d\d?)[:;](?<seconds>\d\d?)$/g;
@@ -162,7 +167,7 @@ function checkCSVrow (row, version, rowNumber) {
         tcMediaElement.duration = hmsPattern.exec(row[1]);
         if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
             addLog(tcMediaElement.fileName + " at row " + rowNumber + " - duration (" + 
-            tcMediaElement.duration + ") is invalid.", logLevels.error);
+            row[1] + ") is invalid.", logLevels.error);
             return false;
         }
         tcMediaElement.duration = compressMatch(tcMediaElement.duration);
@@ -170,15 +175,16 @@ function checkCSVrow (row, version, rowNumber) {
         tcMediaElement.fileTC = hmsfPattern.exec(row[2]);
         if (!validateTime(tcMediaElement.fileTC, tcMediaElement.framerate)) {
             addLog(tcMediaElement.fileName + " at row " + rowNumber + " - File TC (" + 
-            tcMediaElement.fileTC + ") is invalid.", logLevels.error);
+            row[2] + ") is invalid.", logLevels.error);
             return false;
         }
         tcMediaElement.fileTC = compressMatch(tcMediaElement.fileTC);
+        hmsfPattern.lastIndex = 0;
         
         tcMediaElement.audioTC = hmsfPattern.exec(row[3]);
         if (!validateTime(tcMediaElement.audioTC, tcMediaElement.framerate)) {
             addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Audio TC (" + 
-            tcMediaElement.audioTC + ") is invalid.", logLevels.error);
+            row[3] + ") is invalid.", logLevels.error);
             return false;
         } 
         tcMediaElement.audioTC = compressMatch(tcMediaElement.audioTC);
