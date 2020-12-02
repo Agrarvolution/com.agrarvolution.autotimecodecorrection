@@ -47,15 +47,14 @@ $(function () {
         addLog("Default settings are restored.", logLevels.info);
     });
 
-    $('input:not(#source)').on("change", function (e) {
+    $('input:not(#source)').on("click", function (e) {
+        if (this.id !== undefined && this.id === 'logging') {
+            verboseLogging = this.checked;
+            log.toggleClass('hidden');            
+        }
         if (storeSettings(readSettings())) {
             addLog("Settings successfully stored.", logLevels.info);
         };
-    });
-
-    $('#logging').on('click', function(){
-        verboseLogging = this.checked;
-        log.toggleClass('hidden');
     });
 
     $('#start').on("click", function(e){
@@ -321,7 +320,7 @@ function changeSettings(settings) {
 function storeSettings(newSettings) {
     let settingsTxt = "";
     try {
-        settingsTxt = JSON.stringify(settings);
+        settingsTxt = JSON.stringify(newSettings);
     } catch (e) {
         addLog("Failed to create settings string.", logLevels.critical);
         return false;
