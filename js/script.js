@@ -6,7 +6,8 @@ let searchTargetId = 'target';
 let searchRecursionId = 'recursion';
 let loggingId = 'logging';
 
-let verboseLogging = true;
+var logging = logging || {};
+logging.verboseLogging = true;
 const logLevels = {
     critical: "CRIT",
     status: "STAT",
@@ -24,6 +25,7 @@ const defaultSettings = {
 }
 let settings = defaultSettings;
 
+
 const csvVersion = {
     ttc116: 'tentacletimecodetool_1.16'
 };
@@ -32,6 +34,8 @@ let fileLoadedEvent = document.createEvent('Event');
 fileLoadedEvent.initEvent('fileLoaded', true, true);
 
 $(function () {
+    logging.logArea = $('#loggingArea')[0];
+    logging.log = $('#log');
     log = $('#log');
     error = $('#errorDisplay');
 
@@ -44,16 +48,16 @@ $(function () {
         storeSettings(defaultSettings);
         log.addClass('hidden');
         clearLog();
-        addLog("Default settings are restored.", logLevels.info);
+        logging.addLog("Default settings are restored.", logLevels.info);
     });
 
     $('input:not(#source)').on("click", function (e) {
         if (this.id !== undefined && this.id === 'logging') {
-            verboseLogging = this.checked;
+            logging.verboseLogging = this.checked;
             log.toggleClass('hidden');            
         }
         if (storeSettings(readSettings())) {
-            addLog("Settings successfully stored.", logLevels.info);
+            logging.addLog("Settings successfully stored.", logLevels.info);
         };
     });
 
@@ -65,7 +69,7 @@ $(function () {
         let validation = validateForm(form);
 
         if (!validation) {
-            addLog('Process canceled. Inputs are invalid. See logs above.', logLevels.info);
+            logging.addLog('Process canceled. Inputs are invalid. See logs above.', logLevels.info);
         } else {
             processFile(validation);
             document.addEventListener('fileLoaded', function (e){
@@ -97,7 +101,7 @@ function processFile(file) {
             fileLoadedEvent.file = CSVToArray(reader.target.result);
             document.dispatchEvent(fileLoadedEvent);
         } catch {
-            addLog("Failed to parse CSV.", logLevels.status);
+            logging.addLog("Failed to parse CSV.", logLevels.status);
             return false;
         }
     });
@@ -112,7 +116,7 @@ function checkCSV(csv, version) {
         if (!(csv[0][0] !== undefined && csv[0][0] === 'File Name' && csv[0][1] !== undefined && csv[0][1] === 'Duration' && 
             csv[0][2] !== undefined && csv[0][2] === 'File TC' && csv[0][3] !== undefined &&
             csv[0][3] === 'Audio TC' && csv[0][4] !== undefined && csv[0][4] === 'Framerate')) {
-            addLog("CSV Headers don't match [TTCT_1.16]", logLevels.status);
+            logging.addLog("CSV Headers don't match [TTCT_1.16]", logLevels.status);
             return false;
         }
 
@@ -121,13 +125,13 @@ function checkCSV(csv, version) {
             let rowResult = checkCSVrow(csv[i], version, i);
             if (rowResult !== false) {
                 timeCodes.push(rowResult);
-                addLog(rowResult.fileName + " - Parsed and staged at " + rowResult.framerate/100 + " fps. [" + rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);
+                logging.addLog(rowResult.fileName + " - Parsed and staged at " + rowResult.framerate/100 + " fps. [" + rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);
             }
             
         }
         return timeCodes;
     } else {
-        addLog("CSV version is unsupported.", logLevels.status);
+        logging.addLog("CSV version is unsupported.", logLevels.status);
         return false;
     }
 }
@@ -138,7 +142,7 @@ function checkCSVrow (row, version, rowNumber) {
     if (version === csvVersion.ttc116) {
         for (let i = 0; i < row.length; i++) {
             if (row[i] === undefined) {
-                addLog("CSV row " + rowNumber + " is incomplete.", logLevels.error);
+                logging.addLog("CSV row " + rowNumber + " is incomplete.", logLevels.error);
                 return false;
             }
         }
@@ -149,7 +153,7 @@ function checkCSVrow (row, version, rowNumber) {
         
         tcMediaElement.framerate = Number(row[4])*100;
         if (Number.isNaN(tcMediaElement.framerate)) {
-            addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
+            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
             row[4] + ") is invalid.", logLevels.error);
             return false;
         }
@@ -164,7 +168,7 @@ function checkCSVrow (row, version, rowNumber) {
             case 6000:
             break;
             default: 
-                addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
+                logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
                 row[4] + ") is unexpected.", logLevels.info);
         }
 
@@ -173,7 +177,7 @@ function checkCSVrow (row, version, rowNumber) {
 
         tcMediaElement.duration = hmsPattern.exec(row[1]);
         if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
-            addLog(tcMediaElement.fileName + " at row " + rowNumber + " - duration (" + 
+            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - duration (" + 
             row[1] + ") is invalid.", logLevels.error);
             return false;
         }
@@ -181,7 +185,7 @@ function checkCSVrow (row, version, rowNumber) {
 
         tcMediaElement.fileTC = hmsfPattern.exec(row[2]);
         if (!validateTime(tcMediaElement.fileTC, tcMediaElement.framerate)) {
-            addLog(tcMediaElement.fileName + " at row " + rowNumber + " - File TC (" + 
+            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - File TC (" + 
             row[2] + ") is invalid.", logLevels.error);
             return false;
         }
@@ -190,7 +194,7 @@ function checkCSVrow (row, version, rowNumber) {
         
         tcMediaElement.audioTC = hmsfPattern.exec(row[3]);
         if (!validateTime(tcMediaElement.audioTC, tcMediaElement.framerate)) {
-            addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Audio TC (" + 
+            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Audio TC (" + 
             row[3] + ") is invalid.", logLevels.error);
             return false;
         } 
@@ -286,7 +290,7 @@ function readSettings() {
     let form = $('form[name="atc"]')[0];
     let settings = {};
     
-    addLog('Reading settings.', logLevels.info);
+    logging.addLog('Reading settings.', logLevels.info);
 
     settings.logging = form[loggingId].checked;
     settings.searchRecursive = form[searchRecursionId].checked;
@@ -310,10 +314,10 @@ function changeSettings(settings) {
                 form[searchTargetId][i].checked = true;
             }
         }
-        verboseLogging = settings.logging;
-        addLog("Settings successfully updated.", logLevels.info);
+        logging.verboseLogging = settings.logging;
+        logging.addLog("Settings successfully updated.", logLevels.info);
     } catch {
-        addLog("Failed to update settings.", logLevels.error);
+        logging.addLog("Failed to update settings.", logLevels.error);
     }
 }
 
@@ -322,7 +326,7 @@ function storeSettings(newSettings) {
     try {
         settingsTxt = JSON.stringify(newSettings);
     } catch (e) {
-        addLog("Failed to create settings string.", logLevels.critical);
+        logging.addLog("Failed to create settings string.", logLevels.critical);
         return false;
     }
 
@@ -331,61 +335,62 @@ function storeSettings(newSettings) {
     return true;
 }
 
-function loadSettings() {
+
+function loadSettings () {
     let settings = localStorage.getItem(settingsKey);
     if (settings === null) {
-        addLog("No settings have been stored.", logLevels.info);
+        this.addLog("No settings have been stored.", logLevels.info);
         settings = defaultSettings;
     } else {
         try {
             settings = JSON.parse(settings);
         } catch {
-            addLog("Failed to create settings object.", logLevels.critical);
+            logging.addLog("Failed to create settings object.", logLevels.critical);
             settings = defaultSettings;
         }
     }
     return settings;
 }
 
-function validateForm(form) {
+function validateForm (form) {
     if (form[sourceId].files.length === 0) {
-        addLog('No file has been selected.', logLevels.status);
+        this.addLog('No file has been selected.', logLevels.status);
         return false;
     } else if (form[sourceId].files[0].size === 0) {
-        addLog('Selection is not a file.', logLevels.status);
+        this.addLog('Selection is not a file.', logLevels.status);
         return false;
     } else if (!(form[sourceId].files[0].type === 'text/csv' || form[sourceId].files[0].type === 'application/vnd.ms-excel')) {
-        addLog('File type does not match.', logLevels.info);
+        this.addLog('File type does not match.', logLevels.info);
     }
     return form[sourceId].files[0];
 }
 
-function addLog (text, level) {
+logging.addLog = function (text, level) {
     if (level === logLevels.status) {
         error.text(text);
     }
-    if (level === logLevels.error || verboseLogging) {
-        if (log.hasClass('hidden')) {
-            log.removeClass('hidden');
+    if (level === logLevels.error || logging.verboseLogging) {
+        if (this.log.hasClass('hidden')) {
+            this.log.removeClass('hidden');
         }   
        
-        log.children('#loggingArea')[0].value = timeStamp() + level + " " + text + "\n" + log.children('#loggingArea')[0].value;
+        this.logArea.value = this.timeStamp() + level + " " + text + "\n" + log.children('#loggingArea')[0].value;
     }
     
 }
 
-function clearLog () {
-    $('#loggingArea')[0].value = '';
+logging.clearLog = function () {
+    this.logArea.value = '';
 }
 
 
-function timeStamp() {
+logging.timeStamp = function () {
     let date = new Date();
-    return "[" + leadingZero(date.getDate()) + "." + leadingZero(date.getMonth()+1) + "." + 
-    date.getFullYear() + " - " + leadingZero(date.getHours()) + ":" + leadingZero(date.getMinutes()) + 
-    ":" + leadingZero(date.getSeconds()) + "] ";
+    return "[" + this.leadingZero(date.getDate()) + "." + this.leadingZero(date.getMonth()+1) + "." + 
+    date.getFullYear() + " - " + this.leadingZero(date.getHours()) + ":" + this.leadingZero(date.getMinutes()) + 
+    ":" + this.leadingZero(date.getSeconds()) + "] ";
 }
 
-function leadingZero(number) {
+logging.leadingZero = function (number) {
     return number < 10 ? "0" + number : number;
 }
