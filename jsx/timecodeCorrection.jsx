@@ -1,5 +1,12 @@
 var timecodeCorrection = timecodeCorrection || {};
 
+/*Setup eventlistener*/
+/*try {
+    var xLib = new ExternalObject("lib:\\PlugPlugExternalObject");
+} catch (e) {
+    alert(e);
+}*/
+
 timecodeCorrection.processing = {
     ProjectItemTypes: {
         bin: "BIN",
@@ -112,5 +119,12 @@ timecodeCorrection.processing = {
                 this.media[i].frames = Number(this.media[i].frames);
             }
         }
+    },
+
+    logToCEP: function(text) {
+        var eventObj = new CSXSEvent();
+		eventObj.type = "com.adobe.csxs.events.cepLogging";
+		eventObj.data = text;
+		eventObj.dispatch(); 
     }
 };
