@@ -31,9 +31,7 @@ timecodeCorrection.processing = {
                     var selectedItems = app.getProjectViewSelection(viewIDs[i]);
                     
                     for (i = 0; i < selectedItems.length; i++) {
-                        if (!selectItems[i].isSequence()) {
-                            this.processProjectItem(selectedItems[i]);
-                        }
+                        this.processProjectItem(selectedItems[i]);
                     }
                 }
             }            
@@ -42,8 +40,7 @@ timecodeCorrection.processing = {
     processProjectItem: function(projectItem) {
         var i = 0;
 
-        if (projectItem.type === ProjectItemTypes.clip) {
-            //@Todo export to function
+        if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.clip) {
             var item = {};
             item.projectItem = projectItem;
             item.name = projectItem.name;
@@ -56,11 +53,11 @@ timecodeCorrection.processing = {
             item.framerate = footageInterpretation.framerate;
 
             this.media.push(item);
-        } else if (projectItem.type === ProjectItemTypes.bin && this.searchRecursive) {
+        } else if (projectItem.type === this.ProjectItemTypes.bin && this.searchRecursive) {
             for (i = 0; i < projectItem.children.length; i++) {
                 this.processProjectItem(projectItem.children[i]);
             }
-        }
+        } 
     },
 
     updateTimecodes: function() {
@@ -91,7 +88,7 @@ timecodeCorrection.processing = {
     setValues: function (tcObject) {
         if (tcObject.timecodes !== undefined && tcObject.timescodes.length !== 0 && 
         tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined) {
-            this.timecodeUpdates = timecodes;
+            this.timecodeUpdates = tcObject.timecodes;
             this.searchRecursive = tcObject.searchRecursive;
             this.searchTarget = tcObject.searchTarget;
             return true;
@@ -100,7 +97,7 @@ timecodeCorrection.processing = {
     },
 
     timeValuesToInt: function() {
-        var i = 0;ä
+        var i = 0;
         for (i = 0; i < this.media.length; i++) {
             if (this.media[i].hours) {
                 this.media[i].hours = Number(this.media[i].hours);
