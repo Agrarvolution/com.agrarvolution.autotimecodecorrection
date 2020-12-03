@@ -172,16 +172,16 @@ function checkCSVrow (row, version, rowNumber) {
                 row[4] + ") is unexpected.", logLevels.info);
         }
 
-        let hmsPattern = /^(?<hours>\d\d?)[:;](?<minutes>\d\d?)[:;](?<seconds>\d\d?)$/g;
-        let hmsfPattern = /^(?<hours>\d\d?)[:;](?<minutes>\d\d?)[:;](?<seconds>\d\d?)[:;](?<frames>\d\d?)$/g;
+        let hmsfPattern = /^((?<hours>\d\d?)[:;])?(?<minutes>\d\d?)[:;](?<seconds>\d\d?)[:;](?<frames>\d\d?)$/g;
 
-        tcMediaElement.duration = hmsPattern.exec(row[1]);
+        tcMediaElement.duration = hmsfPattern.exec(row[1]);
         if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
             logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - duration (" + 
             row[1] + ") is invalid.", logLevels.error);
             return false;
         }
         tcMediaElement.duration = compressMatch(tcMediaElement.duration);
+        hmsfPattern.lastIndex = 0;
 
         tcMediaElement.fileTC = hmsfPattern.exec(row[2]);
         if (!validateTime(tcMediaElement.fileTC, tcMediaElement.framerate)) {
