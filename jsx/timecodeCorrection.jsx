@@ -12,16 +12,31 @@ timecodeCorrection.processing = {
     timecodeUpdates: [],
     searchRecursive: true,
     searchTarget: 0, //0: root, 1: selection
-
+    timeTicks: 254016000000,
 
     cacheMediaObjects: function() {
         var i = 0;
         if (this.searchTarget === 0) {
             for (i = 0; i < app.project.rootItem.length; i++) {
-                this.processProjectItem(rootItem[i]);
+                if (!selectItems[i].isSequence()) {
+                    this.processProjectItem(rootItem[i]);
+                }
             }
         } else if (this.searchTarget === 1) {
+            var viewIDs = app.getProjectViewIDs();
+            for (i = 0; i < viewIDs.length; i++) {
+                var currentProject = app.getProjectFromViewID(viewIDs[i]);
 
+                if (currentProject.documentID === app.project.documentID) {
+                    var selectedItems = app.getProjectViewSelection(viewIDs[i]);
+                    
+                    for (i = 0; i < selectedItems.length; i++) {
+                        if (!selectItems[i].isSequence()) {
+                            this.processProjectItem(selectedItems[i]);
+                        }
+                    }
+                }
+            }            
         }
     },
     processProjectItem: function(projectItem) {
@@ -47,12 +62,24 @@ timecodeCorrection.processing = {
             }
         }
     },
-        /*
-        @ToDo
-        *iterate through selection / project tree
-        *add Media zu media array -> add object reference + name + duration + starttiem as extra values
-        *push result object to media array
-        */
+
+    updateTimecodes: function() {
+        var i,j = 0;
+        for (i = 0; i < timecodeUpdates.length; i++) {
+            for (j = 0; j < media.length; j++) {
+                if (timecodeUpdates[i].name === media.name[j] && timecodeUpdates.duration[i] === media.duration[j] &&
+                timecodeUpdates[i].fileTC === media.startTime[j]) {
+                    changeStartTime(timecodeUpdates[i], media[j]);
+                }
+            }
+        }
+    },
+    changeStartTime: function(update, projectItem) {
+        var newStartTime = (((update.hours*60 + update.minutes)*60) + update.seconds + (update.frames*100)/update.framerate) * timeTicks;
+        if (newStartTime) {
+            projectItem.setStartTime(new Time(newStartTime));
+        }
+    },
 
     processInput: function (tcObject) {
         if (this.setValues(tcObject)) {
@@ -62,7 +89,8 @@ timecodeCorrection.processing = {
         
     },
     setValues: function (tcObject) {
-        if (tcObject.timecodes !== undefined && tcObject.timescodes.length !== 0 && tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined) {
+        if (tcObject.timecodes !== undefined && tcObject.timescodes.length !== 0 && 
+        tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined) {
             this.timecodeUpdates = timecodes;
             this.searchRecursive = tcObject.searchRecursive;
             this.searchTarget = tcObject.searchTarget;
