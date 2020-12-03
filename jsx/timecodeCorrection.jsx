@@ -1,19 +1,19 @@
-var timecodeProcessing = timecodeProcessing || {};
+var timecodeCorrection = timecodeCorrection || {};
 
-var ProjectItemTypes = {
-    bin: "BIN",
-    clip: "CLIP",
-    file: "FILE",
-    root: "ROOT"
-}
-var kPProPrivateProjectMetadataURI = "http://ns.adobe.com/premierePrivateProjectMetaData/1.0/";
+timecodeCorrection.processing = {
+    ProjectItemTypes: {
+        bin: "BIN",
+        clip: "CLIP",
+        file: "FILE",
+        root: "ROOT"
+    },
+    kPProPrivateProjectMetadataURI: "http://ns.adobe.com/premierePrivateProjectMetaData/1.0/",
+    media: [],
+    timecodeUpdates: [],
+    searchRecursive: true,
+    searchTarget: 0, //0: root, 1: selection
 
-timecodeProcessing.media = [];
-timecodeProcessing.timecodeUpdates = [];
-timecodeProcessing.searchRecursive = true;
-timecodeProcessing.searchTarget = 0; //0: root, 1: selection
 
-timecodeProcessing.mediaLookup = {
     cacheMediaObjects: function() {
         var i = 0;
         if (this.searchTarget === 0) {
@@ -24,7 +24,6 @@ timecodeProcessing.mediaLookup = {
 
         }
     },
-
     processProjectItem: function(projectItem) {
         var i = 0;
 
@@ -41,30 +40,27 @@ timecodeProcessing.mediaLookup = {
             var footageInterpretation = projectItem.getFootageInterpretation();
             item.framerate = footageInterpretation.framerate;
 
-            media.push(item);
+            this.media.push(item);
         } else if (projectItem.type === ProjectItemTypes.bin && this.searchRecursive) {
             for (i = 0; i < projectItem.children.length; i++) {
                 this.processProjectItem(projectItem.children[i]);
             }
         }
-    }
+    },
         /*
         @ToDo
         *iterate through selection / project tree
         *add Media zu media array -> add object reference + name + duration + starttiem as extra values
         *push result object to media array
         */
-    }
-};
 
-timecodeProcessing.timecodeChange = {
     processInput: function (tcObject) {
         if (this.setValues(tcObject)) {
             this.cacheMediaObjects();
+            this.timeValuesToInt();
         }
         
     },
-
     setValues: function (tcObject) {
         if (tcObject.timecodes !== undefined && tcObject.timescodes.length !== 0 && tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined) {
             this.timecodeUpdates = timecodes;
@@ -74,5 +70,22 @@ timecodeProcessing.timecodeChange = {
         }
         return false;
     },
-}
-1;
+
+    timeValuesToInt: function() {
+        var i = 0;ä
+        for (i = 0; i < this.media.length; i++) {
+            if (this.media[i].hours) {
+                this.media[i].hours = Number(this.media[i].hours);
+            }
+            if (this.media[i].minutes) {
+                this.media[i].minutes = Number(this.media[i].minutes);
+            }
+            if (this.media[i].seconds) {
+                this.media[i].seconds = Number(this.media[i].seconds);
+            }
+            if (this.media[i].frames) {
+                this.media[i].frames = Number(this.media[i].frames);
+            }
+        }
+    }
+};
