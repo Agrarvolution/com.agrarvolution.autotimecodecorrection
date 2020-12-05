@@ -86,20 +86,6 @@ $(function () {
                     searchTarget: settings.searchTarget
                 };
 
-                jsx.file({file: 'timecodeCorrection.jsx', 
-                    callback: function(e) {
-                        alert(e);
-                    },
-                    replacements: {input: tcObject}
-                    });
-                
-                jsx.evalScript({
-                    script: 'timecodeCorrection.processInput(__input__);',
-                    replacements: {input: tcObject},
-                    callback: function(){},
-                    eval: true
-                });
-
             });            
         }
         

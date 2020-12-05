@@ -1,20 +1,4 @@
-#include 'json.jsx'
-
-var timecodeCorrection = timecodeCorrection || {};
-
-/*Setup eventlistener*/
-/*try {
-    var xLib = new ExternalObject("lib:\\PlugPlugExternalObject");
-} catch (e) {
-    alert(e);
-}*/
-
-var __input__;
-(function(input) {
-    timecodeCorrection.processing.processInput(input);
-});//(__input__);
-
-timecodeCorrection.processing = {
+timecodeCorrection = timecodeCorrection || {
     ProjectItemTypes: {
         bin: "BIN",
         clip: "CLIP",
@@ -135,5 +119,10 @@ timecodeCorrection.processing = {
 		eventObj.type = "com.adobe.csxs.events.cepLogging";
 		eventObj.data = text;
 		eventObj.dispatch(); 
+    },
+
+    alert: function() {
+        alert("Alert from timecodeCorrection.processing");
     }
 };
+
