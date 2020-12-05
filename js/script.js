@@ -34,6 +34,7 @@ let fileLoadedEvent = document.createEvent('Event');
 fileLoadedEvent.initEvent('fileLoaded', true, true);
 
 $(function () {
+        
     logging.logArea = $('#loggingArea')[0];
     logging.log = $('#log');
     log = $('#log');
@@ -41,6 +42,10 @@ $(function () {
 
     changeSettings(loadSettings());
 
+    $('#refresh').on('click', function(e) {
+        process.removeAllListeners();
+    });
+    
     $('#reset').on("click", function(e){
         e.preventDefault();
         changeSettings(defaultSettings);
@@ -81,8 +86,19 @@ $(function () {
                     searchTarget: settings.searchTarget
                 };
 
-                tcObject;
-
+                jsx.file({file: 'timecodeCorrection.jsx', 
+                    callback: function(e) {
+                        alert(e);
+                    },
+                    replacements: {input: tcObject}
+                    });
+                
+                jsx.evalScript({
+                    script: 'timecodeCorrection.processInput(__input__);',
+                    replacements: {input: tcObject},
+                    callback: function(){},
+                    eval: true
+                });
 
             });            
         }

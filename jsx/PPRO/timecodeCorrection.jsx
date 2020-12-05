@@ -1,4 +1,4 @@
-#include 'general'
+#include 'json.jsx'
 
 var timecodeCorrection = timecodeCorrection || {};
 
