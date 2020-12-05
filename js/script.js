@@ -22,6 +22,7 @@ const defaultSettings = {
     logging: false,
     searchRecursive: true,
     searchTarget: 1,
+    ignoreMediaStart: false
 }
 let settings = defaultSettings;
 
@@ -83,7 +84,8 @@ $(function () {
                 let tcObject = {
                     timeCodes: timeCodes,
                     searchRecursive: settings.searchRecursive,
-                    searchTarget: settings.searchTarget
+                    searchTarget: settings.searchTarget,
+                    ignoreMediaStart: settings.ignoreMediaStart
                 };
 
             });            
@@ -296,6 +298,8 @@ function readSettings() {
 
     settings.logging = form[loggingId].checked;
     settings.searchRecursive = form[searchRecursionId].checked;
+    settings.ignoreMediaStart = form[mediaStart].checked;
+    
     for (let i = 0; i <  form[searchTargetId].length; i++) {
         if(form[searchTargetId][i].checked) {
             settings.searchTarget = i;
@@ -310,6 +314,8 @@ function changeSettings(settings) {
 
         form[loggingId].checked = settings.logging;
         form[searchRecursionId].checked = settings.searchRecursive;
+        form[mediaStart].checked = settings.ignoreMediaStart;
+
         for (let i = 0; i <  form[searchTargetId].length; i++) {
             form[searchTargetId][i].checked = false;
             if (i === settings.searchTarget) {
