@@ -1,9 +1,17 @@
+#include 'json.jsx'
+
+if (ExternalObject.AdobeXMPScript === undefined) {
+
+     ExternalObject.AdobeXMPScript = new ExternalObject('lib:AdobeXMPScript');
+
+}
+
 var timecodeCorrection = timecodeCorrection || {
     ProjectItemTypes: {
-        bin: "BIN",
-        clip: "CLIP",
-        file: "FILE",
-        root: "ROOT"
+        bin: 2,
+        clip: 1,
+        file: 4,
+        root: 3
     },
     kPProPrivateProjectMetadataURI: "http://ns.adobe.com/premierePrivateProjectMetaData/1.0/",
     media: [],
@@ -15,10 +23,8 @@ var timecodeCorrection = timecodeCorrection || {
     cacheMediaObjects: function() {
         var i = 0;
         if (this.searchTarget === 0) {
-            for (i = 0; i < app.project.rootItem.length; i++) {
-                if (!selectItems[i].isSequence()) {
-                    this.processProjectItem(rootItem[i]);
-                }
+            for (i = 0; i < app.project.rootItem.children.length; i++) {
+                this.processProjectItem(app.project.rootItem.children[i]);
             }
         } else if (this.searchTarget === 1) {
             var viewIDs = app.getProjectViewIDs();
@@ -34,25 +40,37 @@ var timecodeCorrection = timecodeCorrection || {
                 }
             }            
         }
-        alert(JSON.lave(this.media));
+        alert(JSON(this.media));
     },
     processProjectItem: function(projectItem) {
         var i = 0;
+        this.media = [];
 
         if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.clip) {
             var item = {};
             item.projectItem = projectItem;
             item.name = projectItem.name;
             
-            var projectItemXMP = new XMPMeta(projectItem.getXMPMetadata());
-            item.duration = projectItemXMP.getProperty(kPProPrivateProjectMetadataURI, 'MediaDuration');
-            item.startTime = projectItemXMP.getProperty(kPProPrivateProjectMetadataURI, 'MediaStart');
+            var projectItemXMP = new XMPMeta(projectItem.getProjectMetadata());
 
+            item.duration = '';
+            if (projectItemXMP.doesPropertyExist(this.kPProPrivateProjectMetadataURI, 'Column.Intrinsic.VideoDuration') === true) {
+                item.duration = projectItemXMP.getProperty(this.kPProPrivateProjectMetadataURI, 'Column.Intrinsic.VideoDuration');
+                item.duration = item.duration.value;
+            }
+
+            item.startTime = '';
+            if (projectItemXMP.doesPropertyExist(this.kPProPrivateProjectMetadataURI, 'Column.Intrinsic.MediaStart') === true) {
+                item.startTime = projectItemXMP.getProperty(this.kPProPrivateProjectMetadataURI, 'Column.Intrinsic.MediaStart');
+                item.startTime = item.startTime.value
+            }
+            
             var footageInterpretation = projectItem.getFootageInterpretation();
-            item.framerate = footageInterpretation.framerate;
+            item.frameRate = footageInterpretation.frameRate;
 
             this.media.push(item);
-        } else if (projectItem.type === this.ProjectItemTypes.bin && this.searchRecursive) {
+            alert(JSON.lave(item));
+        } else if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.bin && this.searchRecursive) {
             for (i = 0; i < projectItem.children.length; i++) {
                 this.processProjectItem(projectItem.children[i]);
             }
@@ -61,11 +79,11 @@ var timecodeCorrection = timecodeCorrection || {
 
     updateTimecodes: function() {
         var i,j = 0;
-        for (i = 0; i < timecodeUpdates.length; i++) {
-            for (j = 0; j < media.length; j++) {
-                if (timecodeUpdates[i].name === media.name[j] && timecodeUpdates.duration[i] === media.duration[j] &&
-                timecodeUpdates[i].fileTC === media.startTime[j]) {
-                    changeStartTime(timecodeUpdates[i], media[j]);
+        for (i = 0; i < this.timecodeUpdates.length; i++) {
+            for (j = 0; j < this.media.length; j++) {
+                if (this.timecodeUpdates[i].name === this.media.name[j] && this.timecodeUpdates.duration[i] === this.media.duration[j] &&
+                this.timecodeUpdates[i].fileTC === this.media.startTime[j]) {
+                    changeStartTime(this.timecodeUpdates[i], this.media[j]);
                 }
             }
         }
@@ -78,7 +96,6 @@ var timecodeCorrection = timecodeCorrection || {
     },
 
     processInput: function (tcObject) {
-        alert(JSON.lave(tcObject));
         if (this.setValues(tcObject)) {
             this.cacheMediaObjects();
             this.timeValuesToInt();
