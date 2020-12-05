@@ -1,5 +1,6 @@
-//#include './timecodeCorrection.jsx'
-//#include './tests.jsx'
+#include './timecodeCorrection.jsx'
+
+//exclude when testing is finished -> used to debug individual methods
 /*************************************************************************
 * ADOBE CONFIDENTIAL
 * ___________________

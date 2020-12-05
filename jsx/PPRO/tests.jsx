@@ -1,2 +1,0 @@
-alert("true");
-//$.timecodeProcessing.alert();

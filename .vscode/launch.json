@@ -6,7 +6,7 @@
             "type": "extendscript-debug",
             "request": "launch",
             "name": "Debug in PPro ATC",
-            "program": "${workspaceFolder}/jsx/PPRO/Premiere.jsx",
+            "program": "${workspaceFolder}/jsx/tests.jsx",
             "stopOnEntry": false,
             "trace": true,
             "logFile" : "${workspaceFolder}/PProPanel_Log.txt",

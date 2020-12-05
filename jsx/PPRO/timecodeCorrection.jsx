@@ -1,4 +1,4 @@
-timecodeCorrection = timecodeCorrection || {
+var timecodeCorrection = timecodeCorrection || {
     ProjectItemTypes: {
         bin: "BIN",
         clip: "CLIP",
