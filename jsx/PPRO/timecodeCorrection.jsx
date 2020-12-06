@@ -73,8 +73,8 @@ $.timecodeCorrection = $.timecodeCorrection || {
         for (var i = 0; i < mediaLog.length; i++) {
             mediaLog[i].projectItem = "[ProjectItem - Object]";
         }
-        this.logToCEP(this.media.length + " media files have been discovered in " + this.searchTarget === 0 ? "project" ? 
-            this.searchTarget === 1 ? "selection" + ": " + JSON.stringify(mediaLog), this.logLevels.info);
+        this.logToCEP(this.media.length + " media files have been discovered in " + this.searchTarget === 0 ? "project" : 
+            this.searchTarget === 1 ? "selection" : "" + ": " + JSON.stringify(mediaLog), this.logLevels.info);
     },
     processProjectItem: function(projectItem) {
         var i = 0;
@@ -132,7 +132,7 @@ $.timecodeCorrection = $.timecodeCorrection || {
             return false;
         }
         return match;
-    }
+    },
 
     validateTime: function (time, framerate) {
         if (time === undefined || time == null || time.groups === undefined || time.groups == null) {

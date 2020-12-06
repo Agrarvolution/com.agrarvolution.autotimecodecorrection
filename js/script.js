@@ -149,7 +149,7 @@ function checkCSV(csv, version) {
             if (rowResult !== false) {
                 timeCodes.push(rowResult);
                 logging.addLog(rowResult.fileName + " - Parsed and staged at " + rowResult.framerate/100 + " fps. [" +
-                    rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);
+                    rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);  
             }
             
         }
@@ -196,7 +196,7 @@ function checkCSVrow (row, version, rowNumber) {
                 row[4] + ") is unexpected.", logLevels.info);
         }
 
-        let hmsfPattern = /^((?<hours>\d\d?)[:;])?(?<minutes>\d\d?)[:;](?<seconds>\d\d?)[:;](?<frames>\d\d?)$/g;
+        let hmsfPattern = /^((?<hours>\d\d?)[:;])?(?<minutes>\d\d?)[:;](?<seconds>\d\d?)[:;](?<frames>\d\d?\d?)$/g;
 
         tcMediaElement.duration = hmsfPattern.exec(row[1]);
         if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
