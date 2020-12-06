@@ -1,12 +1,19 @@
 #include '../json2.js'
 
+//add XMP context
 if (ExternalObject.AdobeXMPScript === undefined) {
 
      ExternalObject.AdobeXMPScript = new ExternalObject('lib:AdobeXMPScript');
 
 }
+//add event context
+/*try {
+    var xLib = new ExternalObject("lib:\\PlugPlugExternalObject");
+} catch (e) {
+    alert(e);
+}*/
 
-var timecodeCorrection = timecodeCorrection || {
+$.timecodeCorrection = $.timecodeCorrection || {
     ProjectItemTypes: {
         bin: 2,
         clip: 1,
@@ -17,7 +24,7 @@ var timecodeCorrection = timecodeCorrection || {
     media: [],
     timecodeUpdates: [],
     searchRecursive: true,
-    searchTarget: 0, //0: root, 1: selection
+    searchTarget: 1, //0: root, 1: selection
     timeTicks: 254016000000,
 
     cacheMediaObjects: function() {
@@ -30,6 +37,9 @@ var timecodeCorrection = timecodeCorrection || {
             }
         } else if (this.searchTarget === 1) {
             var viewIDs = app.getProjectViewIDs();
+            if (viewIDs === undefined) {
+                return false;
+            }
             for (i = 0; i < viewIDs.length; i++) {
                 var currentProject = app.getProjectFromViewID(viewIDs[i]);
 
@@ -100,6 +110,8 @@ var timecodeCorrection = timecodeCorrection || {
     },
 
     processInput: function (tcObject) {
+        alert("test");
+        alert(JSON.stringify(tcObject));
         if (this.setValues(tcObject)) {
             this.cacheMediaObjects();
             this.timeValuesToInt();

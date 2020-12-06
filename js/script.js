@@ -35,6 +35,8 @@ const csvVersion = {
 let fileLoadedEvent = document.createEvent('Event');
 fileLoadedEvent.initEvent('fileLoaded', true, true);
 
+
+
 $(function () {
         
     logging.logArea = $('#loggingArea')[0];
@@ -58,7 +60,7 @@ $(function () {
         logging.addLog("Default settings are restored.", logLevels.info);
     });
 
-    $('input:not(#source)').on("click", function (e) {
+    $('input:not(#source, #start)').on("click", function (e) {
         if (this.id !== undefined && this.id === 'logging') {
             logging.verboseLogging = this.checked;
             log.toggleClass('hidden');            
@@ -76,7 +78,7 @@ $(function () {
         let validation = validateForm(form);
 
         if (!validation) {
-            logging.addLog('Process canceled. Inputs are invalid. See logs above.', logLevels.info);
+            logging.addLog('Process canceled. Inputs are invalid.', logLevels.info);
         } else {
             processFile(validation);
             document.addEventListener('fileLoaded', function (e){
@@ -88,6 +90,11 @@ $(function () {
                     searchTarget: settings.searchTarget,
                     ignoreMediaStart: settings.ignoreMediaStart
                 };
+
+                let csInterface = new CSInterface();
+                csInterface.evalScript('$.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function(e) {
+                    alert(e);
+                })
 
             });            
         }
@@ -364,13 +371,13 @@ function loadSettings () {
 
 function validateForm (form) {
     if (form[sourceId].files.length === 0) {
-        this.addLog('No file has been selected.', logLevels.status);
+        logging.addLog('No file has been selected.', logLevels.status);
         return false;
     } else if (form[sourceId].files[0].size === 0) {
-        this.addLog('Selection is not a file.', logLevels.status);
+        logging.addLog('Selection is not a file.', logLevels.status);
         return false;
     } else if (!(form[sourceId].files[0].type === 'text/csv' || form[sourceId].files[0].type === 'application/vnd.ms-excel')) {
-        this.addLog('File type does not match.', logLevels.info);
+        logging.addLog('File type does not match.', logLevels.info);
     }
     return form[sourceId].files[0];
 }
