@@ -148,7 +148,8 @@ function checkCSV(csv, version) {
             let rowResult = checkCSVrow(csv[i], version, i);
             if (rowResult !== false) {
                 timeCodes.push(rowResult);
-                logging.addLog(rowResult.fileName + " - Parsed and staged at " + rowResult.framerate/100 + " fps. [" + rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);
+                logging.addLog(rowResult.fileName + " - Parsed and staged at " + rowResult.framerate/100 + " fps. [" +
+                    rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);
             }
             
         }
