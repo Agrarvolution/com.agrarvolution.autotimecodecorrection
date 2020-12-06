@@ -1,7 +1,110 @@
 [
     {
-        "projectItem": "[ProjectItem - Object]",
-        "name": "NZ6_0394.MOV",
+        "projectItem": {
+            "getOverrideColorSpaceList": [
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 0,
+                    "name": "sRGB",
+                    "primaries": 1,
+                    "transferCharacteristic": 13
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 6,
+                    "name": "Rec. 601 (NTSC)",
+                    "primaries": 6,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 6,
+                    "name": "Rec. 601 (PAL)",
+                    "primaries": 5,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 1,
+                    "name": "Rec. 709",
+                    "primaries": 1,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 1,
+                    "name": "Rec. 709 (Scene)",
+                    "primaries": 1,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2020",
+                    "primaries": 9,
+                    "transferCharacteristic": 14
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2020 (Scene)",
+                    "primaries": 9,
+                    "transferCharacteristic": 14
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 PQ",
+                    "primaries": 9,
+                    "transferCharacteristic": 16
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 PQ (Scene)",
+                    "primaries": 9,
+                    "transferCharacteristic": 16
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 HLG",
+                    "primaries": 9,
+                    "transferCharacteristic": 18
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 HLG (Scene)",
+                    "primaries": 9,
+                    "transferCharacteristic": 18
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 0,
+                    "name": "DCDM X'Y'Z'",
+                    "primaries": 10,
+                    "transferCharacteristic": 17
+                }
+            ],
+            "name": "NZ6_0394.MOV",
+            "nodeId": "000f4241",
+            "treePath": "\\Testproject.prproj\\NZ6_0394.MOV",
+            "type": 1
+        },
+        "fileName": "NZ6_0394.MOV",
         "nodeId": "000f4241",
         "duration": {
             "text": "00:00:05:10",
@@ -13,19 +116,122 @@
             }
         },
         "startTime": {
-            "text": "00:00:00:00",
+            "text": "08:22:12:18",
             "groups": {
-                "hours": 0,
-                "minutes": 0,
-                "seconds": 0,
-                "frames": 0
+                "hours": 8,
+                "minutes": 22,
+                "seconds": 12,
+                "frames": 18
             }
         },
         "frameRate": 25
     },
     {
-        "projectItem": "[ProjectItem - Object]",
-        "name": "***NEWNAME***",
+        "projectItem": {
+            "getOverrideColorSpaceList": [
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 0,
+                    "name": "sRGB",
+                    "primaries": 1,
+                    "transferCharacteristic": 13
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 6,
+                    "name": "Rec. 601 (NTSC)",
+                    "primaries": 6,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 6,
+                    "name": "Rec. 601 (PAL)",
+                    "primaries": 5,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 1,
+                    "name": "Rec. 709",
+                    "primaries": 1,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 1,
+                    "name": "Rec. 709 (Scene)",
+                    "primaries": 1,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2020",
+                    "primaries": 9,
+                    "transferCharacteristic": 14
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2020 (Scene)",
+                    "primaries": 9,
+                    "transferCharacteristic": 14
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 PQ",
+                    "primaries": 9,
+                    "transferCharacteristic": 16
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 PQ (Scene)",
+                    "primaries": 9,
+                    "transferCharacteristic": 16
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 HLG",
+                    "primaries": 9,
+                    "transferCharacteristic": 18
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 HLG (Scene)",
+                    "primaries": 9,
+                    "transferCharacteristic": 18
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 0,
+                    "name": "DCDM X'Y'Z'",
+                    "primaries": 10,
+                    "transferCharacteristic": 17
+                }
+            ],
+            "name": "***NEWNAME***",
+            "nodeId": "000f4243",
+            "treePath": "\\Testproject.prproj\\Test\\***NEWNAME***",
+            "type": 1
+        },
+        "fileName": "***NEWNAME***",
         "nodeId": "000f4243",
         "duration": {
             "text": "00:00:05:10",
@@ -48,8 +254,111 @@
         "frameRate": 25
     },
     {
-        "projectItem": "[ProjectItem - Object]",
-        "name": "NZ6_0394.MOV",
+        "projectItem": {
+            "getOverrideColorSpaceList": [
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 0,
+                    "name": "sRGB",
+                    "primaries": 1,
+                    "transferCharacteristic": 13
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 6,
+                    "name": "Rec. 601 (NTSC)",
+                    "primaries": 6,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 6,
+                    "name": "Rec. 601 (PAL)",
+                    "primaries": 5,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 1,
+                    "name": "Rec. 709",
+                    "primaries": 1,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 1,
+                    "name": "Rec. 709 (Scene)",
+                    "primaries": 1,
+                    "transferCharacteristic": 1
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2020",
+                    "primaries": 9,
+                    "transferCharacteristic": 14
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2020 (Scene)",
+                    "primaries": 9,
+                    "transferCharacteristic": 14
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 PQ",
+                    "primaries": 9,
+                    "transferCharacteristic": 16
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 PQ (Scene)",
+                    "primaries": 9,
+                    "transferCharacteristic": 16
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 HLG",
+                    "primaries": 9,
+                    "transferCharacteristic": 18
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": true,
+                    "matrixEquation": 9,
+                    "name": "Rec. 2100 HLG (Scene)",
+                    "primaries": 9,
+                    "transferCharacteristic": 18
+                },
+                {
+                    "empty": false,
+                    "isSceneReferred": false,
+                    "matrixEquation": 0,
+                    "name": "DCDM X'Y'Z'",
+                    "primaries": 10,
+                    "transferCharacteristic": 17
+                }
+            ],
+            "name": "NZ6_0394.MOV",
+            "nodeId": "000f4245",
+            "treePath": "\\Testproject.prproj\\Test\\Ablage\\NZ6_0394.MOV",
+            "type": 1
+        },
+        "fileName": "NZ6_0394.MOV",
         "nodeId": "000f4245",
         "duration": {
             "text": "00;00;02;07",

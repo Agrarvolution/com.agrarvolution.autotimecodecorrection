@@ -1,7 +1,7 @@
 #include './PPRO/TimecodeCorrection.jsx'
 #include './PPRO/Premiere.jsx'
 
-
+/*
 var tcObject = {
     timeCodes: [
         {
@@ -37,10 +37,10 @@ var tcObject = {
     ],
     searchRecursive: true,
     searchTarget: 0,
-    ignoreMediaStart: false,
+    ignoreMediaStart: true,
     logging: true
 };
 var timeCorrection = $.timecodeCorrection;
 //timeCorrection.cacheMediaObjects();
 timeCorrection.processInput(tcObject);
-//timeCorrection.updateTimeCodes();
+//timeCorrection.updateTimeCodes();*/
