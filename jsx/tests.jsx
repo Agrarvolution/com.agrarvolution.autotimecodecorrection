@@ -39,8 +39,8 @@ var tcObject = {
     searchTarget: 0,
     ignoreMediaStart: true,
     logging: true
-};
-var timeCorrection = $.timecodeCorrection;
+};*/
+//var timeCorrection = $.timecodeCorrection;
 //timeCorrection.cacheMediaObjects();
-timeCorrection.processInput(tcObject);
-//timeCorrection.updateTimeCodes();*/
+//timeCorrection.processInput(tcObject);
+//timeCorrection.updateTimeCodes();

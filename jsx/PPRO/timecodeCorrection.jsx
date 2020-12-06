@@ -91,8 +91,11 @@ $.timecodeCorrection = $.timecodeCorrection || {
         return true;
     },
     processProjectItem: function(projectItem) {
-        var i = 0;
+        if (this.searchTarget === 1 && this.mediaNodeIdExists(projectItem.nodeId)) {
+            return false;
+        }
 
+        var i = 0;
         if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.clip) {
             var item = {};
             item.projectItem = projectItem;
@@ -122,6 +125,14 @@ $.timecodeCorrection = $.timecodeCorrection || {
                 this.processProjectItem(projectItem.children[i]);
             }
         } 
+    },
+    mediaNodeIdExists: function(nodeId) {
+        for (var i = 0; i < this.media.length; i++) {
+            if (this.media.nodeId === nodeId) {
+                return true;
+            }
+        }
+        return false;
     },
 
     splitTimesToNumbers: function(){
@@ -233,7 +244,7 @@ $.timecodeCorrection = $.timecodeCorrection || {
             this.searchTarget = tcObject.searchTarget;
             this.ignoreMediaStart = tcObject.ignoreMediaStart;
             this.logging = tcObject.logging
-            this.logToCEP("Values have succesfully arrived in host.", this.logLevels.info);
+            this.logToCEP("Values have successfully arrived in host.", this.logLevels.info);
             
             return this.parseTimeGroups();
         }
