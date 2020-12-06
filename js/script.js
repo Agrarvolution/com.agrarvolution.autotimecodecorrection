@@ -22,7 +22,7 @@ const settingsKey = "autoTimecodeCorrection.settings";
 const defaultSettings = {
     logging: false,
     searchRecursive: true,
-    searchTarget: 1,
+    searchTarget: 0,
     ignoreMediaStart: false
 }
 let settings = defaultSettings;
@@ -46,7 +46,7 @@ $(function () {
 
     let csInterface = new CSInterface();
     csInterface.addEventListener("com.adobe.csxs.events.cepLogging", function (e) {
-        logging.addLog(e.data, logLevels.info);
+        logging.addLog(e.data.text , e.data.logLevel);
     });
 
     changeSettings(loadSettings());
@@ -96,13 +96,15 @@ $(function () {
                     ignoreMediaStart: settings.ignoreMediaStart
                 };
 
+                logging.addLog("Media to be updated: " + JSON.stringify(timeCodes), logLevels.info);
+                
                 csInterface.evalScript('$.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function(e) {
                     if (e === 'true') {
                         logging.addLog("Media has been updated. Process finished.", logLevels.status);
+                        $('#source')[0].value = "";
                     } else if (e === 'false') {
                         logging.addLog("Media hasn't been updated.", logLevels.status);
                     }
-                    alert(e);
                 })
 
             });            

@@ -7,11 +7,11 @@ if (ExternalObject.AdobeXMPScript === undefined) {
 
 }
 //add event context
-/*try {
-    var xLib = new ExternalObject("lib:\\PlugPlugExternalObject");
+try {
+    var xLib = new ExternalObject("lib:PlugPlugExternalObject");
 } catch (e) {
     alert(e);
-}*/
+}
 
 $.timecodeCorrection = $.timecodeCorrection || {
     ProjectItemTypes: {
@@ -90,7 +90,6 @@ $.timecodeCorrection = $.timecodeCorrection || {
             item.frameRate = footageInterpretation.frameRate;
 
             this.media.push(item);
-            //alert(JSON.lave(item));
         } else if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.bin && this.searchRecursive) {
             for (i = 0; i < projectItem.children.length; i++) {
                 this.processProjectItem(projectItem.children[i]);
@@ -125,14 +124,15 @@ $.timecodeCorrection = $.timecodeCorrection || {
         return false;
     },
     setValues: function (tcObject) {
-        //this.logToCEP(JSON.stringify(tcObject), this.logLevels.info);
-        if (tcObject !== undefined && tcObject.timecodes !== undefined && tcObject.timescodes.length !== 0
+        this.logToCEP(tcObject, this.logLevels.info);
+        if (tcObject !== undefined && tcObject.timeCodes !== undefined && tcObject.timeCodes.length !== undefined
         && tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined && 
         tcObject.ignoreMediaStart !== undefined) {
             this.timecodeUpdates = tcObject.timecodes;
             this.searchRecursive = tcObject.searchRecursive;
             this.searchTarget = tcObject.searchTarget;
             this.ignoreMediaStart = tcObject.ignoreMediaStart;
+            this.logToCEP("Values have succesfully arrived in host.", this.logLevels.info);
             return true;
         }
         return false;
@@ -157,10 +157,12 @@ $.timecodeCorrection = $.timecodeCorrection || {
     },
 
     logToCEP: function(text, logLevel) {
-        var eventObj = new CSXSEvent();
-		eventObj.type = "com.adobe.csxs.events.cepLogging";
-		//eventObj.data = JSON.stringify({text: text, logLevel: logLevel});
-		eventObj.dispatch(); 
+        if (xLib) {
+            var eventObj = new CSXSEvent();
+            eventObj.type = "com.adobe.csxs.events.cepLogging";
+            eventObj.data = JSON.stringify({text: text, logLevel: logLevel});
+            eventObj.dispatch(); 
+        }
     },
 
     alert: function() {
