@@ -35,6 +35,7 @@ const csvVersion = {
 let fileLoadedEvent = document.createEvent('Event');
 fileLoadedEvent.initEvent('fileLoaded', true, true);
 
+let lockForm = false;
 
 
 $(function () {
@@ -51,8 +52,8 @@ $(function () {
 
     changeSettings(loadSettings());
 
-    $('#refresh').on('click', function(e) {
-
+    $('#resetLog').on('click', function(e) {
+        logging.clearLog();
     });
     
     $('#reset').on("click", function(e){
@@ -77,6 +78,10 @@ $(function () {
 
     $('#start').on("click", function(e){
         e.preventDefault();
+        if (lockForm) {
+            return false;
+        }
+        lockForm = true;
         let form = document.forms[formId];
         let timeCodes = [];
 
@@ -84,6 +89,7 @@ $(function () {
 
         if (!validation) {
             logging.addLog('Process canceled. Inputs are invalid.', logLevels.info);
+            lockForm = false;
         } else {
             processFile(validation);
             document.addEventListener('fileLoaded', function (e){
@@ -106,6 +112,7 @@ $(function () {
                     } else if (e === 'false') {
                         logging.addLog("Media hasn't been updated. Process stopped.", logLevels.status);
                     }
+                    lockForm = false;
                 })
 
             });            
@@ -197,7 +204,7 @@ function checkCSVrow (row, version, rowNumber) {
                 row[4] + ") is unexpected.", logLevels.info);
         }
 
-        let hmsfPattern = /^(?<hours>[\d]{1,2})[:;](?<minutes>[\d]{1,2})[:;](?<seconds>[\d]{1,2})[:;]((?<frames>[\d]{1,}))?$/g;
+        let hmsfPattern = /^(?<hours>[\d]{1,2})[:;](?<minutes>[\d]{1,2})[:;](?<seconds>[\d]{1,2})([:;](?<frames>[\d]{1,}))?$/g;
 
         tcMediaElement.duration = hmsfPattern.exec(row[1]);
         if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
