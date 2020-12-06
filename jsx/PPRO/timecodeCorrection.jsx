@@ -181,10 +181,8 @@ $.timecodeCorrection = $.timecodeCorrection || {
                 if (this.timeCodeUpdates[i].fileName.toUpperCase() === this.media[j].fileName.toUpperCase() && 
                 this.compareTimes(this.timeCodeUpdates[i].duration.groups, this.media[j].duration.groups) && 
                     (this.ignoreMediaStart ? true : this.compareTimes(this.timeCodeUpdates[i].fileTC.groups, this.media[j].startTime.groups))
-                ) { // 
-                    
-                    alert("Change!");
-                    //changeStartTime(this.timeCodeUpdates[i], this.media[j]);
+                ) {
+                    changeStartTime(this.timeCodeUpdates[i], this.media[j]);
                 }
             }
         }
@@ -192,7 +190,7 @@ $.timecodeCorrection = $.timecodeCorrection || {
     },
     compareTimes: function(timeObj1, timeObj2) {
         if (timeObj1.hours === timeObj2.hours && timeObj1.minutes === timeObj2.minutes && 
-        timeObj1.seconds === timeObj2.seconds && (timeObj1.frames === NaN || timeObj2.frames === NaN) ? true : timeObj1.frames === timeObj2.frames) {
+        timeObj1.seconds === timeObj2.seconds && (timeObj1.frames !== NaN || timeObj2.frames !== NaN) ? true : timeObj1.frames === timeObj2.frames) {
             return true
         }
         return false;

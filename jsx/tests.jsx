@@ -37,7 +37,7 @@ var tcObject = {
     ],
     searchRecursive: true,
     searchTarget: 0,
-    ignoreMediaStart: true,
+    ignoreMediaStart: false,
     logging: true
 };
 var timeCorrection = $.timecodeCorrection;
