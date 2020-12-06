@@ -28,11 +28,12 @@ $.timecodeCorrection = $.timecodeCorrection || {
     },
     kPProPrivateProjectMetadataURI: "http://ns.adobe.com/premierePrivateProjectMetaData/1.0/",
     media: [],
-    timecodeUpdates: [],
+    timeCodeUpdates: [],
     searchRecursive: true,
     searchTarget: 1, //0: root, 1: selection
     ignoreMediaStart: true,
     timeTicks: 254016000000,
+    logging: true,
 
     cacheMediaObjects: function() {
         var i = 0;
@@ -62,19 +63,26 @@ $.timecodeCorrection = $.timecodeCorrection || {
             }            
         }
 
-        if (this.splitTimes()) {
+        if (this.splitTimesToNumbers()) {
             this.logToCEP("Processing time strings was successfull.", this.logLevels.info);
         } else {
             this.logToCEP("Processing time strings was unsuccessfull.", this.logLevels.critical);
             return false;
         }
 
-        var mediaLog = this.media;
-        for (var i = 0; i < mediaLog.length; i++) {
-            mediaLog[i].projectItem = "[ProjectItem - Object]";
+        var method = "";
+        switch (this.searchTarget) {
+            case 0: 
+                method = "project";
+                break;
+            case 1:
+                method = "selection";
+                break;
         }
-        this.logToCEP(this.media.length + " media files have been discovered in " + this.searchTarget === 0 ? "project" : 
-            this.searchTarget === 1 ? "selection" : "" + ": " + JSON.stringify(mediaLog), this.logLevels.info);
+        if (this.logging) {
+            this.logToCEP(this.media.length + " media files have been discovered in " + method + ": " + JSON.stringify(this.media), this.logLevels.info);
+        }
+        return true;
     },
     processProjectItem: function(projectItem) {
         var i = 0;
@@ -82,8 +90,9 @@ $.timecodeCorrection = $.timecodeCorrection || {
         if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.clip) {
             var item = {};
             item.projectItem = projectItem;
-            item.name = projectItem.name;
-            
+            item.fileName = projectItem.name;
+            item.nodeId = projectItem.nodeId;
+
             var projectItemXMP = new XMPMeta(projectItem.getProjectMetadata());
 
             item.duration = '';
@@ -116,65 +125,74 @@ $.timecodeCorrection = $.timecodeCorrection || {
                 this.logToCEP(this.media[i].name + " - Couldn't process duration. (" + this.media[i].duration + ")", this.logLevels.status);
                 return false;
             }
+            this.media[i].duration = durationMatch;
+
             var startTimeMatch = this.splitTimeToNumber(this.media[i].startTime, this.media[i].frameRate);
-            if (!durationMatch) {
+            if (!startTimeMatch) {
                 this.logToCEP(this.media[i].name + " - Couldn't process start time. (" + this.media[i].startTime + ")", this.logLevels.status);
                 return false;
             }
+            this.media[i].startTime = startTimeMatch;
         }
         return true;
     },
     splitTimeToNumber: function(timeText, frameRate) {
-        var hmsfPattern = /^((\d\d?)[:;])?(\d\d?)[:;](\d\d?)[:;](\d\d?\d?)$/g;
+        var hmsfPattern = /^([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,})$/g;
         var match = hmsfPattern.exec(timeText);
         match = this.validateTime(match, frameRate);
         if (!match) {
             return false;
         }
         return match;
+        alert(JSON.stringify(match));
     },
 
     validateTime: function (time, framerate) {
-        if (time === undefined || time == null || time.groups === undefined || time.groups == null) {
+        if (time === undefined || time == null) {
             return false;
         }
+        var groups = {};
+        groups.hours = Number(time[1]); 
+        groups.minutes = Number(time[2]); 
+        groups.seconds = Number(time[3]); 
+        groups.frames = Number(time[4]);
 
-        time.groups.hours = Number(time[1]);
-        time.groups.minutes = Number(time[2]);
-        time.groups.seconds = Number(time[3]);
-        time.groups.frames = Number(time[4]);
 
-        if (time.length < 4 || time.length > 6) {
-            return false;
-        }
-
-        if (time.groups.hour > 24 && time.groups.minutes > 60 && time.groups.seconds > 60 && 
-            time.groups.frames !== NaN && time.groups.frames > framerate) {
+        if (groups.hour > 24 && groups.minutes > 60 && groups.seconds > 60 && 
+            groups.frames !== NaN && groups.frames > framerate) {
             return false
         }
 
         return {
             text: time[0],
-            groups: time.groups,
+            groups: groups,
         };
     },
 
     updateTimeCodes: function() {
-        var i,j = 0;
-        for (i = 0; i < this.timecodeUpdates.length; i++) {
+        this.logToCEP(JSON.stringify(this), this.logLevels.info);
+        var i = 0,j = 0;
+        if (!(this.timeCodeUpdates !== undefined && this.media !== undefined)) {
+            return false;
+        }
+
+        for (i = 0; i < this.timeCodeUpdates.length; i++) {
             for (j = 0; j < this.media.length; j++) {
-                if (this.timecodeUpdates[i].name.toUpperCase() === this.media[j].name.toUpperCase() && 
-                this.compareTimes(this.timecodeUpdates.duration[i].groups, this.media.duration[j]) &&
-                this.ignoreMediaStart ? true : this.compareTimes(this.timecodeUpdates[i].fileTC.groups, this.media.startTime[j])) {
-                    changeStartTime(this.timecodeUpdates[i], this.media[j]);
+                if (this.timeCodeUpdates[i].fileName.toUpperCase() === this.media[j].fileName.toUpperCase() && 
+                this.compareTimes(this.timeCodeUpdates[i].duration.groups, this.media[j].duration.groups) && 
+                    (this.ignoreMediaStart ? true : this.compareTimes(this.timeCodeUpdates[i].fileTC.groups, this.media[j].startTime.groups))
+                ) { // 
+                    
+                    alert("Change!");
+                    //changeStartTime(this.timeCodeUpdates[i], this.media[j]);
                 }
             }
         }
         return true;
     },
     compareTimes: function(timeObj1, timeObj2) {
-        if (timeObj1.hours != null && timeObj1.hours != null && timeObj1.hours === timeObj2.hours &&
-        timeObj1.minutes === timeObj2.minutes && timeObj1.seconds === timeObj2.seconds && timeObj1.frames === timeObj2.frames) {
+        if (timeObj1.hours === timeObj2.hours && timeObj1.minutes === timeObj2.minutes && 
+        timeObj1.seconds === timeObj2.seconds && (timeObj1.frames === NaN || timeObj2.frames === NaN) ? true : timeObj1.frames === timeObj2.frames) {
             return true
         }
         return false;
@@ -201,44 +219,64 @@ $.timecodeCorrection = $.timecodeCorrection || {
         }
         return false;
     },
+
     setValues: function (tcObject) {
-        this.logToCEP(tcObject, this.logLevels.info);
         if (tcObject !== undefined && tcObject.timeCodes !== undefined && tcObject.timeCodes.length !== undefined
         && tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined && 
         tcObject.ignoreMediaStart !== undefined) {
-            this.timecodeUpdates = tcObject.timecodes;
+            this.timeCodeUpdates = tcObject.timeCodes;
             this.searchRecursive = tcObject.searchRecursive;
             this.searchTarget = tcObject.searchTarget;
             this.ignoreMediaStart = tcObject.ignoreMediaStart;
+            this.logging = tcObject.logging
             this.logToCEP("Values have succesfully arrived in host.", this.logLevels.info);
             
-            return this.timeValuesToInt();
+            return this.parseTimeGroups();
         }
         return false;
     },
 
-    timeValuesToInt: function() {
+    parseTimeGroups: function() {
         var i = 0;
-        for (i = 0; i < this.media.length; i++) {
-            if (this.media[i].hours) {
-                this.media[i].hours = Number(this.media[i].hours);
+        for (i = 0; i < this.timeCodeUpdates.length; i++) {
+            if (!this.timeValuesToInt(this.timeCodeUpdates[i].duration.groups)) {
+                this.logToCEP(this.timeCodeUpdates[i].name + " - Couln't parse duration. (" + this.timeCodeUpdates[i].duration.text + ")", this.logLevels.status);
+                return false;
             }
-            if (this.media[i].minutes) {
-                this.media[i].minutes = Number(this.media[i].minutes);
+            if (!this.timeValuesToInt(this.timeCodeUpdates[i].fileTC.groups)) {
+                this.logToCEP(this.timeCodeUpdates[i].name + " - Couln't parse file timecode. (" + this.timeCodeUpdates[i].fileTC.text + ")", this.logLevels.status);
+                return false;
             }
-            if (this.media[i].seconds) {
-                this.media[i].seconds = Number(this.media[i].seconds);
-            }
-            if (this.media[i].frames) {
-                this.media[i].frames = Number(this.media[i].frames);
+            if (!this.timeValuesToInt(this.timeCodeUpdates[i].audioTC.groups)) {
+                this.logToCEP(this.timeCodeUpdates[i].name + " - Couln't parse audio timecode. (" + this.timeCodeUpdates[i].audioTC.text + ")", this.logLevels.status);
+                return false;
             }
         }
         this.logToCEP("Inputs times have been converted to numbers.", this.logLevels.info);
         return true;
     },
+    timeValuesToInt: function(group) {
+        if (group) {
+            if (group.hours) {
+               group.hours = Number(group.hours);
+            }
+            if (group.minutes) {
+                group.minutes = Number(group.minutes);
+            }
+            if (group.seconds) {
+                group.seconds = Number(group.seconds);
+            }
+            if (group.frames) {
+                group.frames = Number(group.frames);
+            }
+            return true;
+        }
+        return false;
+    },
 
+    
     logToCEP: function(text, logLevel) {
-        if (xLib) {
+        if (xLib && this.logging) {
             var eventObj = new CSXSEvent();
             eventObj.type = "com.adobe.csxs.events.cepLogging";
             eventObj.data = JSON.stringify({text: text, logLevel: logLevel});

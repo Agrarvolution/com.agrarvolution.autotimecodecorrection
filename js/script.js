@@ -93,7 +93,8 @@ $(function () {
                     timeCodes: timeCodes,
                     searchRecursive: settings.searchRecursive,
                     searchTarget: settings.searchTarget,
-                    ignoreMediaStart: settings.ignoreMediaStart
+                    ignoreMediaStart: settings.ignoreMediaStart,
+                    logging: logging.verboseLogging
                 };
 
                 logging.addLog("Media to be updated: " + JSON.stringify(timeCodes), logLevels.info);
@@ -103,7 +104,7 @@ $(function () {
                         logging.addLog("Media has been updated. Process finished.", logLevels.status);
                         $('#source')[0].value = "";
                     } else if (e === 'false') {
-                        logging.addLog("Media hasn't been updated.", logLevels.status);
+                        logging.addLog("Media hasn't been updated. Process stopped.", logLevels.status);
                     }
                 })
 
@@ -196,7 +197,7 @@ function checkCSVrow (row, version, rowNumber) {
                 row[4] + ") is unexpected.", logLevels.info);
         }
 
-        let hmsfPattern = /^((?<hours>\d\d?)[:;])?(?<minutes>\d\d?)[:;](?<seconds>\d\d?)[:;](?<frames>\d\d?\d?)$/g;
+        let hmsfPattern = /^(?<hours>[\d]{1,2})[:;](?<minutes>[\d]{1,2})[:;](?<seconds>[\d]{1,2})[:;]((?<frames>[\d]{1,}))?$/g;
 
         tcMediaElement.duration = hmsfPattern.exec(row[1]);
         if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
@@ -252,8 +253,8 @@ function validateTime (time, framerate) {
         return false;
     }
 
-    if (time.groups.hour > 24 && time.groups.minutes > 60 && time.groups.seconds > 60 && 
-        time.groups.frames !== NaN && time.groups.frames > framerate) {
+    if (time.groups.hour > 24 || time.groups.minutes > 60 || time.groups.seconds > 60 || (time.groups.frames !== NaN && 
+         time.groups.frames >= framerate)) {
         return false
     }
 

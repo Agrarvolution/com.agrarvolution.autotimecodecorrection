@@ -1,0 +1,74 @@
+[
+    {
+        "projectItem": "[ProjectItem - Object]",
+        "name": "NZ6_0394.MOV",
+        "nodeId": "000f4241",
+        "duration": {
+            "text": "00:00:05:10",
+            "groups": {
+                "hours": 0,
+                "minutes": 0,
+                "seconds": 5,
+                "frames": 10
+            }
+        },
+        "startTime": {
+            "text": "00:00:00:00",
+            "groups": {
+                "hours": 0,
+                "minutes": 0,
+                "seconds": 0,
+                "frames": 0
+            }
+        },
+        "frameRate": 25
+    },
+    {
+        "projectItem": "[ProjectItem - Object]",
+        "name": "***NEWNAME***",
+        "nodeId": "000f4243",
+        "duration": {
+            "text": "00:00:05:10",
+            "groups": {
+                "hours": 0,
+                "minutes": 0,
+                "seconds": 5,
+                "frames": 10
+            }
+        },
+        "startTime": {
+            "text": "00:00:00:00",
+            "groups": {
+                "hours": 0,
+                "minutes": 0,
+                "seconds": 0,
+                "frames": 0
+            }
+        },
+        "frameRate": 25
+    },
+    {
+        "projectItem": "[ProjectItem - Object]",
+        "name": "NZ6_0394.MOV",
+        "nodeId": "000f4245",
+        "duration": {
+            "text": "00;00;02;07",
+            "groups": {
+                "hours": 0,
+                "minutes": 0,
+                "seconds": 2,
+                "frames": 7
+            }
+        },
+        "startTime": {
+            "text": "00;00;00;00",
+            "groups": {
+                "hours": 0,
+                "minutes": 0,
+                "seconds": 0,
+                "frames": 0
+            }
+        },
+        "frameRate": 59.9700000131595
+    }
+]
