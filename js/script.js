@@ -5,6 +5,7 @@ let sourceId = 'source';
 let searchTargetId = 'target';
 let searchRecursionId = 'recursion';
 let loggingId = 'logging';
+let mediaStartId = 'mediaStart';
 
 var logging = logging || {};
 logging.verboseLogging = true;
@@ -44,7 +45,7 @@ $(function () {
     changeSettings(loadSettings());
 
     $('#refresh').on('click', function(e) {
-        process.removeAllListeners();
+
     });
     
     $('#reset').on("click", function(e){
@@ -53,7 +54,7 @@ $(function () {
         $('#source')[0].value = "";
         storeSettings(defaultSettings);
         log.addClass('hidden');
-        clearLog();
+        logging.clearLog();
         logging.addLog("Default settings are restored.", logLevels.info);
     });
 
@@ -298,7 +299,8 @@ function readSettings() {
 
     settings.logging = form[loggingId].checked;
     settings.searchRecursive = form[searchRecursionId].checked;
-    settings.ignoreMediaStart = form[mediaStart].checked;
+
+    settings.ignoreMediaStart = form[mediaStartId].checked;
     
     for (let i = 0; i <  form[searchTargetId].length; i++) {
         if(form[searchTargetId][i].checked) {
@@ -314,7 +316,7 @@ function changeSettings(settings) {
 
         form[loggingId].checked = settings.logging;
         form[searchRecursionId].checked = settings.searchRecursive;
-        form[mediaStart].checked = settings.ignoreMediaStart;
+        form[mediaStartId].checked = settings.ignoreMediaStart;
 
         for (let i = 0; i <  form[searchTargetId].length; i++) {
             form[searchTargetId][i].checked = false;

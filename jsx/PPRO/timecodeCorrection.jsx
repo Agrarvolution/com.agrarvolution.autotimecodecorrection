@@ -1,4 +1,4 @@
-#include 'json.jsx'
+#include '../json2.js'
 
 if (ExternalObject.AdobeXMPScript === undefined) {
 
@@ -22,6 +22,8 @@ var timecodeCorrection = timecodeCorrection || {
 
     cacheMediaObjects: function() {
         var i = 0;
+        this.media = [];
+
         if (this.searchTarget === 0) {
             for (i = 0; i < app.project.rootItem.children.length; i++) {
                 this.processProjectItem(app.project.rootItem.children[i]);
@@ -34,17 +36,19 @@ var timecodeCorrection = timecodeCorrection || {
                 if (currentProject.documentID === app.project.documentID) {
                     var selectedItems = app.getProjectViewSelection(viewIDs[i]);
                     
-                    for (i = 0; i < selectedItems.length; i++) {
-                        this.processProjectItem(selectedItems[i]);
-                    }
+                    if (selectedItems !== undefined) {
+                        for (i = 0; i < selectedItems.length; i++) {
+                            this.processProjectItem(selectedItems[i]);
+                        }
+                    }  
                 }
             }            
         }
-        alert(JSON(this.media));
+        
+       alert(JSON.stringify(this.media));
     },
     processProjectItem: function(projectItem) {
         var i = 0;
-        this.media = [];
 
         if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.clip) {
             var item = {};
@@ -69,7 +73,7 @@ var timecodeCorrection = timecodeCorrection || {
             item.frameRate = footageInterpretation.frameRate;
 
             this.media.push(item);
-            alert(JSON.lave(item));
+            //alert(JSON.lave(item));
         } else if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.bin && this.searchRecursive) {
             for (i = 0; i < projectItem.children.length; i++) {
                 this.processProjectItem(projectItem.children[i]);
