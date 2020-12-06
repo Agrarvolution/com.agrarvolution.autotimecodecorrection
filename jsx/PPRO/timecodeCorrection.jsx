@@ -70,17 +70,23 @@ $.timecodeCorrection = $.timecodeCorrection || {
             return false;
         }
 
-        var method = "";
-        switch (this.searchTarget) {
-            case 0: 
-                method = "project";
-                break;
-            case 1:
-                method = "selection";
-                break;
-        }
+
         if (this.logging) {
-            this.logToCEP(this.media.length + " media files have been discovered in " + method + ": " + JSON.stringify(this.media), this.logLevels.info);
+            var method = "";
+            switch (this.searchTarget) {
+                case 0: 
+                    method = "project";
+                    break;
+                case 1:
+                    method = "selection";
+                    break;
+            }
+
+            var mediaLog = JSON.parse(JSON.stringify(this.media));
+            for (var i = 0; i < mediaLog.length; i++) {
+                mediaLog[i].projectItem = "[object ProjectItem]";
+            }
+            this.logToCEP(this.media.length + " media files have been discovered in " + method + ": " + JSON.stringify(mediaLog), this.logLevels.info);
         }
         return true;
     },
@@ -144,7 +150,6 @@ $.timecodeCorrection = $.timecodeCorrection || {
             return false;
         }
         return match;
-        alert(JSON.stringify(match));
     },
 
     validateTime: function (time, framerate) {
@@ -170,7 +175,6 @@ $.timecodeCorrection = $.timecodeCorrection || {
     },
 
     updateTimeCodes: function() {
-        this.logToCEP(JSON.stringify(this), this.logLevels.info);
         var i = 0,j = 0;
         if (!(this.timeCodeUpdates !== undefined && this.media !== undefined)) {
             return false;
@@ -182,7 +186,7 @@ $.timecodeCorrection = $.timecodeCorrection || {
                 this.compareTimes(this.timeCodeUpdates[i].duration.groups, this.media[j].duration.groups) && 
                     (this.ignoreMediaStart ? true : this.compareTimes(this.timeCodeUpdates[i].fileTC.groups, this.media[j].startTime.groups))
                 ) {
-                    changeStartTime(this.timeCodeUpdates[i], this.media[j]);
+                    this.changeStartTime(this.timeCodeUpdates[i], this.media[j]);
                 }
             }
         }
@@ -195,23 +199,24 @@ $.timecodeCorrection = $.timecodeCorrection || {
         }
         return false;
     },
-    changeStartTime: function(update, projectItem) {
+    changeStartTime: function(update, mediaItem) {
         var newStartTime = (((update.audioTC.groups.hours*60 + update.audioTC.groups.minutes)*60) + update.audioTC.groups.seconds + 
-            (update.audioTC.groups.frames*100)/update.framerate) * timeTicks;
+            (update.audioTC.groups.frames*100)/update.framerate) * this.timeTicks;
 
         if (newStartTime) {
-            projectItem.setStartTime(new Time(newStartTime));
-            this.logToCEP(projectItem.name + " - start time / timecode has been updated. (" + projectItem.startTime.text + "->" + 
+            mediaItem.projectItem.setStartTime(newStartTime.toString());
+            this.logToCEP(mediaItem.fileName + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" + 
                 update.audioTC.text + ")", this.logLevels.info);
             return true;
         }
 
-        this.logToCEP(projectItem.name + " - failed to update start time / timecode. (" + projectItem.startTime.text + "->" + 
+        this.logToCEP(mediaItem.fileName + " - failed to update start time / timecode. (" + mediaItem.startTime.text + "->" + 
                 update.audioTC.text + ")", this.logLevels.error);
         return false;
     },
 
     processInput: function (tcObject) {
+
         if (this.setValues(tcObject) && this.cacheMediaObjects() && this.updateTimeCodes()) {
             return true;
         }
@@ -219,6 +224,7 @@ $.timecodeCorrection = $.timecodeCorrection || {
     },
 
     setValues: function (tcObject) {
+        this.timeCodeUpdates = [];
         if (tcObject !== undefined && tcObject.timeCodes !== undefined && tcObject.timeCodes.length !== undefined
         && tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined && 
         tcObject.ignoreMediaStart !== undefined) {
