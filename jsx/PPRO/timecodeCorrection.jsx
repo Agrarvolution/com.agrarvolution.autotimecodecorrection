@@ -20,11 +20,18 @@ $.timecodeCorrection = $.timecodeCorrection || {
         file: 4,
         root: 3
     },
+    logLevels: {
+        critical: "CRIT",
+        status: "STAT",
+        info: "INFO",
+        error: "ERR "
+    },
     kPProPrivateProjectMetadataURI: "http://ns.adobe.com/premierePrivateProjectMetaData/1.0/",
     media: [],
     timecodeUpdates: [],
     searchRecursive: true,
     searchTarget: 1, //0: root, 1: selection
+    ignoreMediaStart: true,
     timeTicks: 254016000000,
 
     cacheMediaObjects: function() {
@@ -110,20 +117,22 @@ $.timecodeCorrection = $.timecodeCorrection || {
     },
 
     processInput: function (tcObject) {
-        alert("test");
-        alert(JSON.stringify(tcObject));
         if (this.setValues(tcObject)) {
             this.cacheMediaObjects();
             this.timeValuesToInt();
+            return true;
         }
-        
+        return false;
     },
     setValues: function (tcObject) {
-        if (tcObject.timecodes !== undefined && tcObject.timescodes.length !== 0 && 
-        tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined) {
+        //this.logToCEP(JSON.stringify(tcObject), this.logLevels.info);
+        if (tcObject !== undefined && tcObject.timecodes !== undefined && tcObject.timescodes.length !== 0
+        && tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined && 
+        tcObject.ignoreMediaStart !== undefined) {
             this.timecodeUpdates = tcObject.timecodes;
             this.searchRecursive = tcObject.searchRecursive;
             this.searchTarget = tcObject.searchTarget;
+            this.ignoreMediaStart = tcObject.ignoreMediaStart;
             return true;
         }
         return false;
@@ -147,10 +156,10 @@ $.timecodeCorrection = $.timecodeCorrection || {
         }
     },
 
-    logToCEP: function(text) {
+    logToCEP: function(text, logLevel) {
         var eventObj = new CSXSEvent();
 		eventObj.type = "com.adobe.csxs.events.cepLogging";
-		eventObj.data = text;
+		//eventObj.data = JSON.stringify({text: text, logLevel: logLevel});
 		eventObj.dispatch(); 
     },
 

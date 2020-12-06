@@ -44,6 +44,11 @@ $(function () {
     log = $('#log');
     error = $('#errorDisplay');
 
+    let csInterface = new CSInterface();
+    csInterface.addEventListener("com.adobe.csxs.events.cepLogging", function (e) {
+        logging.addLog(e.data, logLevels.info);
+    });
+
     changeSettings(loadSettings());
 
     $('#refresh').on('click', function(e) {
@@ -91,8 +96,12 @@ $(function () {
                     ignoreMediaStart: settings.ignoreMediaStart
                 };
 
-                let csInterface = new CSInterface();
                 csInterface.evalScript('$.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function(e) {
+                    if (e === 'true') {
+                        logging.addLog("Media has been updated. Process finished.", logLevels.status);
+                    } else if (e === 'false') {
+                        logging.addLog("Media hasn't been updated.", logLevels.status);
+                    }
                     alert(e);
                 })
 
