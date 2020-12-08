@@ -32,9 +32,6 @@ const csvVersion = {
     ttc116: 'tentacletimecodetool_1.16'
 };
 
-let fileLoadedEvent = document.createEvent('Event');
-fileLoadedEvent.initEvent('fileLoaded', true, true);
-
 let lockForm = false;
 
 
@@ -50,7 +47,9 @@ $(function () {
         logging.addLog(e.data.text , e.data.logLevel);
     });
 
-    changeSettings(loadSettings());
+    //restore settings
+    settings = loadSettings();
+    changeSettings(settings);
 
     $('#resetLog').on('click', function(e) {
         logging.clearLog();
@@ -94,18 +93,17 @@ $(function () {
             lockForm = false;
         } else {
             processFile(validation);        
-        }
-        
+        }      
     })    
-
-
-
-    let testCSV = 'File Name,Duration,File TC,Audio TC,Framerate\n"NZ6_0394.MOV","00:00:05","15:21:06:07","08:22:12:18","25.00",';
 });
 
-function handleFileLoad (e) {
+/**
+ * Handler for a fileLoaded event. Calls a csv validation and interfaces with Premiere to send the staged media and settings.
+ * @param {*} file parsed csv
+ */
+function handleFileLoad (file) {
     let timeCodes = [];
-    timeCodes = checkCSV(e.file, csvVersion.ttc116);
+    timeCodes = checkCSV(file, csvVersion.ttc116);
     
     let tcObject = {
         timeCodes: timeCodes,
@@ -130,12 +128,15 @@ function handleFileLoad (e) {
     return true;
 }
 
+/**
+ * Creates a file reader and loads the file and calls a csv-parser. 
+ * @param {string} file filepath
+ */
 function processFile(file) {
     const reader = new FileReader();
     reader.addEventListener('load', (reader) => {
         try {
-            fileLoadedEvent.file = CSVToArray(reader.target.result);
-            document.dispatchEvent(fileLoadedEvent);
+            handleFileLoad(CSVToArray(reader.target.result));
         } catch {
             logging.addLog("Failed to parse CSV.", logLevels.status);
             return false;
@@ -143,8 +144,12 @@ function processFile(file) {
     });
     reader.readAsText(file);
 }
-document.addEventListener('fileLoaded', handleFileLoad);   
-
+/**
+ * Validates parsed csv. Creates an array of timecode objects.
+ * @param {array} csv 
+ * @param {string} version 
+ * @returns {boolean|array.{fileName: string, framerate: number, duration: object, fileTC: object, audioTC: object}} false on failure
+ */
 function checkCSV(csv, version) {
     let timeCodes = [];
 
@@ -154,7 +159,7 @@ function checkCSV(csv, version) {
             csv[0][2] !== undefined && csv[0][2] === 'File TC' && csv[0][3] !== undefined &&
             csv[0][3] === 'Audio TC' && csv[0][4] !== undefined && csv[0][4] === 'Framerate')) {
             logging.addLog("CSV Headers don't match [TTCT_1.16]", logLevels.status);
-            return false;
+            return [];
         }
 
         //check rows + copy data
@@ -170,10 +175,16 @@ function checkCSV(csv, version) {
         return timeCodes;
     } else {
         logging.addLog("CSV version is unsupported.", logLevels.status);
-        return false;
+        return [];
     }
 }
-
+/**
+ * Parse one csv row into a new object.
+ * @param {array} row 
+ * @param {string} version 
+ * @param {number} rowNumber 
+ * @returns {boolean|array.{fileName: string, framerate: number, duration: object, fileTC: object, audioTC: object}} false on failure
+ */
 function checkCSVrow (row, version, rowNumber) {
     let tcMediaElement = {};
 
@@ -241,7 +252,11 @@ function checkCSVrow (row, version, rowNumber) {
         return tcMediaElement;
     }  
 }
-
+/**
+ * Discards unneeded references from a regex match.
+ * @param {object} timeMatched 
+ * @returns {{text: string, groups: object}}
+ */
 function compressMatch (timeMatched) {
     if (timeMatched !== undefined) {
         return {
@@ -250,7 +265,12 @@ function compressMatch (timeMatched) {
         }
     }
 }
-
+/**
+ * Validates a regex matched time string and converts its part into numbers.
+ * @param {object} time 
+ * @param {number} framerate 
+ * @returns {boolean} true on success
+ */
 function validateTime (time, framerate) {
     if (time === undefined || time == null || time.groups === undefined || time.groups == null) {
         return false;
@@ -273,11 +293,13 @@ function validateTime (time, framerate) {
 
     return true;
 }
-
-//@source https://www.bennadel.com/blog/1504-ask-ben-parsing-csv-strings-with-javascript-exec-regular-expression-command.htm
-// This will parse a delimited string into an array of
-// arrays. The default delimiter is the comma, but this
-// can be overriden in the second argument.
+/**
+ * This will parse a delimited string into an array of arrays. The default delimiter is the comma, but this can be overriden in the second argument.
+ * @source https://www.bennadel.com/blog/1504-ask-ben-parsing-csv-strings-with-javascript-exec-regular-expression-command.htm
+ * @param {string} strData 
+ * @param {string} strDelimiter 
+ * @returns {array}
+ */
 function CSVToArray (strData, strDelimiter){
 
     strDelimiter = (strDelimiter || ",");
@@ -324,6 +346,10 @@ function CSVToArray (strData, strDelimiter){
     return(arrData);
 }
 
+/**
+ * Reads settings from the gui.
+ * @returns {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}}
+ */
 function readSettings() {
     let form = $('form[name="atc"]')[0];
     let settings = {};
@@ -342,7 +368,10 @@ function readSettings() {
     }
     return settings;
 }
-
+/**
+ * Updates settings in gui.
+ * @param {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}} settings 
+ */
 function changeSettings(settings) {
     try {
         let form = $('form[name="atc"]')[0];
@@ -363,7 +392,11 @@ function changeSettings(settings) {
         logging.addLog("Failed to update settings.", logLevels.error);
     }
 }
-
+/**
+ * Stores settings in local storage.
+ * @param {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}} newSettings 
+ * @returns {boolean} true on success
+ */
 function storeSettings(newSettings) {
     let settingsTxt = "";
     try {
@@ -377,8 +410,10 @@ function storeSettings(newSettings) {
     localStorage.setItem(settingsKey, settingsTxt);
     return true;
 }
-
-
+/**
+ * Loads gui settings from local storage.
+ * @returns {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}}
+ */
 function loadSettings () {
     let settings = localStorage.getItem(settingsKey);
     if (settings === null) {
@@ -394,7 +429,10 @@ function loadSettings () {
     }
     return settings;
 }
-
+/**
+ * Validates the source file path.
+ * @param {*} form 
+ */
 function validateForm (form) {
     if (form[sourceId].files.length === 0) {
         logging.addLog('No file has been selected.', logLevels.status);
@@ -408,6 +446,11 @@ function validateForm (form) {
     return form[sourceId].files[0];
 }
 
+/**
+ * Adds a new log message to the log text area.
+ * @param {string} text 
+ * @param {string} level 
+ */
 logging.addLog = function (text, level) {
     if (level === logLevels.status) {
         error.text(text);
@@ -421,19 +464,27 @@ logging.addLog = function (text, level) {
     }
     
 }
-
+/**
+ * Clears the log area.
+ */
 logging.clearLog = function () {
     this.logArea.value = '';
 }
-
-
+/**
+ * Creates a new timestamp, which is put in fron of the log messages.
+ * @returns {string}
+ */
 logging.timeStamp = function () {
     let date = new Date();
     return "[" + this.leadingZero(date.getDate()) + "." + this.leadingZero(date.getMonth()+1) + "." + 
     date.getFullYear() + " - " + this.leadingZero(date.getHours()) + ":" + this.leadingZero(date.getMinutes()) + 
     ":" + this.leadingZero(date.getSeconds()) + "] ";
 }
-
+/**
+ * Adds a leading zero to single digit numbers.
+ * @param {number} number 
+ * @returns {string}
+ */
 logging.leadingZero = function (number) {
     return number < 10 ? "0" + number : number;
 }

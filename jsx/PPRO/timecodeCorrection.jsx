@@ -41,7 +41,7 @@ $.agrarvolution.timecodeCorrection = {
     /**
         *Function that start the timecode correction process. Usually called by the gui.
         *@param {Object} tcObject input object sent by the gui, contains settings and media references to be updated.
-        *@return {boolean} true on success | false on failure  
+        *@returns {boolean} true on success | false on failure  
     */
     processInput: function (tcObject) {
 
@@ -53,7 +53,7 @@ $.agrarvolution.timecodeCorrection = {
     /**
         *Processes values sent by the gui and ends process if it cannot do that.
         *@param {Object} tcObject input object sent by the gui, contains settings and media references to be updated. 
-        *@return {boolean} true on success | false on failure 
+        *@returns {boolean} true on success | false on failure 
     */
     setValues: function (tcObject) {
         this.timeCodeUpdates = [];
@@ -74,7 +74,7 @@ $.agrarvolution.timecodeCorrection = {
     /**
         *Calls timeValuesToInt(group) to convert time strings into numbers.
         *Can only be called after the internal timeCodeUpdate array has been set. (setValues(tcObject))
-        *@return {boolean} true on success | false on failure 
+        *@returns {boolean} true on success | false on failure 
     */
     parseTimeGroups: function() {
         var i = 0;
@@ -98,7 +98,7 @@ $.agrarvolution.timecodeCorrection = {
     /**
         *Converts strings into numbers, custom made for a group object. 
         *@param {Object} group - object created while looking for parts in a time string (e.g. hh:mm:ss:ff) -> groups.hour = hh, groups.minutes = mm, groups.seconds = ss, groups.frames = ff*
-        *@return {boolean} true - on success | false if group did not exist
+        *@returns {boolean} true - on success | false if group did not exist
     */
     timeValuesToInt: function(group) {
         if (group) {
@@ -120,7 +120,7 @@ $.agrarvolution.timecodeCorrection = {
     },
     /**
         *Loads media file / clips into a semipermanent cache. This avoids scraping through the app DOM everytime a match has to be found later.
-        *@return {boolean} false - not processed times, thus useless for comparisons, true - everything worked
+        *@returns {boolean} false - not processed times, thus useless for comparisons, true - everything worked
     */
     cacheMediaObjects: function() {
         var i = 0;
@@ -222,7 +222,7 @@ $.agrarvolution.timecodeCorrection = {
     /**
         *Checks if ProjectItem has already been stored in the media array. (Only useful when dealing with overlapping selections and deep search).
         *@param {string} nodeID unique Id of a ProjectItem object
-        *@return {boolean} true if it already is in use | false if it is not
+        *@returns {boolean} true if it already is in use | false if it is not
     */
     mediaNodeIdExists: function(nodeId) {
         for (var i = 0; i < this.media.length; i++) {
@@ -234,7 +234,7 @@ $.agrarvolution.timecodeCorrection = {
     },
     /**
         *Calls splutTimeToNumber for duration and startTime for every object in the media array.
-        *@return {boolean} false on any error | true on success
+        *@returns {boolean} false on any error | true on success
     */
     splitTimesToNumbers: function(){
         for (var i = 0; i < this.media.length; i++) {
@@ -258,7 +258,7 @@ $.agrarvolution.timecodeCorrection = {
         *Processes a time string into separate values and call validateTime to convert the separate values into numbers.
         *@param {string} timeText "hh:mm:ss:ff*"
         *@param {number} frameRate
-        *@return {boolean|object} false on failure | matched group on success
+        *@returns {boolean|object} false on failure | matched group on success
     */
     splitTimeToNumber: function(timeText, frameRate) {
         var hmsfPattern = /^([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,})$/g;
@@ -273,7 +273,7 @@ $.agrarvolution.timecodeCorrection = {
         *Process the matched values into numbers and stores it into a new object containing the text and the capture group.
         *@param {string} timeText "hh:mm:ss:ff*"
         *@param {number} frameRate
-        *@return {boolean|object} false on failure | matched group on success
+        *@returns {boolean|object} false on failure | matched group on success
     */
     validateTime: function (time, framerate) {
         if (time === undefined || time == null) {
@@ -300,7 +300,7 @@ $.agrarvolution.timecodeCorrection = {
 
     /**
         *Compares all objects in media and timeCodeUpdates and calls changeStartTime if a match has been found.
-        @return {boolean} true on success
+        @returns {boolean} true on success
     */
     updateTimeCodes: function() {
         var i = 0,j = 0;
@@ -324,7 +324,7 @@ $.agrarvolution.timecodeCorrection = {
         *Compares two time groups.
         *@param {{hour: number, minutes: number, seconds: number, frames: number}} timeObj1 
         *@param {{hour: number, minutes: number, seconds: number, frames: number}} timeObj1
-        *@return {boolean} true if values match 
+        *@returns {boolean} true if values match 
     */
     compareTimes: function(timeObj1, timeObj2) {
         if (timeObj1.hours === timeObj2.hours && timeObj1.minutes === timeObj2.minutes && 
@@ -337,7 +337,7 @@ $.agrarvolution.timecodeCorrection = {
         *Updates / changes the starttime of a given ProjectItem.
         *@param {audioTC: {text: string, groups: object}} update
         *@param {projectItem: object, fileName: string, startTime: object} mediaItem
-        *@return {boolean} true on success
+        *@returns {boolean} true on success
     */
     changeStartTime: function(update, mediaItem) {
         var newStartTime = (((update.audioTC.groups.hours*60 + update.audioTC.groups.minutes)*60) + update.audioTC.groups.seconds + 
