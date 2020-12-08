@@ -333,8 +333,8 @@ function readSettings() {
     settings.logging = form[loggingId].checked;
     settings.searchRecursive = form[searchRecursionId].checked;
 
-    settings.ignoreMediaStart = !form[mediaStartId].checked;
-    
+    settings.ignoreMediaStart = form[mediaStartId].checked;
+
     for (let i = 0; i <  form[searchTargetId].length; i++) {
         if(form[searchTargetId][i].checked) {
             settings.searchTarget = i;
@@ -349,7 +349,7 @@ function changeSettings(settings) {
 
         form[loggingId].checked = settings.logging;
         form[searchRecursionId].checked = settings.searchRecursive;
-        form[mediaStartId].checked = !settings.ignoreMediaStart;
+        form[mediaStartId].checked = settings.ignoreMediaStart;
 
         for (let i = 0; i <  form[searchTargetId].length; i++) {
             form[searchTargetId][i].checked = false;

@@ -39,8 +39,8 @@ var tcObject = {
     searchTarget: 0,
     ignoreMediaStart: true,
     logging: true
-};*/
-//var timeCorrection = $.agrarvolution.timecodeCorrection;
+};
+var timeCorrection = $.agrarvolution.timecodeCorrection;*/
 //timeCorrection.cacheMediaObjects();
 //timeCorrection.processInput(tcObject);
 //timeCorrection.updateTimeCodes();
