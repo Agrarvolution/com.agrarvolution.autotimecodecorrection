@@ -46,7 +46,7 @@ $(function () {
     error = $('#errorDisplay');
 
     let csInterface = new CSInterface();
-    csInterface.addEventListener("com.adobe.csxs.events.cepLogging", function (e) {
+    csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
         logging.addLog(e.data.text , e.data.logLevel);
     });
 
@@ -105,7 +105,7 @@ $(function () {
 
                 logging.addLog("Media to be updated: " + JSON.stringify(timeCodes), logLevels.info);
                 
-                csInterface.evalScript('$.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function(e) {
+                csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function(e) {
                     if (e === 'true') {
                         logging.addLog("Media has been updated. Process finished.", logLevels.status);
                         $('#source')[0].value = "";

@@ -13,7 +13,10 @@ try {
     alert(e);
 }
 
-$.timecodeCorrection = $.timecodeCorrection || {
+//define namespace
+$.agrarvolution = $.agrarvolution || {};
+
+$.agrarvolution.timecodeCorrection = {
     ProjectItemTypes: {
         bin: 2,
         clip: 1,
@@ -26,24 +29,108 @@ $.timecodeCorrection = $.timecodeCorrection || {
         info: "INFO",
         error: "ERR "
     },
-    kPProPrivateProjectMetadataURI: "http://ns.adobe.com/premierePrivateProjectMetaData/1.0/",
+    kPProPrivateProjectMetadataURI: "http://ns.adobe.com/premierePrivateProjectMetaData/1.0/", //XMP context for private Premiere meta data
     media: [],
     timeCodeUpdates: [],
     searchRecursive: true,
     searchTarget: 1, //0: root, 1: selection
     ignoreMediaStart: true,
-    timeTicks: 254016000000,
+    timeTicks: 254016000000, //per second
     logging: true,
 
+    /**
+        *Function that start the timecode correction process. Usually called by the gui.
+        *@param {Object} tcObject input object sent by the gui, contains settings and media references to be updated.
+        *@return {boolean} true on success | false on failure  
+    */
+    processInput: function (tcObject) {
+
+        if (this.setValues(tcObject) && this.cacheMediaObjects() && this.updateTimeCodes()) {
+            return true;
+        }
+        return false;
+    },
+    /**
+        *Processes values sent by the gui and ends process if it cannot do that.
+        *@param {Object} tcObject input object sent by the gui, contains settings and media references to be updated. 
+        *@return {boolean} true on success | false on failure 
+    */
+    setValues: function (tcObject) {
+        this.timeCodeUpdates = [];
+        if (tcObject !== undefined && tcObject.timeCodes !== undefined && tcObject.timeCodes.length !== undefined
+        && tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined && 
+        tcObject.ignoreMediaStart !== undefined) {
+            this.timeCodeUpdates = tcObject.timeCodes;
+            this.searchRecursive = tcObject.searchRecursive;
+            this.searchTarget = tcObject.searchTarget;
+            this.ignoreMediaStart = tcObject.ignoreMediaStart;
+            this.logging = tcObject.logging
+            this.logToCEP("Values have successfully arrived in host.", this.logLevels.info);
+            
+            return this.parseTimeGroups();
+        }
+        return false;
+    },
+    /**
+        *Calls timeValuesToInt(group) to convert time strings into numbers.
+        *Can only be called after the internal timeCodeUpdate array has been set. (setValues(tcObject))
+        *@return {boolean} true on success | false on failure 
+    */
+    parseTimeGroups: function() {
+        var i = 0;
+        for (i = 0; i < this.timeCodeUpdates.length; i++) {
+            if (!this.timeValuesToInt(this.timeCodeUpdates[i].duration.groups)) {
+                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse duration. (" + this.timeCodeUpdates[i].duration.text + ")", this.logLevels.status);
+                return false;
+            }
+            if (!this.timeValuesToInt(this.timeCodeUpdates[i].fileTC.groups)) {
+                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse file timecode. (" + this.timeCodeUpdates[i].fileTC.text + ")", this.logLevels.status);
+                return false;
+            }
+            if (!this.timeValuesToInt(this.timeCodeUpdates[i].audioTC.groups)) {
+                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse audio timecode. (" + this.timeCodeUpdates[i].audioTC.text + ")", this.logLevels.status);
+                return false;
+            }
+        }
+        this.logToCEP("Inputs times have been converted to numbers.", this.logLevels.info);
+        return true;
+    },
+    /**
+        *Converts strings into numbers, custom made for a group object. 
+        *@param {Object} group - object created while looking for parts in a time string (e.g. hh:mm:ss:ff) -> groups.hour = hh, groups.minutes = mm, groups.seconds = ss, groups.frames = ff*
+        *@return {boolean} true - on success | false if group did not exist
+    */
+    timeValuesToInt: function(group) {
+        if (group) {
+            if (group.hours) {
+               group.hours = Number(group.hours);
+            }
+            if (group.minutes) {
+                group.minutes = Number(group.minutes);
+            }
+            if (group.seconds) {
+                group.seconds = Number(group.seconds);
+            }
+            if (group.frames) {
+                group.frames = Number(group.frames);
+            }
+            return true;
+        }
+        return false;
+    },
+    /**
+        *Loads media file / clips into a semipermanent cache. This avoids scraping through the app DOM everytime a match has to be found later.
+        *@return {boolean} false - not processed times, thus useless for comparisons, true - everything worked
+    */
     cacheMediaObjects: function() {
         var i = 0;
         this.media = [];
 
-        if (this.searchTarget === 0) {
+        if (this.searchTarget === 0) { //process project root
             for (i = 0; i < app.project.rootItem.children.length; i++) {
                 this.processProjectItem(app.project.rootItem.children[i]);
             }
-        } else if (this.searchTarget === 1) {
+        } else if (this.searchTarget === 1) { //process selection
             var viewIDs = app.getProjectViewIDs();
             if (viewIDs === undefined) {
                 return false;
@@ -70,7 +157,7 @@ $.timecodeCorrection = $.timecodeCorrection || {
             return false;
         }
 
-
+        //extended log
         if (this.logging) {
             var method = "";
             switch (this.searchTarget) {
@@ -90,6 +177,12 @@ $.timecodeCorrection = $.timecodeCorrection || {
         }
         return true;
     },
+    /**
+        *Processes a single project item. 
+        *If it is a folder, it will call this method for all its children (depending on the settings.)
+        *If it is a clip it will store some informations about the ProjectItem and the ProjectItem itself into this namespace's media array for quicker search later in the process.
+        *@param {Object} projectItem Premiere Project Item, see CEP reference
+    */
     processProjectItem: function(projectItem) {
         if (this.searchTarget === 1 && this.mediaNodeIdExists(projectItem.nodeId)) {
             return false;
@@ -126,6 +219,11 @@ $.timecodeCorrection = $.timecodeCorrection || {
             }
         } 
     },
+    /**
+        *Checks if ProjectItem has already been stored in the media array. (Only useful when dealing with overlapping selections and deep search).
+        *@param {string} nodeID unique Id of a ProjectItem object
+        *@return {boolean} true if it already is in use | false if it is not
+    */
     mediaNodeIdExists: function(nodeId) {
         for (var i = 0; i < this.media.length; i++) {
             if (this.media.nodeId === nodeId) {
@@ -134,7 +232,10 @@ $.timecodeCorrection = $.timecodeCorrection || {
         }
         return false;
     },
-
+    /**
+        *Calls splutTimeToNumber for duration and startTime for every object in the media array.
+        *@return {boolean} false on any error | true on success
+    */
     splitTimesToNumbers: function(){
         for (var i = 0; i < this.media.length; i++) {
             var durationMatch = this.splitTimeToNumber(this.media[i].duration, this.media[i].frameRate);
@@ -153,6 +254,12 @@ $.timecodeCorrection = $.timecodeCorrection || {
         }
         return true;
     },
+    /**
+        *Processes a time string into separate values and call validateTime to convert the separate values into numbers.
+        *@param {string} timeText "hh:mm:ss:ff*"
+        *@param {number} frameRate
+        *@return {boolean|object} false on failure | matched group on success
+    */
     splitTimeToNumber: function(timeText, frameRate) {
         var hmsfPattern = /^([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,})$/g;
         var match = hmsfPattern.exec(timeText);
@@ -162,7 +269,12 @@ $.timecodeCorrection = $.timecodeCorrection || {
         }
         return match;
     },
-
+    /**
+        *Process the matched values into numbers and stores it into a new object containing the text and the capture group.
+        *@param {string} timeText "hh:mm:ss:ff*"
+        *@param {number} frameRate
+        *@return {boolean|object} false on failure | matched group on success
+    */
     validateTime: function (time, framerate) {
         if (time === undefined || time == null) {
             return false;
@@ -185,6 +297,11 @@ $.timecodeCorrection = $.timecodeCorrection || {
         };
     },
 
+
+    /**
+        *Compares all objects in media and timeCodeUpdates and calls changeStartTime if a match has been found.
+        @return {boolean} true on success
+    */
     updateTimeCodes: function() {
         var i = 0,j = 0;
         if (!(this.timeCodeUpdates !== undefined && this.media !== undefined)) {
@@ -203,6 +320,12 @@ $.timecodeCorrection = $.timecodeCorrection || {
         }
         return true;
     },
+    /**
+        *Compares two time groups.
+        *@param {{hour: number, minutes: number, seconds: number, frames: number}} timeObj1 
+        *@param {{hour: number, minutes: number, seconds: number, frames: number}} timeObj1
+        *@return {boolean} true if values match 
+    */
     compareTimes: function(timeObj1, timeObj2) {
         if (timeObj1.hours === timeObj2.hours && timeObj1.minutes === timeObj2.minutes && 
         timeObj1.seconds === timeObj2.seconds && (timeObj1.frames !== NaN || timeObj2.frames !== NaN) ? true : timeObj1.frames === timeObj2.frames) {
@@ -210,6 +333,12 @@ $.timecodeCorrection = $.timecodeCorrection || {
         }
         return false;
     },
+    /**
+        *Updates / changes the starttime of a given ProjectItem.
+        *@param {audioTC: {text: string, groups: object}} update
+        *@param {projectItem: object, fileName: string, startTime: object} mediaItem
+        *@return {boolean} true on success
+    */
     changeStartTime: function(update, mediaItem) {
         var newStartTime = (((update.audioTC.groups.hours*60 + update.audioTC.groups.minutes)*60) + update.audioTC.groups.seconds + 
             (update.audioTC.groups.frames*100)/update.framerate) * this.timeTicks;
@@ -226,81 +355,19 @@ $.timecodeCorrection = $.timecodeCorrection || {
         return false;
     },
 
-    processInput: function (tcObject) {
-
-        if (this.setValues(tcObject) && this.cacheMediaObjects() && this.updateTimeCodes()) {
-            return true;
-        }
-        return false;
-    },
-
-    setValues: function (tcObject) {
-        this.timeCodeUpdates = [];
-        if (tcObject !== undefined && tcObject.timeCodes !== undefined && tcObject.timeCodes.length !== undefined
-        && tcObject.searchRecursive !== undefined && tcObject.searchTarget !== undefined && 
-        tcObject.ignoreMediaStart !== undefined) {
-            this.timeCodeUpdates = tcObject.timeCodes;
-            this.searchRecursive = tcObject.searchRecursive;
-            this.searchTarget = tcObject.searchTarget;
-            this.ignoreMediaStart = tcObject.ignoreMediaStart;
-            this.logging = tcObject.logging
-            this.logToCEP("Values have successfully arrived in host.", this.logLevels.info);
-            
-            return this.parseTimeGroups();
-        }
-        return false;
-    },
-
-    parseTimeGroups: function() {
-        var i = 0;
-        for (i = 0; i < this.timeCodeUpdates.length; i++) {
-            if (!this.timeValuesToInt(this.timeCodeUpdates[i].duration.groups)) {
-                this.logToCEP(this.timeCodeUpdates[i].name + " - Couln't parse duration. (" + this.timeCodeUpdates[i].duration.text + ")", this.logLevels.status);
-                return false;
-            }
-            if (!this.timeValuesToInt(this.timeCodeUpdates[i].fileTC.groups)) {
-                this.logToCEP(this.timeCodeUpdates[i].name + " - Couln't parse file timecode. (" + this.timeCodeUpdates[i].fileTC.text + ")", this.logLevels.status);
-                return false;
-            }
-            if (!this.timeValuesToInt(this.timeCodeUpdates[i].audioTC.groups)) {
-                this.logToCEP(this.timeCodeUpdates[i].name + " - Couln't parse audio timecode. (" + this.timeCodeUpdates[i].audioTC.text + ")", this.logLevels.status);
-                return false;
-            }
-        }
-        this.logToCEP("Inputs times have been converted to numbers.", this.logLevels.info);
-        return true;
-    },
-    timeValuesToInt: function(group) {
-        if (group) {
-            if (group.hours) {
-               group.hours = Number(group.hours);
-            }
-            if (group.minutes) {
-                group.minutes = Number(group.minutes);
-            }
-            if (group.seconds) {
-                group.seconds = Number(group.seconds);
-            }
-            if (group.frames) {
-                group.frames = Number(group.frames);
-            }
-            return true;
-        }
-        return false;
-    },
-
     
+
+    /**
+    *CSXSEvent wrapping function to send log messages to the gui.
+    *@param {string} text - text that should be sent to gui
+    *@param {string} logLevel - choose which log level to display in gui
+    */
     logToCEP: function(text, logLevel) {
         if (xLib && this.logging) {
             var eventObj = new CSXSEvent();
-            eventObj.type = "com.adobe.csxs.events.cepLogging";
+            eventObj.type = "com.adobe.csxs.events.agrarvolution.cepLogging";
             eventObj.data = JSON.stringify({text: text, logLevel: logLevel});
             eventObj.dispatch(); 
         }
     },
-
-    alert: function() {
-        alert("Alert from timecodeCorrection.processing");
-    }
 };
-

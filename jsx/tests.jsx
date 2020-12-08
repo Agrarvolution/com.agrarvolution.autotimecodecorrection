@@ -40,7 +40,7 @@ var tcObject = {
     ignoreMediaStart: true,
     logging: true
 };*/
-//var timeCorrection = $.timecodeCorrection;
+//var timeCorrection = $.agrarvolution.timecodeCorrection;
 //timeCorrection.cacheMediaObjects();
 //timeCorrection.processInput(tcObject);
 //timeCorrection.updateTimeCodes();
