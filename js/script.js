@@ -86,39 +86,14 @@ $(function () {
         }
         lockForm = true;
         let form = document.forms[formId];
-        let timeCodes = [];
-
+        
         let validation = validateForm(form);
 
         if (!validation) {
             logging.addLog('Process canceled. Inputs are invalid.', logLevels.info);
             lockForm = false;
         } else {
-            processFile(validation);
-            document.addEventListener('fileLoaded', function (e){
-                timeCodes = checkCSV(e.file, csvVersion.ttc116);
-                
-                let tcObject = {
-                    timeCodes: timeCodes,
-                    searchRecursive: settings.searchRecursive,
-                    searchTarget: settings.searchTarget,
-                    ignoreMediaStart: settings.ignoreMediaStart,
-                    logging: logging.verboseLogging
-                };
-
-                logging.addLog("Media to be updated: " + JSON.stringify(timeCodes), logLevels.info);
-                
-                csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function(e) {
-                    if (e === 'true') {
-                        logging.addLog("Media has been updated. Process finished.", logLevels.status);
-                        $('#source')[0].value = "";
-                    } else if (e === 'false') {
-                        logging.addLog("Media hasn't been updated. Process stopped.", logLevels.status);
-                    }
-                    lockForm = false;
-                })
-
-            });            
+            processFile(validation);        
         }
         
     })    
@@ -127,6 +102,33 @@ $(function () {
 
     let testCSV = 'File Name,Duration,File TC,Audio TC,Framerate\n"NZ6_0394.MOV","00:00:05","15:21:06:07","08:22:12:18","25.00",';
 });
+
+function handleFileLoad (e) {
+    let timeCodes = [];
+    timeCodes = checkCSV(e.file, csvVersion.ttc116);
+    
+    let tcObject = {
+        timeCodes: timeCodes,
+        searchRecursive: settings.searchRecursive,
+        searchTarget: settings.searchTarget,
+        ignoreMediaStart: settings.ignoreMediaStart,
+        logging: logging.verboseLogging
+    };
+
+    logging.addLog("Media to be updated: " + JSON.stringify(timeCodes), logLevels.info);
+    
+    let csInterface = new CSInterface();
+    csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function(e) {
+        if (e === 'true') {
+            logging.addLog("Media has been updated. Process finished.", logLevels.status);
+            $('#source')[0].value = "";
+        } else if (e === 'false') {
+            logging.addLog("Media hasn't been updated. Process stopped.", logLevels.status);
+        }
+        lockForm = false;
+    })
+    return true;
+}
 
 function processFile(file) {
     const reader = new FileReader();
@@ -141,6 +143,7 @@ function processFile(file) {
     });
     reader.readAsText(file);
 }
+document.addEventListener('fileLoaded', handleFileLoad);   
 
 function checkCSV(csv, version) {
     let timeCodes = [];
