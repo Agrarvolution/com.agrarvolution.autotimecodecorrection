@@ -104,7 +104,7 @@
             "treePath": "\\Testproject.prproj\\NZ6_0394.MOV",
             "type": 1
         },
-        "fileName": "NZ6_0394.MOV",
+        "fileName": "FileName.MOV",
         "nodeId": "000f4241",
         "duration": {
             "text": "00:00:05:10",
@@ -353,12 +353,12 @@
                     "transferCharacteristic": 17
                 }
             ],
-            "name": "NZ6_0394.MOV",
+            "name": "FileName.MOV",
             "nodeId": "000f4245",
-            "treePath": "\\Testproject.prproj\\Test\\Ablage\\NZ6_0394.MOV",
+            "treePath": "\\Testproject.prproj\\Test\\Ablage\\FileName.MOV",
             "type": 1
         },
-        "fileName": "NZ6_0394.MOV",
+        "fileName": "FileName.MOV",
         "nodeId": "000f4245",
         "duration": {
             "text": "00;00;02;07",

@@ -51,8 +51,8 @@
 			<premierePrivateProjectMetaData:Column.Intrinsic.TapeName>***TAPENAME***</premierePrivateProjectMetaData:Column.Intrinsic.TapeName>
 			<premierePrivateProjectMetaData:Column.PropertyText.Description>***DESCRIPTION***</premierePrivateProjectMetaData:Column.PropertyText.Description>
 			<premierePrivateProjectMetaData:Column.Intrinsic.LogNote>This log note inserted by PProPanel.</premierePrivateProjectMetaData:Column.Intrinsic.LogNote>
-			<premierePrivateProjectMetaData:Column.Intrinsic.FilePath>E:\Programme\Premiere Pro CEP\NZ6_0394.MOV</premierePrivateProjectMetaData:Column.Intrinsic.FilePath>
-			<premierePrivateProjectMetaData:Column.Intrinsic.FileName>NZ6_0394.MOV</premierePrivateProjectMetaData:Column.Intrinsic.FileName>
+			<premierePrivateProjectMetaData:Column.Intrinsic.FilePath>E:\Programme\Premiere Pro CEP\FileName.MOV</premierePrivateProjectMetaData:Column.Intrinsic.FilePath>
+			<premierePrivateProjectMetaData:Column.Intrinsic.FileName>FileName.MOV</premierePrivateProjectMetaData:Column.Intrinsic.FileName>
 			<premierePrivateProjectMetaData:Column.PropertyText.Status>Online</premierePrivateProjectMetaData:Column.PropertyText.Status>
 			<premierePrivateProjectMetaData:Column.PropertyBool.Good>False</premierePrivateProjectMetaData:Column.PropertyBool.Good>
 			<premierePrivateProjectMetaData:Column.PropertyBool.Hide>False</premierePrivateProjectMetaData:Column.PropertyBool.Hide>
