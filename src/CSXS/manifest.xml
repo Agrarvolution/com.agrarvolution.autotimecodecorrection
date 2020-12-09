@@ -38,7 +38,7 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 					<Geometry>
 						<Size>
 							<Height>500</Height>
-							<Width>300</Width>
+							<Width>350</Width>
 						</Size>
 					</Geometry>
 				</UI>
