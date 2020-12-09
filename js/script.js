@@ -46,7 +46,10 @@ $(function () {
     explainer = $('#explainer');
     fileEl = $('#file');
 
+    onAppThemeColorChanged('');
+    
     let csInterface = new CSInterface();
+    csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, onAppThemeColorChanged);
     csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
         logging.addLog(e.data.text , e.data.logLevel);
     });
@@ -496,4 +499,117 @@ logging.timeStamp = function () {
  */
 logging.leadingZero = function (number) {
     return number < 10 ? "0" + number : number;
+}
+
+
+/**
+ * Retrieves the appSkinInfo from Premiere.
+ * @param {*} event 
+ */
+function onAppThemeColorChanged(event) {
+	// Should get a latest HostEnvironment object from application.
+	var skinInfo = JSON.parse(window.__adobe_cep__.getHostEnvironment()).appSkinInfo;
+	// Gets the style information such as color info from the skinInfo, 
+	// and redraw all UI controls of your extension according to the style info.
+	updateThemeWithAppSkinInfo(skinInfo);
+} 
+
+function updateThemeWithAppSkinInfo(appSkinInfo) {
+
+	//Update the background color of the panel
+
+	let panelBackgroundColor = toHex(appSkinInfo.panelBackgroundColor.color);
+	let systemHighlightColor = toHex(appSkinInfo.systemHighlightColor);
+
+    let textColor = lightenDarkenColor(panelBackgroundColor, 150);
+        
+    let cssStyle = "[type=checkbox]:not(:checked) + label::before, [type=checkbox]:checked + label::before,\n"+ 
+        "[type=radio]:not(:checked) + label::before, [type=radio]:checked + label::before, section#log,\n" +
+        "input[type=\"file\"]::-webkit-file-upload-button   {\n" +
+            "border-color: " + textColor + ";\n" +
+        "}\n" +
+        "[type=checkbox]:not(:checked) + label::after, [type=checkbox]:checked + label::after, input[type=\"file\"]::-webkit-file-upload-button {\n" +
+            "color: " + textColor +";\n" +
+        "}\n" +
+        ".autotc_gui button:hover, .autotc_gui input[type=submit]:hover , input[type=file]::-webkit-file-upload-button:hover, \n" +
+        ".autotc_gui input:not([type=file]):hover, .autotc_gui input + span:hover, [type=checkbox]:checked:hover + label,\n" +
+        "[type=checkbox]:not(:checked):hover + label, [type=checkbox]:checked:hover + label:before,\n" +
+        "[type=checkbox]:not(:checked):hover + label:before, [type=checkbox]:checked:hover + label:after,\n" +
+        "[type=checkbox]:not(:checked):hover + label:after, [type=radio]:not(:checked):hover + label, \n" +
+        "[type=radio]:checked:hover + label, [type=radio]:checked:hover + label:before, \n" +
+        "[type=radio]:not(:checked):hover + label:before, [type=radio]:checked:hover + label:after, \n" +
+        "[type=radio]:not(:checked):hover + label:after  {\n" +
+            "color: " + systemHighlightColor + ";\n" +
+            "border-color:" + systemHighlightColor + ";\n" +
+        "}\n" +
+        ".file input[type=\"file\"], .autotc_gui textarea#loggingArea {\n" +
+            "color: " + panelBackgroundColor + ";\n" +
+            "background-color: " + textColor + ";\n" +
+        "}\n" +
+        "body.autotc_gui, .autotc_gui button, .autotc_gui input[type=submit], input[type=\"file\"]::-webkit-file-upload-button {\n" +
+            "color: " + textColor + ";\n" +
+            "background-color: " + panelBackgroundColor + ";\n" +
+        "}\n";
+    $("#dynStyle")[0].textContent = cssStyle;
+	
+	//Update the default text style with pp values
+
+}
+/**
+ * Convert the Color object to string in hexadecimal format;
+ */
+
+function toHex(color, delta) {
+	function computeValue(value, delta) {
+		var computedValue = !isNaN(delta) ? value + delta : value;
+		if (computedValue < 0) {
+			computedValue = 0;
+		} else if (computedValue > 255) {
+			computedValue = 255;
+		}
+
+		computedValue = Math.round(computedValue).toString(16);
+		return computedValue.length == 1 ? "0" + computedValue : computedValue;
+	}
+
+	var hex = "";
+	if (color) {
+		hex = computeValue(color.red, delta) + computeValue(color.green, delta) + computeValue(color.blue, delta);
+	}
+	return "#" + hex;
+}
+/**
+ * @author Chris Coyier
+ * @source https://css-tricks.com/snippets/javascript/lighten-darken-color/
+ * @param {*} col 
+ * @param {*} amt 
+ */
+function lightenDarkenColor(col, amt) {
+  
+    var usePound = false;
+  
+    if (col[0] == "#") {
+        col = col.slice(1);
+        usePound = true;
+    }
+ 
+    var num = parseInt(col,16);
+ 
+    var r = (num >> 16) + amt;
+ 
+    if (r > 255) r = 255;
+    else if  (r < 0) r = 0;
+ 
+    var b = ((num >> 8) & 0x00FF) + amt;
+ 
+    if (b > 255) b = 255;
+    else if  (b < 0) b = 0;
+ 
+    var g = (num & 0x0000FF) + amt;
+ 
+    if (g > 255) g = 255;
+    else if (g < 0) g = 0;
+ 
+    return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
+  
 }

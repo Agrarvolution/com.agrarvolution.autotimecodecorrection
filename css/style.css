@@ -3,14 +3,13 @@
 	text-rendering: optimizeLegibility !important;
 	-webkit-font-smoothing: antialiased !important;
 	font-size: 10pt;
-	color: lightgray;
 }
 
 body.autotc_gui {
 	padding: 0 1rem;
 	min-width: 250px; 
 	font-size: 9pt;
-	color: #e1e1e1;
+	color:  #b9b9b9;
 	background-color: #232323;
 }
 
@@ -44,7 +43,7 @@ body.autotc_gui {
     width: 100%;
     line-height: 1.5;
     color: #232323;
-    background-color: #fff;
+    background-color: #b9b9b9;
     background-clip: padding-box;
 	border-radius: .25rem;
 	height: 2em;
@@ -52,14 +51,14 @@ body.autotc_gui {
 }
 
 section#log {
-	border-top: 1px solid lightgray;
+	border-top: 1px solid #b9b9b9;
 }
 
 input[type="file"]::-webkit-file-upload-button {
 	padding: .25rem 1rem;
-	color: lightgray;
+	color: #b9b9b9;
 	background-color: #232323;
-	border: .075rem solid lightgray;
+	border: .075rem solid #b9b9b9;
 	border-radius: .25rem 0 0 .25rem;
 	height: 100%;
 	font-size: 0.9em;	
@@ -69,7 +68,7 @@ input[type="file"]::-webkit-file-upload-button {
 .autotc_gui button, .autotc_gui input[type=submit] {
 	margin: 1rem auto;
 	font-size: 0.7rem;
-	border:1px solid gray;
+	border:1px solid #b9b9b9;
 	border-radius: 50px;
 	background-color: transparent;
 	background-image: none;
@@ -77,17 +76,19 @@ input[type="file"]::-webkit-file-upload-button {
 	width: 100px; 
 	height: 100%;
 	display:block;
+	color: #b9b9b9;
 }
 
-.autotc_gui button:hover, .autotc_gui input[type=submit]:hover , input[type="file"]::-webkit-file-upload-button:hover, 
-	.autotc_gui input:not([type=file]):hover, .autotc_gui input + span:hover, [type="checkbox"]:checked:hover + label,
-	[type="checkbox"]:not(:checked):hover + label, [type="checkbox"]:checked:hover + label:before,
-	[type="checkbox"]:not(:checked):hover + label:before, [type="checkbox"]:checked:hover + label:after,
-	[type="checkbox"]:not(:checked):hover + label:after, [type="radio"]:not(:checked):hover + label, 
-	[type="radio"]:checked:hover + label:before, [type="radio"]:not(:checked):hover + label:before, 
-	[type="radio"]:checked:hover + label:after, [type="radio"]:not(:checked):hover + label:after    {
-	color: lightskyblue;
-	border-color: lightskyblue;
+.autotc_gui button:hover, .autotc_gui input[type=submit]:hover , input[type=file]::-webkit-file-upload-button:hover, 
+	.autotc_gui input:not([type=file]):hover, .autotc_gui input + span:hover, [type=checkbox]:checked:hover + label,
+	[type=checkbox]:not(:checked):hover + label, [type=checkbox]:checked:hover + label:before,
+	[type=checkbox]:not(:checked):hover + label:before, [type=checkbox]:checked:hover + label:after,
+	[type=checkbox]:not(:checked):hover + label:after, [type=radio]:not(:checked):hover + label, 
+	[type=radio]:checked:hover + label, [type=radio]:checked:hover + label:before, 
+	[type=radio]:not(:checked):hover + label:before, [type=radio]:checked:hover + label:after, 
+	[type=radio]:not(:checked):hover + label:after {
+	color: #0078d7;
+	border-color: #0078d7;
 	transition: all .25s;
 }
 
@@ -201,7 +202,7 @@ input[type="file"]::-webkit-file-upload-button {
 	left: 0; top: .2em;
 	font-size: 1em;
 	width: 1.1em; height: 1.1em;
-	border: 1px solid lightgray;
+	border: 1px solid #b9b9b9;
 	background: transparent;
 	transition: all .25s;
 }
@@ -221,7 +222,7 @@ input[type="file"]::-webkit-file-upload-button {
 	font-size: 0.7em;
 	left: .4em; top: .6em;
 	line-height: 0.8;
-	color: lightgray;
+	color: #b9b9b9;
 	transition: all .25s;
 	width: 10px; height: 10px;
 	font-family: 'Segoe UI', 'Lucida Sans Unicode', 'Arial Unicode MS', Arial;
@@ -232,10 +233,10 @@ input[type=checkbox]:not(:checked) + label::after, input[type=checkbox]:checked 
 }
 
 [type=radio]:checked + label::before {
-	border: 4px solid lightgray;
+	border: 4px solid #b9b9b9;
 }
 
 [type=checkbox]:checked + label::before {
-	border: 2px solid lightgray;
+	border: 2px solid #b9b9b9;
 }
 

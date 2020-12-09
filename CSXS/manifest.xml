@@ -37,8 +37,8 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 					<Menu>Auto Timecode Correction</Menu>
 					<Geometry>
 						<Size>
-							<Height>400</Height>
-							<Width>250</Width>
+							<Height>500</Height>
+							<Width>300</Width>
 						</Size>
 					</Geometry>
 				</UI>
