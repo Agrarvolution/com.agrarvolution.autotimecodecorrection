@@ -40,11 +40,13 @@ At the end every successful change will be logged only if verbose logging is ena
 
 This plugin will not be thoroughly maintained. If any bugs occur, it might take a while for them to be fixed. It is just a side project of myself.
 
+---
+
 ## Compiling / running the source code
 
+---
 
-
-## Create panels for Premiere Pro
+## License
 
 
 ### 1. Obtain and install these
