@@ -8,7 +8,7 @@
 
 body.autotc_gui {
 	padding: 0 1rem;
-	min-width: 400px; /*toDo fit to actial sice needed*/
+	min-width: 250px; 
 	font-size: 9pt;
 	color: #e1e1e1;
 	background-color: #232323;
@@ -20,6 +20,12 @@ body.autotc_gui {
 
 .autotc_gui a {
         color: #8080ff;
+}
+
+.autotc_gui form section > span {
+	display: block;
+	margin: .15em .5em;
+	padding: .2em;
 }
 
 .file {
@@ -34,24 +40,30 @@ body.autotc_gui {
 }  
 .file input[type="file"] {
 	overflow: hidden;
-	display: block;
+	display: flex;
     width: 100%;
     line-height: 1.5;
-    color: #212529;
+    color: #232323;
     background-color: #fff;
     background-clip: padding-box;
-    border: 1px solid #ced4da;
 	border-radius: .25rem;
 	height: 2em;
+	vertical-align: middle;
+}
+
+section#log {
+	border-top: 1px solid lightgray;
 }
 
 input[type="file"]::-webkit-file-upload-button {
 	padding: .25rem 1rem;
-	color: #555;
-	background-color: #eee;
-	border: .075rem solid #ddd;
+	color: lightgray;
+	background-color: #232323;
+	border: .075rem solid lightgray;
 	border-radius: .25rem 0 0 .25rem;
 	height: 100%;
+	font-size: 0.9em;	
+	cursor: pointer;
 }
 
 .autotc_gui button, .autotc_gui input[type=submit] {
@@ -153,7 +165,11 @@ input[type="file"]::-webkit-file-upload-button {
 	vertical-align:middle;
 }
 
+
+
 /*Custom radio and checkboxes*/
+
+
 [type=checkbox], [type=radio] {
 	visibility: hidden;
 	transform: scale(0);
@@ -166,6 +182,7 @@ input[type="file"]::-webkit-file-upload-button {
 	position: relative;
 	padding-left: 1.95em;
 	cursor: pointer;
+	margin: auto 0;
 }
 [type=checkbox]:not(:checked) + label::after {
 	opacity: 0;
@@ -181,7 +198,7 @@ input[type="file"]::-webkit-file-upload-button {
 	box-sizing: border-box;
 	content: '';
 	position: absolute;
-	left: 0; top: 0;
+	left: 0; top: .2em;
 	font-size: 1em;
 	width: 1.1em; height: 1.1em;
 	border: 1px solid lightgray;
@@ -197,12 +214,12 @@ input[type="file"]::-webkit-file-upload-button {
 	
 }
 
-input[type=checkbox]:not(:checked) + label::after, input[type=checkbox]:checked + label::after {
+[type=checkbox]:not(:checked) + label::after, [type=checkbox]:checked + label::after {
 	content: '\2716\0020';
 	position: absolute;
 	margin: auto;
 	font-size: 0.7em;
-	left: .39em; top: .32em;
+	left: .4em; top: .6em;
 	line-height: 0.8;
 	color: lightgray;
 	transition: all .25s;
@@ -221,3 +238,4 @@ input[type=checkbox]:not(:checked) + label::after, input[type=checkbox]:checked 
 [type=checkbox]:checked + label::before {
 	border: 2px solid lightgray;
 }
+

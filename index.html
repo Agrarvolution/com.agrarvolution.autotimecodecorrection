@@ -281,22 +281,30 @@
 						<input type="file" id="source">
 					</label>				
 				</section>
-				<section>			
-						<input type="radio" id="all" name="target" value="all">
-						<label for="all">Start in Project bin</label>
-
-						<input type="radio" id="selection" name="target" value="selection" checked>
-						<label for="selection">Selection</label>
+				<section id="formradio">			
+						<span>
+							<input type="radio" id="all" name="target" value="all">
+							<label for="all">Start in Project bin</label>
+						</span>
+						<span>
+							<input type="radio" id="selection" name="target" value="selection" checked>
+							<label for="selection">Selection</label>
+						</span>
 				</section>
 				<section>
-						<input type="checkbox" id="recursion" name="recursion">
-						<label for="recursion">Search in sub bins</label>
+						<span>
+							<input type="checkbox" id="recursion" name="recursion">
+							<label for="recursion">Search in sub bins</label>
+						</span>
+						<span>
+							<input type="checkbox" id="logging" name="logging">
+							<label for="logging">Enable verbose logging</label>
+						</span>
 
-						<input type="checkbox" id="logging" name="logging">
-						<label for="logging">Enable verbose logging</label>
-
-						<input type="checkbox" id="mediaStart" name="mediaStart">
-						<label for="mediaStart">Disable media start comparison</label>
+						<span>
+							<input type="checkbox" id="mediaStart" name="mediaStart">
+							<label for="mediaStart">Disable media start comparison</label>
+						</span>
 				</section>
 				<input type="submit" id="start" value="Start">	
 			</form>
