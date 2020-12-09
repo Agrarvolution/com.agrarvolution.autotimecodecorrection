@@ -1,18 +1,51 @@
-# Premiere Pro panels
+# Automated Timecode Update for Adobe Premiere 14.5+ (CC 2020)
 
-*Last updated October 2020, current released version = Premiere Pro 14.4, also known as "Premiere Pro 2020".*
+*Made for .csv files outputed by the Tentacle Timecode Tool 1.16.*
 
-## Premiere Pro 14.0 : API Improvements
+## Automated processing
+This CEP HTML plugin changes start times of media files (can be any, except sequences) in a project. 
 
-### Colorspace control
+**Important: Media files are not changed. Only XMP Metadata is updated.**
 
-Panels can now get and set the colorspace in use by projectItems, and sequences.
+There is no guarantee every editing software is capable of interpreting Adobe XMP metadata.
 
-### System compatibility reports
+### Options
 
-Panels can generate the same system and project reports that PPro does; useful for troubleshooting. 
+
+### Safety
+
+It was important for me to get a quick overview on mistakes that might have come up during import, so one can fix it easily. Especially for the more critical process of settings timecodes, where finding mistakes can take a long time. For this reason a log area is implement, which shows errors or a verbose process status.
+
+If an error in the csv is discovered at the parsing stage, it will push a log message inside the gui with the cause of failure.
+
+The process will stop if the file is not a .csv, header information of the .csv is incomplete, the rows are missing columns etc. . 
+
+Parsing single rows will give a warning for every file that couldn't be processed.
+
+At the end every successful change will be logged only if verbose logging is enabled.
+- - -
+## Version history
+
+### Current
+
+### Previous
+
+| Version   | Date      | Description
+|---------  |------     |------------
+| 0.10      | 10.12.2020 | Pre-test, non-compiled, but optically finished build
+| 0.00      | 25.11.2020 | Development start
+- - -
+
+## Maintenance
+
+This plugin will not be thoroughly maintained. If any bugs occur, it might take a while for them to be fixed. It is just a side project of myself.
+
+## Compiling / running the source code
+
+
 
 ## Create panels for Premiere Pro
+
 
 ### 1. Obtain and install these
 
@@ -143,108 +176,3 @@ of Extension Manager.
 If you encounter any issues with the Add-Ons store or ExManCmd, please [contact
 the Add-Ons team](mailto:kwak@adobe.com).
 
-## Previous Updates
-
-### What was new in 13.0
-
-#### Get and set footage interpretation
-
-All aspects of Premiere Pro's footage interpretation are now available via API. Among other workflows, this enables panels to replace a footage reference, while preserving existing interpretation information the user may have already set.
-
-#### Get and set sequence settings
-
-Previously, it was possible to clone existing sequences, and create sequences from a sequence preset. It is now possible to get and set each individual sequence setting, providing much more granular control over sequences.
-
-#### Detect trackItems which are reversed, have speed adjustments, or are adjustment layers
-
-This important information was previously unavailable.
-
-#### Open projectItems in the Source monitor
-
-This allows for sequences, multi-cam sequences, still image sequences and merged clips to be opened in the Source monitor.
-
-#### Create sub-sequences
-
-Lift/extract sections of existing sequences into new ones, with control over whether or not to adopt the track mapping present in the original.
-
-#### Close open sequences
-
-Close superfluous/distracting sequences.
-
-#### Consolidate Duplicates via API
-
-Invoke the same duplicate consolidation functionality available to users.
-
-## What was new in 12.1
-
-### Get and set the current Project panel selection
-
-It's now possible for a panel to know which `projectItems` are selected, and to select projectItems as appropriate.
-
-### Consolidate and Transcode API
-
-All functionality available from Premiere Pro's Project Manager dialog, is now available to panels.
-
-### Improved time resolution for trackItems
-
-We now provide (and accept) time values for track items in ticks, eliminating an opportunity for rounding error.
-
-### Import and change Motion Graphics templates (.mogrts)
-
-Panels can now insert .mogrt files into sequences, and change the parameters of those .mogrts as desired.
-
-### Forcibly replace footage
-
-It's now possible to force Premiere Pro to update the path to a given `projectItem`, even if Premiere Pro doesn't think such a change is advisable.
-
-### Identify sequences
-
-All `projectItems` now have an `isSequence()` method; this eliminates the need to compare a list of 'all project items' against a list of 'all sequences', to determine which `projectItems` are and are not sequences.
-
-### Set the frame rate for projectItems
-
-Use the handy new `setOverrideFramerate()`.
-
-### API Documentation
-
-While the sample panel should continue to be your first option for working example code, Premiere Pro's ExtendScript API [is documented here](http://ppro.aenhancers.com), to enable developer participation.
-
-## What was new in 13.x
-
-We added many new capabilities for the 13.1 release. All of these are exercised in the PProPanel sample, [available on GitHub](https://github.com/Adobe-CEP/Samples/tree/master/PProPanel).
-
-### Sequence change messaging
-
-Panels can now subscribe to be notified whenever something is added to, removed from, or changed in a sequence.
-
-### Identify Team Projects
-
-Persistently identify cloud-based Team Projects.
-
-### Sequence work area API
-
-Control the start, end, and enablement of the sequence work area.
-
-### Remove track items
-
-Track items can now be removed.
-
-### Render frames from sequences
-
-Render frames from sequences into buffers.
-
-### Control Workspaces
-
-Retrieve available workspaces, and set the current workspace.
-
-## What was new in 12.0
-
-- We've extended our new, not-in-the-QE-DOM Source monitor object, to close the [front-most](https://github.com/Adobe-CEP/Samples/blob/master/PProPanel/jsx/PPRO/Premiere.jsx#L1465) or [all open clips](https://github.com/Adobe-CEP/Samples/blob/master/PProPanel/jsx/PPRO/Premiere.jsx#L1469).
-
-- [Change the Label](https://github.com/Adobe-CEP/Samples/blob/master/PProPanel/jsx/PPRO/Premiere.jsx#L1473) assigned to projectItems.
-
-- Query PPro for the [current insertion bin](https://github.com/Adobe-CEP/Samples/blob/master/PProPanel/jsx/PPRO/Premiere.jsx#L1486), the default target for items imported into the project (but not via drag). *Previously, you could set, but not get, the insertion bin.*
-
-- [Import Compositions](https://github.com/Adobe-CEP/Samples/blob/master/PProPanel/jsx/PPRO/Premiere.jsx#L1502) by name, from After Effects projects.
-
-- Open PPro's Events panel to see PProPanel's feedback; I've minimized modal alerts.
