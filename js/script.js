@@ -17,6 +17,8 @@ const logLevels = {
 }
 let log = null;
 let error = null;
+let explainer = null;
+let fileEl = null;
 
 const settingsKey = "autoTimecodeCorrection.settings";
 const defaultSettings = {
@@ -41,6 +43,8 @@ $(function () {
     logging.log = $('#log');
     log = $('#log');
     error = $('#errorDisplay');
+    explainer = $('#explainer');
+    fileEl = $('#file');
 
     let csInterface = new CSInterface();
     csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
@@ -66,6 +70,8 @@ $(function () {
         log.addClass('hidden');
         logging.clearLog();
         logging.addLog("Default settings are restored.", logLevels.info);
+        explainer.removeClass('hidden');
+        error.addClass('hidden');
     });
 
     $('input:not(#source, #start)').on("click", function (e) {
@@ -97,6 +103,8 @@ $(function () {
     })    
 });
 
+
+
 /**
  * Handler for a fileLoaded event. Calls a csv validation and interfaces with Premiere to send the staged media and settings.
  * @param {*} file parsed csv
@@ -118,7 +126,7 @@ function handleFileLoad (file) {
     let csInterface = new CSInterface();
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function(e) {
         if (e === 'true') {
-            logging.addLog("Media has been updated. Process finished.", logLevels.status);
+            logging.addLog("Media has been updated. Process finished. Select the next file to be processed.", logLevels.status);
             $('#source')[0].value = "";
         } else if (e === 'false') {
             logging.addLog("Media hasn't been updated. Process stopped.", logLevels.status);
@@ -453,6 +461,7 @@ function validateForm (form) {
  */
 logging.addLog = function (text, level) {
     if (level === logLevels.status) {
+        explainer.addClass('hidden');
         error.text(text);
     }
     if (level === logLevels.error || logging.verboseLogging) {

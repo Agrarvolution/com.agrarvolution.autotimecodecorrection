@@ -7,10 +7,11 @@
 }
 
 body.autotc_gui {
-	padding: 1rem;
+	padding: 0 1rem;
 	min-width: 400px; /*toDo fit to actial sice needed*/
 	font-size: 9pt;
 	color: #e1e1e1;
+	background-color: #232323;
 }
 
 .autotc_gui p {
@@ -31,53 +32,27 @@ body.autotc_gui {
 .file * {
 	margin: auto;
 }  
-.file input {
-	min-width: 14rem;
-	margin: 0;
-	filter: alpha(opacity=0);
-	opacity: 0;
-}
-.file-custom {
-	position: absolute;
-	right: 0;
-	left: 0;
-	top: 0;
-	z-index: 5;
-	line-height: 1.5;
-	color: #555;
-	background-color: #fff;
-	border: .075rem solid #ddd;
-	border-radius: .25rem;
-	box-shadow: inset 0 .2rem .4rem rgba(0,0,0,.05);
-	-webkit-user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		user-select: none;
-}
-.file-custom:after {
-	margin: .5rem 1rem .5rem 5rem;
-	content: "Choose file (.csv with TC data) ...";
-	line-height: 2.3;
-  }
-.file-custom:before {
-	position: absolute;
-	left: 0rem;
-	z-index: 6;
+.file input[type="file"] {
+	overflow: hidden;
 	display: block;
-	content: "Browse";
+    width: 100%;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+	border-radius: .25rem;
+	height: 2em;
+}
+
+input[type="file"]::-webkit-file-upload-button {
 	padding: .25rem 1rem;
-	line-height: 1.5;
 	color: #555;
 	background-color: #eee;
 	border: .075rem solid #ddd;
-	border-radius: 0 .25rem .25rem 0;
+	border-radius: .25rem 0 0 .25rem;
+	height: 100%;
 }
-
-/* Focus */
-.file input:focus ~ .file-custom {
-	box-shadow: 0 0 0 .075rem #fff, 0 0 0 .2rem #0074d9;
-}
-  
 
 .autotc_gui button, .autotc_gui input[type=submit] {
 	margin: 1rem auto;
@@ -91,6 +66,31 @@ body.autotc_gui {
 	height: 100%;
 	display:block;
 }
+
+.autotc_gui button:hover, .autotc_gui input[type=submit]:hover , input[type="file"]::-webkit-file-upload-button:hover, 
+	.autotc_gui input:not([type=file]):hover, .autotc_gui input + span:hover, [type="checkbox"]:checked:hover + label,
+	[type="checkbox"]:not(:checked):hover + label, [type="checkbox"]:checked:hover + label:before,
+	[type="checkbox"]:not(:checked):hover + label:before, [type="checkbox"]:checked:hover + label:after,
+	[type="checkbox"]:not(:checked):hover + label:after, [type="radio"]:not(:checked):hover + label, 
+	[type="radio"]:checked:hover + label:before, [type="radio"]:not(:checked):hover + label:before, 
+	[type="radio"]:checked:hover + label:after, [type="radio"]:not(:checked):hover + label:after    {
+	color: lightskyblue;
+	border-color: lightskyblue;
+	transition: all .25s;
+}
+
+.autotc_gui button:focus, .autotc_gui input[type=submit]:focus , input[type="file"]::-webkit-file-upload-button:focus, input {
+	outline: 0;
+}
+.autotc_gui button:active, input[type="file"]::-webkit-file-upload-button:active, 
+	.autotc_gui input:not([type=file]):active, .autotc_gui input + span:active {
+	filter: brightness(90%);
+}
+
+.autotc_gui button, .autotc_gui input, .autotc_gui input + span {
+	cursor: pointer;
+}
+
 .logButtons {
 	display:block;
 	margin: 1rem auto;
@@ -107,7 +107,7 @@ body.autotc_gui {
 	height: 50px;
 	white-space: nowrap;
 	font-family: monospace;
-	color: black;
+	color:darkgray;
 	font-size: 1em;
 	border-radius: .25rem;
 }
@@ -135,13 +135,89 @@ body.autotc_gui {
     display: none;
 }
 
-.autotc_gui input[type=checkbox] {
-	border-radius: 15px;
-	border: 2px solid gray;
-	background-color: transparent;
+.autotc_gui h3 {
+	padding: .25em 0;
+	font-size: 1em;
+	font-weight: bold;
+	margin: 1em 0;
+	text-align: center;
 }
 
-.autotc_gui header {
-	text-align: center;
-    font-size: 2em;
+.autotc_gui label:not(.file) {
+	height: 1em;
+}
+.autotc_gui input[type=checkbox], .autotc_gui input[type=radio], 
+	.autotc_gui input[type=checkbox]:checked + span, .autotc_gui input[type=checkbox]:not(:checked) + span,
+	.autotc_gui input[type=radio]:checked + span, .autotc_gui input[type=radio]:not(:checked) + span {
+	margin: auto;
+	vertical-align:middle;
+}
+
+/*Custom radio and checkboxes*/
+[type=checkbox], [type=radio] {
+	visibility: hidden;
+	transform: scale(0);
+	position: absolute;
+	left: -9999px;
+}
+
+[type=checkbox]:not(:checked) + label, [type=checkbox]:checked + label, 
+	[type=radio]:not(:checked) + label, [type=radio]:checked + label {
+	position: relative;
+	padding-left: 1.95em;
+	cursor: pointer;
+}
+[type=checkbox]:not(:checked) + label::after {
+	opacity: 0;
+	 transform: scale(0);
+}
+[type=checkbox]:checked + label::after {
+	opacity: 1;
+	 transform: scale(1);
+}
+
+[type=checkbox]:not(:checked) + label::before, [type=checkbox]:checked + label::before, 
+	[type=radio]:not(:checked) + label::before, [type=radio]:checked + label::before {
+	box-sizing: border-box;
+	content: '';
+	position: absolute;
+	left: 0; top: 0;
+	font-size: 1em;
+	width: 1.1em; height: 1.1em;
+	border: 1px solid lightgray;
+	background: transparent;
+	transition: all .25s;
+}
+[type=checkbox]:not(:checked) + label::before, [type=checkbox]:checked + label::before {
+	border-radius: 4px;
+}
+
+[type=radio]:not(:checked) + label::before, [type=radio]:checked + label::before {
+	border-radius: 50px;
+	
+}
+
+input[type=checkbox]:not(:checked) + label::after, input[type=checkbox]:checked + label::after {
+	content: '\2716\0020';
+	position: absolute;
+	margin: auto;
+	font-size: 0.7em;
+	left: .39em; top: .32em;
+	line-height: 0.8;
+	color: lightgray;
+	transition: all .25s;
+	width: 10px; height: 10px;
+	font-family: 'Segoe UI', 'Lucida Sans Unicode', 'Arial Unicode MS', Arial;
+	
+}
+input[type=checkbox]:not(:checked) + label::after, input[type=checkbox]:checked + label::after {
+	border-radius: 3px;
+}
+
+[type=radio]:checked + label::before {
+	border: 4px solid lightgray;
+}
+
+[type=checkbox]:checked + label::before {
+	border: 2px solid lightgray;
 }
