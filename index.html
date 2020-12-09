@@ -266,32 +266,45 @@
 	</script>
 </head>
 
-<body onLoad="onLoaded()">
+<body class="autotc_gui" onLoad="onLoaded()">
 	<header>Automated Timecode Correction</header>
 	<main>
 		<a id="refresh" href="javascript:history.go(0)">Refresh panel</a>
-		<p id="errorDisplay"></p>
-		<button id="reset">Reset panel.</button>
+		
+		<button id="reset">Reset panel</button>
 		<form name="atc" onsubmit="return 0" method="post">
+			<p>Select which media files should be updated.</p>
+			<p id="errorDisplay"></p>
 			<section>
-				<p>Select a file (.csv) containing timecode data:</p>
-				<input type="file" id="source">
+				<label class="file">
+					<input type="file" id="source">
+					<span class="file-custom"></span>
+				</label>				
 			</section>
-
-			<section>
-				<p>Select which media files should be updated.</p>
-				<input type="radio" id="all" name="target" value="all">
-				<label for="all">Start in Project bin</label>
-				<input type="radio" id="selection" name="target" value="selection" checked>
-				<label for="selection">Selection</label>
+			<section>			
+				<label for="all">
+					<input type="radio" id="all" name="target" value="all">
+					Start in Project bin
+				</label>
+				
+				<label for="selection">
+					<input type="radio" id="selection" name="target" value="selection" checked>
+					Selection
+				</label>
 			</section>
 			<section>
-				<input type="checkbox" id="recursion" name="recursion">
-				<label for="recursion">Search in sub bins</label>
-				<input type="checkbox" id="logging" name="logging">
-				<label for="logging">Enable verbose logging</label>
-				<input type="checkbox" id="mediaStart" name="mediaStart">
-				<label for="mediaStart">Disable media start comparison</label>
+				<label for="recursion">
+					<input type="checkbox" id="recursion" name="recursion">
+					Search in sub bins
+				</label>				
+				<label for="logging">
+					<input type="checkbox" id="logging" name="logging">
+					Enable verbose logging
+				</label>
+				<label for="mediaStart">
+					<input type="checkbox" id="mediaStart" name="mediaStart">
+					Disable media start comparison
+				</label>
 			</section>
 
 			
@@ -301,8 +314,10 @@
 		</form>
 		<section id="log" class="hidden">
 			<h3>Log</h3>
-			<button id="resetLog">Reset log</button>
-			<button id="hideLog">Hide log</button>
+			<span class="logButtons">
+				<button id="resetLog">Reset log</button>
+				<button id="hideLog">Hide log</button>
+			</span>			
 			<textarea id='loggingArea'></textarea>
 		</section>
 	</main>

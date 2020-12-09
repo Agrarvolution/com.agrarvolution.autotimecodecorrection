@@ -1,42 +1,119 @@
-* {
-	font-family: Segoe UI, Lucida Grande, Tahoma, sans-serif;
+.autotc_gui * {
+	font-family: "Adobe Clean UX", Segoe UI, Lucida Grande, Tahoma, sans-serif;
 	text-rendering: optimizeLegibility !important;
-    -webkit-font-smoothing: antialiased !important;
+	-webkit-font-smoothing: antialiased !important;
+	font-size: 10pt;
+	color: lightgray;
 }
 
-body {
-	padding-left: 20px;
-	padding-right: 20px;
+body.autotc_gui {
+	padding: 1rem;
 	min-width: 400px; /*toDo fit to actial sice needed*/
+	font-size: 9pt;
 	color: #e1e1e1;
 }
 
-p {
+.autotc_gui p {
 	text-align:center;
 }
 
-a {
+.autotc_gui a {
         color: #8080ff;
 }
 
-button
-{
-	font-size:12px;
-	border:1px solid;
-	height:20px;
+.file {
+	position: relative;
+	display: inline-block;
+	cursor: pointer;
+	height: 2.5rem;
+	width: 100%;
+  }
+.file * {
+	margin: auto;
+}  
+.file input {
+	min-width: 14rem;
+	margin: 0;
+	filter: alpha(opacity=0);
+	opacity: 0;
+}
+.file-custom {
+	position: absolute;
+	right: 0;
+	left: 0;
+	top: 0;
+	z-index: 5;
+	line-height: 1.5;
+	color: #555;
+	background-color: #fff;
+	border: .075rem solid #ddd;
+	border-radius: .25rem;
+	box-shadow: inset 0 .2rem .4rem rgba(0,0,0,.05);
+	-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+}
+.file-custom:after {
+	margin: .5rem 1rem .5rem 5rem;
+	content: "Choose file (.csv with TC data) ...";
+	line-height: 2.3;
+  }
+.file-custom:before {
+	position: absolute;
+	left: 0rem;
+	z-index: 6;
+	display: block;
+	content: "Browse";
+	padding: .25rem 1rem;
+	line-height: 1.5;
+	color: #555;
+	background-color: #eee;
+	border: .075rem solid #ddd;
+	border-radius: 0 .25rem .25rem 0;
 }
 
-textarea {
+/* Focus */
+.file input:focus ~ .file-custom {
+	box-shadow: 0 0 0 .075rem #fff, 0 0 0 .2rem #0074d9;
+}
+  
+
+.autotc_gui button, .autotc_gui input[type=submit] {
+	margin: 1rem auto;
+	font-size: 0.7rem;
+	border:1px solid gray;
+	border-radius: 50px;
+	background-color: transparent;
+	background-image: none;
+	padding: 0.5em 1em 0.5em;
+	width: 100px; 
+	height: 100%;
+	display:block;
+}
+.logButtons {
+	display:block;
+	margin: 1rem auto;
+	width: fit-content;
+}
+.logButtons button {
+	margin: .2rem .25rem;
+	display: inline;
+}
+
+.autotc_gui textarea {
 	resize: vertical;
 	width: 100%;
 	height: 50px;
 	white-space: nowrap;
 	font-family: monospace;
+	color: black;
+	font-size: 1em;
+	border-radius: .25rem;
 }
 
-input[type=text]
-{
-	height:12px;
+.autotc_gui input {
+	height:1rem;
 }
 
 #content {
@@ -58,4 +135,13 @@ input[type=text]
     display: none;
 }
 
+.autotc_gui input[type=checkbox] {
+	border-radius: 15px;
+	border: 2px solid gray;
+	background-color: transparent;
+}
 
+.autotc_gui header {
+	text-align: center;
+    font-size: 2em;
+}

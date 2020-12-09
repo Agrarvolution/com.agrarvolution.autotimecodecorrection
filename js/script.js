@@ -23,7 +23,7 @@ const defaultSettings = {
     logging: false,
     searchRecursive: true,
     searchTarget: 0,
-    ignoreMediaStart: false
+    ignoreMediaStart: true
 }
 let settings = defaultSettings;
 
