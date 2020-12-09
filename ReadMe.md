@@ -5,7 +5,7 @@
 ## Automated processing
 This CEP HTML plugin changes start times of media files (can be any, except sequences) in a project. 
 
-**Important: Media files are not changed. Only XMP Metadata is updated.**
+**Important: Media files are not changed. Only XMP Metadata is updated. Use at your own risk.**
 
 There is no guarantee every editing software is capable of interpreting Adobe XMP metadata.
 
