@@ -34,6 +34,10 @@ Tested with:
 - Premiere pro 14.7 (CC 2020)
 - Premiere Pro 14.5 (CC 2020)
 
+## Installation
+
+@Todo
+
 ## Options
 
 
