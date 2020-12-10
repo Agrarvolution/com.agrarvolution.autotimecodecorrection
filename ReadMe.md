@@ -129,7 +129,9 @@ http://localhost:7780/
 
 ## Future
 
-This is considered feature complete. There will only be bug fixes if the time allows and or maintenance to make the plugin run on newer Premiere Pro versions again.
+This is considered feature complete. There will only be bug fixes and maintence, since this is just a side project. 
+
+If the plugin breaks on newer Premiere versions it will eventually updated.
 
 
 ## Reason
