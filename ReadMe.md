@@ -31,7 +31,7 @@ Your Premiere Pro has to at least support Adobe CEP plugins.
 
 Tested with:
 
-- Premiere pro 14.7 (CC 2020)
+- Premiere pro 14.7 (CC 2020) (not working yet)
 - Premiere Pro 14.5 (CC 2020)
 
 ## Installation
