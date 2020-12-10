@@ -65,6 +65,14 @@ If a .csv spreadsheet is created without the tentacle timecode tool, it has to c
 |-----------|----------|---------|----------|-----------
 |Test | 00:00:05 | 15:23:10:20| 15:23:08:20 | 25.00
 
+The .csv string is as following:
+
+```csv
+File Name,Duration,File TC,Audio TC,Framerate
+"TestName.MOV","00:00:05","15:21:06:07","08:22:12:18","25.00",
+```
+
+
 Tentacle Timecode Tool only stores hh:mm:ss for durations, but frames can be inserted in this section. The match will work anyways.
 
 ## Safety
@@ -78,42 +86,51 @@ The process will stop if the file is not a .csv, header information of the .csv 
 Parsing single rows will give a warning for every file that couldn't be processed.
 
 At the end every successful change will be logged only if verbose logging is enabled.
-- - -
+
 
 ## Version history
 
 ### Current
+in progess
 
 ### Previous
 
 | Version   | Date      | Description
 |---------  |------     |------------
-| 0.10      | 10.12.2020 | Pre-test, non-compiled, but optically finished build
+| 0.10      | 11.12.2020 | Pre-test, non-compiled, but optically finished build
 | 0.00      | 25.11.2020 | Development start
 - - -
 
+### Chagelist
+- 0.10 <-> 11.12.2020
+
+   - Pretesting stage (not tested with a production Premiere Pro Project)
+   - CSS design is basically finished
+   - Severe bugs have been caught
+
+- 0.00 <-> 25.11.2020
+    
+    Development start
 ## Maintenance
 
 This plugin will not be thoroughly maintained. If any bugs occur, it might take a while for them to be fixed. It is just a side project of myself.
 
----
 
 ## Compiling / running the source code
 
-Running the plugin via the source code requires the setting up [Premiere Pro for Developemnt](https://github.com/Adobe-CEP/Samples/tree/master/PProPanel).
+Running the plugin via the source code requires the setting up [Premiere Pro for Developement](https://github.com/Adobe-CEP/Samples/tree/master/PProPanel).
 
 Further informations for creating a package out of changed source code can be found under this link as well.
 
----
+The debugging port for the HTML of this panel is configured at port **7780**.
+```html
+http://localhost:7780/
+```
 
-## License
-
----
 ## Future
 
 This is considered feature complete. There will only be bug fixes if the time allows and or maintenance to make the plugin run on newer Premiere Pro versions again.
 
----
 
 ## Reason
 
@@ -124,80 +141,3 @@ These audio timecode need to be read by a tool like the Tentacle Timecode Tool a
 This could have been implemented as a macro as well. Implementing error detection / correction would have needed extensive programming anywways. 
 
 So I opted for making a CEP plugin which integrates seemlessly into Premiere. I wanted an "easier" scope to test CEP plugin development for Premiere, to have a better idea creating future  plugins.
-ing a JavaScript debugger
-
-To enable debugging of panels using Chrome’s developer tools, put a file named
-`.debug` into your extension’s folder (as a peer of the `/CSXS` folder). The
-contents of the file should resemble the following (and the Extension ID must
-match the one in the panel's manifest):
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<ExtensionList>
-    <Extension Id="com.example.PProPanel">
-        <HostList>
-            <Host Name="PPRO" Port="7777"/>
-        </HostList>
-    </Extension>
-</ExtensionList>
-```
-
-When the panel is active, you can debug the panel in Chrome by
-browsing to `localhost:7777`, and selecting your panel:
-
-![Localhost screenshot](payloads/localhost.png)
-
-Note: You can also use Microsoft Visual Studio Code to debug your panel's JavaScript.
-
-Optional diagnostics: Turn on CEP logging. Find CEP logs (distinct from Premiere
-Pro's logs) here. Note that Mac Library path is the system's library, not the
-user's. Also, note that logging WILL impact performance.
-
-```html
-Windows:    %\AppData\Local\Temp\csxs9-PPRO.log
-Mac:        /Library/Logs/CSXS/csxs9-PPRO.log
-```
-
-Set logging level in Windows Registry (see above), or MacOS X .plist:
-
-```html
-defaults write /Users/<username>/Library/Preferences/com.adobe.CSXS.9.plist LogLevel 6
-```
-
-## 5. Create your panel's ExtendScript using Microsoft Visual Studio Code
-
-Once you've installed the ExtendScript debugging extension, you can set breakpoints in your ExtendScript code within VSCode. Here's a view of the debug configurations associated with the PProPanel sample, in VSCode:
-
-![ESTK Screenshot](payloads/vscode_debug.png)
-
-
-Here's a [screen video](https://www.dropbox.com/s/sasea78m05nqcyz/MS_Code_Debugging.mp4?dl=1)
-showing how to debug panels at both the JavaScript and ExtendScript levels.
-
-## 6. Package and deploy your panel
-
-Further [relevant information](https://github.com/Adobe-CEP/Getting-Started-guides/tree/master/Package%20Distribute%20Install) is available from the Extensibility team.
-
-You can either generate a self-signed certificate (ZXPSignCmd will make them for
-you), or get one from a commercial security provider. Here's an example:
-
-```bash
-./ZXPSignCmd -selfSignedCert US California Adobe "Bruce Bullis" TotallySecurePassword certificate.p12
-```
-
-To sign directory `/PanelDir` with `certificate.p12`, do the following:
-
-```bash
-./ZXPSignCmd -sign panelDir/ PanelName.zxp certificate.p12 password -tsa http://timestamp.digicert.com/
-```
-
-Submit your panel to the [Adobe Add-Ons
-site](https://www.adobeexchange.com/producer) for approval, and distribution.
-You can also directly supply the .zxp file enterprise customers, and those who
-do not connect their systems to the public internet, for installation using
-[ExManCmd](https://www.adobeexchange.com/resources/28), the command line version
-of Extension Manager.
-
-If you encounter any issues with the Add-Ons store or ExManCmd, please [contact
-the Add-Ons team](mailto:kwak@adobe.com).
-
