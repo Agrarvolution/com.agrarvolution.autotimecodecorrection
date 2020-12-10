@@ -1,6 +1,6 @@
 # Automated Timecode Update for Adobe Premiere Pro  14.5+ (CC 2020)
 
-*Made for .csv files exported by the [Tentacle Timecode Tool 1.16](https://tentaclesync.com/timecode-tool).*
+*Made for .csv files exported by [Tentacle Timecode Tool 1.16](https://tentaclesync.com/timecode-tool).*
 
 ## Automated processing
 This CEP HTML plugin changes start times of media files (can be any, except sequences) in a Premiere Pro project. 
