@@ -514,6 +514,11 @@ function onAppThemeColorChanged(event) {
 	updateThemeWithAppSkinInfo(skinInfo);
 } 
 
+/**
+ * Adds a new css style to the style#dynStyle element. This enables dynamic theme updates according to the 
+ * settings in Premiere.
+ * @param {*} appSkinInfo 
+ */
 function updateThemeWithAppSkinInfo(appSkinInfo) {
 
 	//Update the background color of the panel
@@ -555,11 +560,20 @@ function updateThemeWithAppSkinInfo(appSkinInfo) {
 	//Update the default text style with pp values
 
 }
+
 /**
  * Convert the Color object to string in hexadecimal format;
+ * @param {{red: string|number, green: string|number, blue: string|number}} color 
+ * @param {number} delta 
+ * @return {string} color as hex value
  */
-
 function toHex(color, delta) {
+    /**
+     * Creates a hex value for a given number offset by the delta.
+     * @param {number} value 
+     * @param {number} delta 
+     * @return {string} hex value
+     */
 	function computeValue(value, delta) {
 		var computedValue = !isNaN(delta) ? value + delta : value;
 		if (computedValue < 0) {
@@ -579,10 +593,12 @@ function toHex(color, delta) {
 	return "#" + hex;
 }
 /**
+ * Lightens and darkens colors in hex format.
  * @author Chris Coyier
  * @source https://css-tricks.com/snippets/javascript/lighten-darken-color/
- * @param {*} col 
- * @param {*} amt 
+ * @param {string} col 
+ * @param {number} amt
+ * @return {string} color as hex string 
  */
 function lightenDarkenColor(col, amt) {
   
