@@ -31,7 +31,7 @@ Your Premiere Pro has to at least support Adobe CEP plugins.
 
 Tested with:
 
-- Premiere pro 14.7 (CC 2020) (not working yet)
+- Premiere pro 14.7 (CC 2020)
 - Premiere Pro 14.5 (CC 2020)
 
 ## Installation
@@ -69,6 +69,7 @@ After selecting your file, you can select following options to discover the medi
 
 ![Panel with logging enabled](payloads/panel_2.png)
 
+**These settings will not be stored between program updates!**
 
 ### .CSV content / Manual input
 

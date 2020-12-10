@@ -428,7 +428,7 @@ function storeSettings(newSettings) {
 function loadSettings () {
     let settings = localStorage.getItem(settingsKey);
     if (settings === null) {
-        this.addLog("No settings have been stored.", logLevels.info);
+        logging.addLog("No settings have been stored.", logLevels.info);
         settings = defaultSettings;
     } else {
         try {
