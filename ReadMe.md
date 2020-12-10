@@ -25,6 +25,15 @@ This plugin offers following benefits:
 
 It would have drastically widened the scope and it wouldn't ahve been able to be made in the time that it was.
 
+## Requirements
+
+Your Premiere Pro has to at least support Adobe CEP plugins.
+
+Tested with:
+
+- Premiere pro 14.7 (CC 2020)
+- Premiere Pro 14.5 (CC 2020)
+
 ## Options
 
 
