@@ -30,7 +30,7 @@
 	<main>
 		<section id="process">
 			<h3>Media selection</h3>
-			<a id="refresh" href="javascript:history.go(0)">Refresh panel</a>
+			<<a id="refresh" href="javascript:history.go(0)">Refresh panel</a>
 			
 			<button id="reset">Reset panel</button>
 			<form name="atc" onsubmit="return 0" method="post">
@@ -48,7 +48,7 @@
 						</span>
 						<span>
 							<input type="radio" id="selection" name="target" value="selection" checked>
-							<label for="selection">Selection</label>
+							<label for="selection">Start with Selection</label>
 						</span>
 				</section>
 				<section>
@@ -57,13 +57,12 @@
 							<label for="recursion">Search in sub bins</label>
 						</span>
 						<span>
-							<input type="checkbox" id="logging" name="logging">
-							<label for="logging">Enable verbose logging</label>
-						</span>
-
-						<span>
 							<input type="checkbox" id="mediaStart" name="mediaStart">
 							<label for="mediaStart">Disable media start comparison</label>
+						</span>
+						<span>
+							<input type="checkbox" id="logging" name="logging">
+							<label for="logging">Enable verbose logging</label>
 						</span>
 				</section>
 				<input type="submit" id="start" value="Start">	
