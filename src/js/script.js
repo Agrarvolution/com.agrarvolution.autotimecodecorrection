@@ -244,7 +244,7 @@ function checkCSVrow (row, version, rowNumber) {
         hmsfPattern.lastIndex = 0;
 
         tcMediaElement.fileTC = hmsfPattern.exec(row[2]);
-        if (!validateTime(tcMediaElement.fileTC, tcMediaElement.framerate)) {
+        if (!validateTime(tcMediaElement.fileTC, tcMediaElement.framerate, true)) {
             logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - File TC (" + 
             row[2] + ") is invalid.", logLevels.error);
             return false;
@@ -282,7 +282,10 @@ function compressMatch (timeMatched) {
  * @param {number} framerate 
  * @returns {boolean} true on success
  */
-function validateTime (time, framerate) {
+function validateTime(time, framerate) {
+    return validateTime(time, framerate, false);
+}
+function validateTime (time, framerate, blockFrameCheck) {
     if (time === undefined || time == null || time.groups === undefined || time.groups == null) {
         return false;
     }
@@ -297,7 +300,7 @@ function validateTime (time, framerate) {
         return false;
     }
 
-    if (time.groups.hour > 24 || time.groups.minutes > 60 || time.groups.seconds > 60 || (time.groups.frames !== NaN && 
+    if (time.groups.hour > 24 || time.groups.minutes > 60 || time.groups.seconds > 60 || (!blockFrameCheck && time.groups.frames !== NaN && 
          time.groups.frames >= framerate)) {
         return false
     }
