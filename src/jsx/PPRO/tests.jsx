@@ -1,5 +1,5 @@
-#include './PPRO/TimecodeCorrection.jsx'
-#include './PPRO/Premiere.jsx'
+#include 'TimecodeCorrection.jsx'
+
 
 /*
 var tcObject = {

@@ -44,7 +44,7 @@ $.agrarvolution.timecodeCorrection = {
         *@returns {boolean} true on success | false on failure  
     */
     processInput: function (tcObject) {
-
+        this.logToCEP("Starting host script.", this.logLevels.info);
         if (this.setValues(tcObject) && this.cacheMediaObjects() && this.updateTimeCodes()) {
             return true;
         }
@@ -92,7 +92,7 @@ $.agrarvolution.timecodeCorrection = {
                 return false;
             }
         }
-        this.logToCEP("Inputs times have been converted to numbers.", this.logLevels.info);
+        this.logToCEP("Input times have been converted to numbers.", this.logLevels.info);
         return true;
     },
     /**
@@ -149,7 +149,6 @@ $.agrarvolution.timecodeCorrection = {
                 }
             }            
         }
-
         if (this.splitTimesToNumbers()) {
             this.logToCEP("Processing time strings was successfull.", this.logLevels.info);
         } else {
@@ -212,7 +211,10 @@ $.agrarvolution.timecodeCorrection = {
             var footageInterpretation = projectItem.getFootageInterpretation();
             item.frameRate = footageInterpretation.frameRate;
 
-            this.media.push(item);
+            // Audio+Image File check
+            if (item.duration !== "" && item.startTime != '') {
+                this.media.push(item);
+            }        
         } else if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.bin && this.searchRecursive) {
             for (i = 0; i < projectItem.children.length; i++) {
                 this.processProjectItem(projectItem.children[i]);
@@ -238,6 +240,7 @@ $.agrarvolution.timecodeCorrection = {
     */
     splitTimesToNumbers: function(){
         for (var i = 0; i < this.media.length; i++) {
+            var media = this.media[i];
             var durationMatch = this.splitTimeToNumber(this.media[i].duration, this.media[i].frameRate);
             if (!durationMatch) {
                 this.logToCEP(this.media[i].name + " - Couldn't process duration. (" + this.media[i].duration + ")", this.logLevels.status);
