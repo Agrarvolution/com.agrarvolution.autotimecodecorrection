@@ -35,7 +35,7 @@ $.agrarvolution.timecodeCorrection = {
     searchRecursive: true,
     searchTarget: 1, //0: root, 1: selection
     ignoreMediaStart: true,
-    timeTicks: 254016000000, //per second
+    timeTicks: 254016, //per second misses 6 digits (zeros)
     logging: true,
 
     /**
@@ -345,8 +345,9 @@ $.agrarvolution.timecodeCorrection = {
     changeStartTime: function(update, mediaItem) {
         var newStartTime = (((update.audioTC.groups.hours*60 + update.audioTC.groups.minutes)*60) + update.audioTC.groups.seconds + 
             (update.audioTC.groups.frames*100)/update.framerate) * this.timeTicks;
+        newStartTime = newStartTime.toString() + "000000"; //multiplication over integer limit hack
         if (newStartTime) {
-            mediaItem.projectItem.setStartTime(newStartTime.toString());
+            mediaItem.projectItem.setStartTime(newStartTime);
             this.logToCEP(mediaItem.fileName + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" + 
                 update.audioTC.text + ")", this.logLevels.info);
             return true;
