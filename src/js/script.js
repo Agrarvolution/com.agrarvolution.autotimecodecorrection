@@ -38,7 +38,8 @@ let lockForm = false;
 
 
 $(function () {
-        
+    onLoaded();  
+    
     logging.logArea = $('#loggingArea')[0];
     logging.log = $('#log');
     log = $('#log');
