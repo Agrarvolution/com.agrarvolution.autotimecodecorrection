@@ -347,7 +347,7 @@ $.agrarvolution.timecodeCorrection = {
             (update.audioTC.groups.frames*1000)/(update.framerate*10))) * this.timeTicks;
         //newStartTime = Math.floor(newStartTime) + "00000"; //multiplication over integer limit hack
         if (newStartTime) {
-            mediaItem.projectItem.setStartTime(newStartTime.toString();
+            mediaItem.projectItem.setStartTime(newStartTime.toString());
             this.logToCEP(mediaItem.fileName + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" + 
                 update.audioTC.text + ")", this.logLevels.info);
             return true;
