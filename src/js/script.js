@@ -316,6 +316,7 @@ function validateTime (time, framerate, blockFrameCheck) {
  * @returns {array}
  */
 function CSVToArray (strData, strDelimiter){
+    strData = strData.trim();
 
     strDelimiter = (strDelimiter || ",");
 
