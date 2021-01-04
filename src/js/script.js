@@ -232,6 +232,7 @@ function checkCSVrow (row, version, rowNumber) {
                 logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
                 row[4] + ") is unexpected.", logLevels.info);
         }
+        tcMediaElement.framerate /= 100;
 
         let hmsfPattern = /^(?<hours>[\d]{1,2})[:;](?<minutes>[\d]{1,2})[:;](?<seconds>[\d]{1,2})([:;](?<frames>[\d]{1,}))?$/g;
 
@@ -296,7 +297,6 @@ function validateTime (time, framerate, blockFrameCheck) {
     time.groups.seconds = Number(time.groups.seconds);
     time.groups.frames = Number(time.groups.frames);
 
-    framerate = framerate / 100;
     if (time.length < 4 || time.length > 6) {
         return false;
     }

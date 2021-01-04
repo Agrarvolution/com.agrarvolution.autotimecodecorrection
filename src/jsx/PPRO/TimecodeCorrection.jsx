@@ -310,12 +310,14 @@ $.agrarvolution.timecodeCorrection = {
         if (!(this.timeCodeUpdates !== undefined && this.media !== undefined)) {
             return false;
         }
-
+        var ob = this;
         for (i = 0; i < this.timeCodeUpdates.length; i++) {
-            for (j = 0; j < this.media.length; j++) {
+            for (j = 0; j < this.media.length; j++) {            
                 if (this.timeCodeUpdates[i].fileName.toUpperCase() === this.media[j].fileName.toUpperCase() && 
-                    this.compareTimes(this.timeCodeUpdates[i].duration.groups, this.media[j].duration.groups) && 
-                    (this.ignoreMediaStart ? true : this.compareTimes(this.timeCodeUpdates[i].fileTC.groups, this.media[j].startTime.groups))
+                    this.compareTimes(this.timeCodeUpdates[i].duration.groups, this.timeCodeUpdates[i].framerate, 
+                        this.media[j].duration.groups, this.media[j].frameRate) && 
+                    (this.ignoreMediaStart ? true : this.compareTimes(this.timeCodeUpdates[i].fileTC.groups, 
+                        this.timeCodeUpdates[i].framerate, this.media[j].startTime.groups, this.media[j].frameRate))
                 ) {
                     this.changeStartTime(this.timeCodeUpdates[i], this.media[j]);
                 }
@@ -326,15 +328,13 @@ $.agrarvolution.timecodeCorrection = {
     /**
         *Compares two time groups.
         *@param {{hour: number, minutes: number, seconds: number, frames: number}} timeObj1 
-        *@param {{hour: number, minutes: number, seconds: number, frames: number}} timeObj1
+        * @param {number} frameRate1
+        *@param {{hour: number, minutes: number, seconds: number, frames: number}} timeObj2
+        * @param {number} frameRate2
         *@returns {boolean} true if values match 
     */
-    compareTimes: function(timeObj1, timeObj2) {
-        if (timeObj1.hours === timeObj2.hours && timeObj1.minutes === timeObj2.minutes && 
-        timeObj1.seconds === timeObj2.seconds && (timeObj1.frames !== NaN || timeObj2.frames !== NaN) ? true : timeObj1.frames === timeObj2.frames) {
-            return true
-        }
-        return false;
+    compareTimes: function(timeObj1, frameRate1, timeObj2, frameRate2) {
+        return this.convertTimeToSeconds(timeObj1, frameRate1) === this.convertTimeToSeconds(timeObj2, frameRate2);
     },
     /**
         *Updates / changes the starttime of a given ProjectItem.
@@ -344,7 +344,7 @@ $.agrarvolution.timecodeCorrection = {
     */
     changeStartTime: function(update, mediaItem) {
         var newStartTime = Math.floor((((update.audioTC.groups.hours*60 + update.audioTC.groups.minutes)*60) + update.audioTC.groups.seconds + 
-            (update.audioTC.groups.frames*100)/(update.framerate)) * this.timeTicks);
+            (update.audioTC.groups.frames)/(update.framerate)) * this.timeTicks);
         newStartTime *= 10000;
         if (newStartTime) {
             mediaItem.projectItem.setStartTime(newStartTime.toString());
@@ -357,7 +357,40 @@ $.agrarvolution.timecodeCorrection = {
                 update.audioTC.text + ")", this.logLevels.error);
         return false;
     },
+    /**
+    * Converts time values into seconds. Contains a timebase fix, especially for files whose duration doesn't match due to rounding error.
+    * @param {hour: number, minutes: number, seconds: number, frames: number} time
+    * @param {number} frameRate
+    * @return {number} time in seconds
+    */
+    convertTimeToSeconds: function(time, frameRate) {
+        if (time.hours === undefined || time.minutes === undefined || time.seconds === undefined || time.frames === undefined) {
+            return false;
+        }
+        var frames = 0;
+        if (time.frames !== null) {
+            frames = time.frames;
+        }
 
+        //footage framerate vs. timecode fix ~ hack
+        frameRate = Math.floor(frameRate*100);
+        switch (frameRate) {
+            case 11988: 
+            case 12000:
+            case 5994:
+            case 6000: 
+                frameRate = 3000;
+                break;
+            case 10000:
+            case 5000:
+                frameRate = 2500;
+                break;
+            default:
+        }
+        frameRate /= 100;
+        var result = Math.round(((time.hours * 60 + time.minutes) * 60 + time.seconds + frames / frameRate))
+        return result;
+    },
     
 
     /**
