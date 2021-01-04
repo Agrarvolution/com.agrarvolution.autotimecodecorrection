@@ -203,7 +203,7 @@ function checkCSVrow (row, version, rowNumber) {
     if (version === csvVersion.ttc116) {
         for (let i = 0; i < row.length; i++) {
             if (row[i] === undefined) {
-                logging.addLog("CSV row " + rowNumber + " is incomplete.", logLevels.error);
+                logging.addLog("CSV row " + rowNumber + (row[0]!== undefined ? " (" + row[0] + ")" : '') + " is incomplete.", logLevels.error);
                 return false;
             }
         }
