@@ -35,7 +35,7 @@ $.agrarvolution.timecodeCorrection = {
     searchRecursive: true,
     searchTarget: 1, //0: root, 1: selection
     ignoreMediaStart: true,
-    timeTicks: 2540160, //per second misses 5 digits (zeros)
+    timeTicks: 25401600, //per second misses 5 digits (zeros)
     logging: true,
 
     /**
@@ -314,7 +314,7 @@ $.agrarvolution.timecodeCorrection = {
         for (i = 0; i < this.timeCodeUpdates.length; i++) {
             for (j = 0; j < this.media.length; j++) {
                 if (this.timeCodeUpdates[i].fileName.toUpperCase() === this.media[j].fileName.toUpperCase() && 
-                this.compareTimes(this.timeCodeUpdates[i].duration.groups, this.media[j].duration.groups) && 
+                    this.compareTimes(this.timeCodeUpdates[i].duration.groups, this.media[j].duration.groups) && 
                     (this.ignoreMediaStart ? true : this.compareTimes(this.timeCodeUpdates[i].fileTC.groups, this.media[j].startTime.groups))
                 ) {
                     this.changeStartTime(this.timeCodeUpdates[i], this.media[j]);
@@ -344,8 +344,8 @@ $.agrarvolution.timecodeCorrection = {
     */
     changeStartTime: function(update, mediaItem) {
         var newStartTime = Math.floor((((update.audioTC.groups.hours*60 + update.audioTC.groups.minutes)*60) + update.audioTC.groups.seconds + 
-            (update.audioTC.groups.frames*100)/(update.framerate)) * 100000) * this.timeTicks;
-
+            (update.audioTC.groups.frames*100)/(update.framerate)) * this.timeTicks);
+        newStartTime *= 10000;
         if (newStartTime) {
             mediaItem.projectItem.setStartTime(newStartTime.toString());
             this.logToCEP(mediaItem.fileName + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" + 
