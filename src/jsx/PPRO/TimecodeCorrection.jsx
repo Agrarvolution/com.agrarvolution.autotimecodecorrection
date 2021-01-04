@@ -375,12 +375,17 @@ $.agrarvolution.timecodeCorrection = {
         //footage framerate vs. timecode fix ~ hack
         frameRate = Math.floor(frameRate*100);
         switch (frameRate) {
+            case 23976:
             case 11988: 
-            case 12000:
             case 5994:
+                frameRate = 2997;
+                break;
+            case 24000:
+            case 12000:
             case 6000: 
                 frameRate = 3000;
                 break;
+            case 20000:
             case 10000:
             case 5000:
                 frameRate = 2500;
