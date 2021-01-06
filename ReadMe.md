@@ -101,6 +101,10 @@ Parsing single rows will give a warning for every file that couldn't be processe
 
 At the end every successful change will be logged only if verbose logging is enabled.
 
+### Known Issues
+
+- **High Framerate Files don't match**
+File duration is used to pick the correct files. Tentacle only outputs duration down to the second. Which can lead to rounding errors in combination with highframerate footage. In this case the duration in the .csv should be rounded down.
 
 ## Version history
 
@@ -111,6 +115,7 @@ in progess
 
 | Version   | Date      | Description
 |---------  |------     |------------
+| 0.11      | 05.01.2021 | Mid-test, small fixes (time in ticks, matching of files)
 | 0.10      | 11.12.2020 | Pre-test, non-compiled, but optically finished build
 | 0.00      | 25.11.2020 | Development start
 - - -
