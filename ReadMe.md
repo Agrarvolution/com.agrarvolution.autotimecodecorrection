@@ -36,7 +36,32 @@ Tested with:
 
 ## Installation
 
-@Todo
+### Future
+
+This app will be available in Adobe Exchange (also accessible through Creative Cloud Experience PlugIns).
+### Manual installation
+See also [PProPanel Docs](https://github.com/Adobe-CEP/Samples/tree/master/PProPanel).
+
+Put the plugin folder into these directiories, to have Premiere Pro load it:
+
+```html
+Windows:    C:\Program Files (x86)\Common Files\Adobe\CEP\extensions
+Mac:        /Library/Application Support/Adobe/CEP/extensions
+```
+
+### Debug Mode
+If you try to run a non signed instance you have to enable ```PlayerDebugMode```.
+
+On Mac, type the following into Terminal, then relaunch Finder (either via
+rebooting, or from the Force Quit dialog):
+
+```html
+defaults write /Users/<username>/Library/Preferences/com.adobe.CSXS.10.plist PlayerDebugMode 1
+```
+
+On Windows, make the following registry entry (a new Key, of type String):
+
+![Registry image](payloads/Registry.png)
 
 ## Options
 
