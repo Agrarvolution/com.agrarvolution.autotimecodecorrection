@@ -8,7 +8,7 @@ let loggingId = 'logging';
 let mediaStartId = 'mediaStart';
 
 var logging = logging || {};
-logging.verboseLogging = true;
+logging.verboseLogging = false;
 const logLevels = {
     critical: "CRIT",
     status: "STAT",
@@ -104,7 +104,7 @@ $(function () {
         } else {
             processFile(validation);        
         }      
-    })    
+    });   
 });
 
 
@@ -392,7 +392,8 @@ function changeSettings(settings) {
     try {
         let form = $('form[name="atc"]')[0];
 
-        form[loggingId].checked = settings.logging;
+        form[loggingId].checked = settings.logging; 
+
         form[searchRecursionId].checked = settings.searchRecursive;
         form[mediaStartId].checked = settings.ignoreMediaStart;
 
@@ -472,7 +473,7 @@ logging.addLog = function (text, level) {
         explainer.addClass('hidden');
         error.text(text);
     }
-    if (level === logLevels.error || logging.verboseLogging) {
+    if (level === logLevels.error || this.verboseLogging) {
         if (this.log.hasClass('hidden')) {
             this.log.removeClass('hidden');
         }   
