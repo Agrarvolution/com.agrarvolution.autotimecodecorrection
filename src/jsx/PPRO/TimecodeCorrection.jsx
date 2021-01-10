@@ -135,18 +135,22 @@ $.agrarvolution.timecodeCorrection = {
             if (viewIDs === undefined) {
                 return false;
             }
+
             for (i = 0; i < viewIDs.length; i++) {
                 var currentProject = app.getProjectFromViewID(viewIDs[i]);
-
-                if (currentProject.documentID === app.project.documentID) {
-                    var selectedItems = app.getProjectViewSelection(viewIDs[i]);
-                    
-                    if (selectedItems !== undefined) {
-                        for (i = 0; i < selectedItems.length; i++) {
-                            this.processProjectItem(selectedItems[i]);
-                        }
-                    }  
-                }
+                try {
+                    if (currentProject.hasOwnProperty('documentID') && currentProject.documentID === app.project.documentID) {
+                        var selectedItems = app.getProjectViewSelection(viewIDs[i]);
+                        
+                        if (selectedItems !== undefined) {
+                            for (var j = 0; j < selectedItems.length; j++) {
+                                this.processProjectItem(selectedItems[j]);
+                            }
+                        }  
+                    }
+                } catch (error) {
+                     //unknown error couldn't be located
+                }       
             }            
         }
         if (this.splitTimesToNumbers()) {
