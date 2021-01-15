@@ -1,0 +1,31 @@
+[15.01.2021 - 22:37:27] INFO Dumping XMPMeta object ""  (0x0)
+
+   xmp:  http://ns.adobe.com/xap/1.0/  (0x80000000 : schema)
+      xmp:ModifyDate = "2020-06-13T11:28:11Z"
+      xmp:MetadataDate = "2021-01-14T21:12:48+01:00"
+      xmp:CreateDate = "2020-06-13T11:28:11Z"
+
+   xmpDM:  http://ns.adobe.com/xmp/1.0/DynamicMedia/  (0x80000000 : schema)
+      xmpDM:startTimeScale = "30000"
+      xmpDM:startTimeSampleSize = "1001"
+      xmpDM:altTimecode  (0x100 : isStruct)
+         xmpDM:timeValue = "12;27;03;29"
+         xmpDM:timeFormat = "2997DropTimecode"
+      xmpDM:duration  (0x100 : isStruct)
+         xmpDM:value = "5147142"
+         xmpDM:scale = "1/120000"
+
+   xmpMM:  http://ns.adobe.com/xap/1.0/mm/  (0x80000000 : schema)
+      xmpMM:InstanceID = "xmp.iid:5ef1b1dc-baed-5f48-97c1-113d32696b03"
+      xmpMM:DocumentID = "xmp.did:5ef1b1dc-baed-5f48-97c1-113d32696b03"
+      xmpMM:OriginalDocumentID = "xmp.did:5ef1b1dc-baed-5f48-97c1-113d32696b03"
+      xmpMM:History  (0x600 : isOrdered isArray)
+         [1]  (0x100 : isStruct)
+            stEvt:action = "saved"
+            stEvt:instanceID = "xmp.iid:5ef1b1dc-baed-5f48-97c1-113d32696b03"
+            stEvt:when = "2021-01-14T21:12:48+01:00"
+            stEvt:softwareAgent = "Adobe Bridge 2021 (Windows)"
+            stEvt:changed = "/metadata"
+
+   tiff:  http://ns.adobe.com/tiff/1.0/  (0x80000000 : schema)
+      tiff:Orientation = "1"

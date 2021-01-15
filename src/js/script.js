@@ -55,6 +55,15 @@ $(function () {
         logging.addLog(e.data.text , e.data.logLevel);
     });
 
+    $('#xmp').on('click', function(e) {
+        e.preventDefault();
+        logging.addLog("Start xmp" , logLevels.status);
+        let csInterface = new CSInterface();
+        csInterface.evalScript('$.agrarvolution.timecodeCorrection.metaDataOfSelected()', function (e) {
+            logging.addLog(e , logLevels.status);
+        });
+    });
+    
     //restore settings
     settings = loadSettings();
     changeSettings(settings);

@@ -29,10 +29,9 @@
 <body class="autotc_gui">
 	<main>
 		<section id="process">
-			<h3>Media selection</h3>
 			<a id="refresh" href="javascript:history.go(0)">Refresh panel</a>
 			
-			<button id="reset">Reset panel</button>
+			
 			<form name="atc" onsubmit="return 0" method="post">
 				<p id="explainer">Select .csv file to start.</p>
 				<p id="errorDisplay"></p>
@@ -65,7 +64,11 @@
 							<label for="logging">Enable verbose logging</label>
 						</span>
 				</section>
-				<input type="submit" id="start" value="Start">	
+				<section id="processButtons">
+					<input type="submit" id="start" value="Start">
+					<button id="reset">Reset panel</button>
+					<button id="xmp">XMP</button>
+				</section>
 			</form>
 		</section>
 		<section id="log" class="hidden">

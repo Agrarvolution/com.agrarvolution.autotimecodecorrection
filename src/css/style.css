@@ -104,12 +104,12 @@ input[type="file"]::-webkit-file-upload-button {
 	cursor: pointer;
 }
 
-.logButtons {
+.logButtons, #processButtons {
 	display:block;
 	margin: 1rem auto;
 	width: fit-content;
 }
-.logButtons button {
+.logButtons button, #processButtons button,  #processButtons input[type="submit"] {
 	margin: .2rem .25rem;
 	display: inline;
 }
