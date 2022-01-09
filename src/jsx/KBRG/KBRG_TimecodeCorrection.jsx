@@ -38,6 +38,9 @@ $.agrarvolution.timecodeCorrection = {
     timeTicks: 25401600, //per second misses 5 digits (zeros)
     logging: true,
 
+
+
+
     metaDataOfSelected: function() {
         if (app.document.selectionLength !== 0) {
             var thumb = app.document.selections[0];
@@ -49,14 +52,17 @@ $.agrarvolution.timecodeCorrection = {
                 var xmp = new XMPMeta(md.serialize());
 
                 this.logToCEP(xmp.dumpObject(), this.logLevels.info);
-                var altTime = xmp.getProperty(XMPConst.NS_DM, "altTimecode");
-                this.logToCEP(JSON.stringify(altTime.value), this.logLevels.info);
-
 
                 var startTime = xmp.getStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue");
                 this.logToCEP(startTime.value, this.logLevels.info);
                 var frameRate = xmp.getStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat");
                 this.logToCEP(frameRate.value, this.logLevels.info);   
+
+                xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimecode", startTime);
+                xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", "10:37:27:20");
+
+                var changedXMP = xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT);
+                thumb.synchronousMetadata = new Metadata(changedXMP);
             }
             return true;
         }
@@ -142,6 +148,7 @@ $.agrarvolution.timecodeCorrection = {
         }
         return false;
     },
+
     /**
         *Loads media file / clips into a semipermanent cache. This avoids scraping through the app DOM everytime a match has to be found later.
         *@returns {boolean} false - not processed times, thus useless for comparisons, true - everything worked
@@ -150,39 +157,26 @@ $.agrarvolution.timecodeCorrection = {
         var i = 0;
         this.media = [];
 
-        if (this.searchTarget === 0) { //process project root
-            for (i = 0; i < app.project.rootItem.children.length; i++) {
-                this.processProjectItem(app.project.rootItem.children[i]);
-            }
-        } else if (this.searchTarget === 1) { //process selection
-            var viewIDs = app.getProjectViewIDs();
-            if (viewIDs === undefined) {
-                return false;
-            }
+        var hasNoSelection = app.document.selectionLength === 0;
 
-            for (i = 0; i < viewIDs.length; i++) {
-                var currentProject = app.getProjectFromViewID(viewIDs[i]);
-                try {
-                    if (currentProject.hasOwnProperty('documentID') && currentProject.documentID === app.project.documentID) {
-                        var selectedItems = app.getProjectViewSelection(viewIDs[i]);
-                        
-                        if (selectedItems !== undefined) {
-                            for (var j = 0; j < selectedItems.length; j++) {
-                                this.processProjectItem(selectedItems[j]);
-                            }
-                        }  
-                    }
-                } catch (error) {
-                     //unknown error couldn't be located
-                }       
-            }            
+        if (hasNoSelection) { //process root - get all thumbnails if there is no selection
+            app.document.selectAll();
+        } 
+        
+        for (i = 0; i < app.document.selectionLength; i++) {
+            this.processThumbnail(app.document.selections[i]);
         }
+
+        if (hasNoSelection) { // remove selection if there was none before
+            app.document.deselectAll()
+        }
+        /*
         if (this.splitTimesToNumbers()) {
             this.logToCEP("Processing time strings was successfull.", this.logLevels.info);
         } else {
             this.logToCEP("Processing time strings was unsuccessfull.", this.logLevels.critical);
             return false;
-        }
+        }*/
 
         //extended log
         if (this.logging) {
@@ -207,20 +201,20 @@ $.agrarvolution.timecodeCorrection = {
     /**
         *Processes a single project item. 
         *If it is a folder, it will call this method for all its children (depending on the settings.)
-        *If it is a clip it will store some informations about the ProjectItem and the ProjectItem itself into this namespace's media array for quicker search later in the process.
-        *@param {Object} projectItem Premiere Project Item, see CEP reference
+        *If it is a clip it will store some informations about the thumbnail into this namespace's media array for quicker search later in the process.
+        *@param {Object} thumb Premiere Project Item, see CEP reference
     */
-    processProjectItem: function(projectItem) {
-        if (this.searchTarget === 1 && this.mediaNodeIdExists(projectItem.nodeId)) {
+    processThumbnail: function(thumb) {
+        if (this.searchTarget === 1 && this.mediaNodeIdExists(thumb.nodeId)) {
             return false;
         }
 
         var i = 0;
-        if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.clip) {
+        if (!thumb.isSequence() && thumb.type === this.thumbTypes.clip) {
             var item = {};
-            item.projectItem = projectItem;
-            item.fileName = projectItem.name;
-            item.nodeId = projectItem.nodeId;
+            item.thumb = thumb;
+            item.fileName = thumb.name;
+            item.nodeId = thumb.nodeId;
 
             var projectItemXMP = new XMPMeta(projectItem.getProjectMetadata());
 
@@ -245,7 +239,7 @@ $.agrarvolution.timecodeCorrection = {
             }        
         } else if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.bin && this.searchRecursive) {
             for (i = 0; i < projectItem.children.length; i++) {
-                this.processProjectItem(projectItem.children[i]);
+                this.processThumbnail(projectItem.children[i]);
             }
         } 
     },
@@ -263,7 +257,7 @@ $.agrarvolution.timecodeCorrection = {
         return false;
     },
     /**
-        *Calls splutTimeToNumber for duration and startTime for every object in the media array.
+        *Calls splitTimeToNumber for duration and startTime for every object in the media array.
         *@returns {boolean} false on any error | true on success
     */
     splitTimesToNumbers: function(){
