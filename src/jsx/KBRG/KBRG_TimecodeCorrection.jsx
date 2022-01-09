@@ -17,11 +17,17 @@ try {
 $.agrarvolution = $.agrarvolution || {};
 
 $.agrarvolution.timecodeCorrection = {
-    ProjectItemTypes: {
-        bin: 2,
-        clip: 1,
-        file: 4,
-        root: 3
+    AllowedMediaTypes: [
+        'mp4', 'av1', 'mov', 'ogg', 'ogv', 'mkv', 'webm',
+        'wav', 'bwf', 'rf64', 'amb', 'acc', 'aif', 'aiff', 'aifc', 'mp2', 'mp3', '3gp', 'wma', 'flac', 'ape'
+    ],
+    ThumbnailTypes: {
+        file: 'file',
+        folder: 'folder',
+        alias: 'alias',
+        pkg: 'package',
+        app: 'application',
+        other: 'other'
     },
     logLevels: {
         critical: "CRIT",
@@ -46,23 +52,32 @@ $.agrarvolution.timecodeCorrection = {
             var thumb = app.document.selections[0];
             if(thumb !== undefined && thumb != null && thumb.hasMetadata) {
                 // Get the metadata object - wait for  valid values
-                var md = thumb.synchronousMetadata;
-
+                var md = thumb.metadata;
                 // Get the XMP packet as a string and create the XMPMeta object
                 var xmp = new XMPMeta(md.serialize());
 
                 this.logToCEP(xmp.dumpObject(), this.logLevels.info);
 
+                // audio uses startTimecode instead of altTimecode -> switch values around for video?
+
                 var startTime = xmp.getStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue");
                 this.logToCEP(startTime.value, this.logLevels.info);
                 var frameRate = xmp.getStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat");
                 this.logToCEP(frameRate.value, this.logLevels.info);   
+                var duration = xmp.getStructField(XMPConst.NS_DM, "duration", XMPConst.NS_DM, "value").value;
+                var duration2 = xmp.doesPropertyExist(XMPConst.NS_DM, "startTimecode");
 
+
+
+                var type = thumb.type;
+                var name = thumb.name;
+                var mimeType = thumb.mimeType;
+                var model = thumb.model;
                 xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimecode", startTime);
                 xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", "10:37:27:20");
-
+/*
                 var changedXMP = xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT);
-                thumb.synchronousMetadata = new Metadata(changedXMP);
+                thumb.synchronousMetadata = new Metadata(changedXMP);*/
             }
             return true;
         }
@@ -170,13 +185,13 @@ $.agrarvolution.timecodeCorrection = {
         if (hasNoSelection) { // remove selection if there was none before
             app.document.deselectAll()
         }
-        /*
+        
         if (this.splitTimesToNumbers()) {
             this.logToCEP("Processing time strings was successfull.", this.logLevels.info);
         } else {
             this.logToCEP("Processing time strings was unsuccessfull.", this.logLevels.critical);
             return false;
-        }*/
+        }
 
         //extended log
         if (this.logging) {
@@ -192,7 +207,7 @@ $.agrarvolution.timecodeCorrection = {
 
             var mediaLog = JSON.parse(JSON.stringify(this.media));
             for (var i = 0; i < mediaLog.length; i++) {
-                mediaLog[i].projectItem = "[object ProjectItem]";
+                mediaLog[i].thumb = "[object ProjectItem]";
             }
             this.logToCEP(this.media.length + " media files have been discovered in " + method + ": " + JSON.stringify(mediaLog), this.logLevels.info);
         }
@@ -202,60 +217,39 @@ $.agrarvolution.timecodeCorrection = {
         *Processes a single project item. 
         *If it is a folder, it will call this method for all its children (depending on the settings.)
         *If it is a clip it will store some informations about the thumbnail into this namespace's media array for quicker search later in the process.
-        *@param {Object} thumb Premiere Project Item, see CEP reference
+        *@param {Object} thumb Bridge folder element, see CEP reference
     */
     processThumbnail: function(thumb) {
-        if (this.searchTarget === 1 && this.mediaNodeIdExists(thumb.nodeId)) {
-            return false;
-        }
+        var thumbFileType = this.getFileType(thumb.name);
 
-        var i = 0;
-        if (!thumb.isSequence() && thumb.type === this.thumbTypes.clip) {
+        if (thumb.type === this.ThumbnailTypes.file && thumb.hasMetadata) {
+            var timecodeMetadataStruct = thumb.mimeType.match('audio') ? 'startTimecode' : 'altTimecode';
             var item = {};
             item.thumb = thumb;
             item.fileName = thumb.name;
-            item.nodeId = thumb.nodeId;
+            item.xmp = new XMPMeta(thumb.serializedMetadata.serialize());
 
-            var projectItemXMP = new XMPMeta(projectItem.getProjectMetadata());
-
-            item.duration = '';
-            if (projectItemXMP.doesPropertyExist(this.kPProPrivateProjectMetadataURI, 'Column.Intrinsic.VideoDuration') === true) {
-                item.duration = projectItemXMP.getProperty(this.kPProPrivateProjectMetadataURI, 'Column.Intrinsic.VideoDuration');
-                item.duration = item.duration.value;
+            item.tcStruct = '';
+            if (item.xmp.doesPropertyExist(XMPConst.NS_DM, "altTimecode")) {
+                item.tcStruct = "altTimecode";
+            } else if (item.xmp.doesPropertyExist(XMPConst.NS_DM, "startTimecode")) {
+                item.tcStruct = "startTimecode";
             }
 
-            item.startTime = '';
-            if (projectItemXMP.doesPropertyExist(this.kPProPrivateProjectMetadataURI, 'Column.Intrinsic.MediaStart') === true) {
-                item.startTime = projectItemXMP.getProperty(this.kPProPrivateProjectMetadataURI, 'Column.Intrinsic.MediaStart');
-                item.startTime = item.startTime.value
-            }
-            
-            var footageInterpretation = projectItem.getFootageInterpretation();
-            item.frameRate = footageInterpretation.frameRate;
 
-            // Audio+Image File check
-            if (item.duration !== "" && item.startTime != '') {
-                this.media.push(item);
-            }        
-        } else if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.bin && this.searchRecursive) {
-            for (i = 0; i < projectItem.children.length; i++) {
-                this.processThumbnail(projectItem.children[i]);
+            if (tcStruct !== '') {
+                item.startTime = item.xmp.getStructField(XMPConst.NS_DM, item.tcStruct, XMPConst.NS_DM, "timeValue").value || '';
+                item.frameRate = item.xmp.getStructField(XMPConst.NS_DM, item.tcStruct, XMPConst.NS_DM, "timeFormat").value.match(/\d+/g)[0] || '';
+            }
+
+            this.media.push(item);     
+        } else if (thumb.type === this.ThumbnailTypes.folder && this.searchRecursive) {
+            for (var i = 0; i < thumb.children.length; i++) {
+                this.processThumbnail(thumb.children[i]);
             }
         } 
     },
-    /**
-        *Checks if ProjectItem has already been stored in the media array. (Only useful when dealing with overlapping selections and deep search).
-        *@param {string} nodeID unique Id of a ProjectItem object
-        *@returns {boolean} true if it already is in use | false if it is not
-    */
-    mediaNodeIdExists: function(nodeId) {
-        for (var i = 0; i < this.media.length; i++) {
-            if (this.media.nodeId === nodeId) {
-                return true;
-            }
-        }
-        return false;
-    },
+
     /**
         *Calls splitTimeToNumber for duration and startTime for every object in the media array.
         *@returns {boolean} false on any error | true on success
@@ -263,17 +257,10 @@ $.agrarvolution.timecodeCorrection = {
     splitTimesToNumbers: function(){
         for (var i = 0; i < this.media.length; i++) {
             var media = this.media[i];
-            var durationMatch = this.splitTimeToNumber(this.media[i].duration, this.media[i].frameRate);
-            if (!durationMatch) {
-                this.logToCEP(this.media[i].name + " - Couldn't process duration. (" + this.media[i].duration + ")", this.logLevels.status);
-                return false;
-            }
-            this.media[i].duration = durationMatch;
 
             var startTimeMatch = this.splitTimeToNumber(this.media[i].startTime, this.media[i].frameRate);
             if (!startTimeMatch) {
                 this.logToCEP(this.media[i].name + " - Couldn't process start time. (" + this.media[i].startTime + ")", this.logLevels.status);
-                return false;
             }
             this.media[i].startTime = startTimeMatch;
         }
@@ -359,10 +346,10 @@ $.agrarvolution.timecodeCorrection = {
         return false;	
     },
     /**    
-        *Updates / changes the starttime of a given ProjectItem.
-        *@param {audioTC: {text: string, groups: object}} update
-        *@param {projectItem: object, fileName: string, startTime: object} mediaItem
-        *@returns {boolean} true on success
+        * Updates / changes the starttime of a given ProjectItem.
+        * @param {audioTC: {text: string, groups: object}} update
+        * @param {projectItem: object, fileName: string, startTime: object} mediaItem
+        * @returns {boolean} true on success
     */
     changeStartTime: function(update, mediaItem) {
         var newStartTime = Math.floor((((update.audioTC.groups.hours*60 + update.audioTC.groups.minutes)*60) + update.audioTC.groups.seconds + 
@@ -380,7 +367,35 @@ $.agrarvolution.timecodeCorrection = {
         return false;
     },
   
+    /**
+        * Create a float value from 1/X strings as commonly seen in XMP Metadata.
+        * @param {string} scale in 1/X
+        * @returns {number} 1 if scale was invalid, float if matches were found
+    */
+    calcScale: function (scale) {
+        scale = scale.match(/\d+/g);
+        if (scale.length === 1) {
+            return scale[0];
+        } else if (scale.length >= 2) {
+            return scale[0] / scale[1];
+        }
+        return 1;
+    },
+    /**
+        * Extracts the file ending of a file name.
+        * @param {string} fileName - filename without path
+        * @returns {string} file type without leading dot, returns empty string if nothing was found
+    */
+    getFileType: function (fileName) {
+        if (fileName !== undefined || fileName !== '') {
+            var fileType = fileName.match(/\.([\w]){1,}$/gi)
 
+            if (fileType[0]) {
+                return fileType[0].replace('.', '').trim();
+            }
+        }
+        return '';
+    },
     /**
     *CSXSEvent wrapping function to send log messages to the gui.
     *@param {string} text - text that should be sent to gui
