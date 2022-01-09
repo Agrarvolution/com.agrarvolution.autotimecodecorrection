@@ -389,6 +389,11 @@ $.agrarvolution.timecodeCorrection = {
         mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimeValue", mediaItem.startTime.text);
         mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", mediaItem.startTime.text);
 
+        if (mediaItem.tcStruct === 'startTimecode') {
+            mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat",
+                mediaItem.xmp.getStructField(XMPConst.NS_DM, "startTimecode", XMPConst.NS_DM, "startTimecode"));
+        }
+
         try {
             mediaItem.thumb.synchronousMetadata = new Metadata(mediaItem.xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
             this.logToCEP(mediaItem.filename + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" +
