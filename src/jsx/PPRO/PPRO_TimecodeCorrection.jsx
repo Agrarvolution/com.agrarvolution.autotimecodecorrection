@@ -314,7 +314,7 @@ $.agrarvolution.timecodeCorrection = {
         if (!(this.timeCodeUpdates !== undefined && this.media !== undefined)) {
             return false;
         }
-        var ob = this;
+
         for (i = 0; i < this.timeCodeUpdates.length; i++) {
             for (j = 0; j < this.media.length; j++) {            
                 if (this.timeCodeUpdates[i].fileName.toUpperCase() === this.media[j].fileName.toUpperCase() && 
