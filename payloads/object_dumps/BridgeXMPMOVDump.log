@@ -29,3 +29,194 @@
 
    tiff:  http://ns.adobe.com/tiff/1.0/  (0x80000000 : schema)
       tiff:Orientation = "1"
+
+
+[09.01.2022 - 14:47:36] INFO 
+[09.01.2022 - 14:47:36] INFO 
+[09.01.2022 - 14:47:36] INFO Dumping XMPMeta object ""  (0x0)
+
+   xmpDM:  http://ns.adobe.com/xmp/1.0/DynamicMedia/  (0x80000000 : schema)
+      xmpDM:tapeName = "200722"
+      xmpDM:shotNumber = "357"
+      xmpDM:scene = "PK"
+      xmpDM:projectName = "22-07-20"
+      xmpDM:good = "False"
+      xmpDM:audioSampleRate = "48000"
+      xmpDM:audioSampleType = "24Int"
+      xmpDM:startTimecode  (0x100 : isStruct)
+         xmpDM:timeValue = "16:37:44:13"
+         xmpDM:timeFormat = "25Timecode"
+
+   bext:  http://ns.adobe.com/bwf/bext/1.0/  (0x80000000 : schema)
+      bext:timeReference = "2873496961"
+      bext:description = "sSPEED=025.000-ND<0D>
+sTAKE=357<0D>
+sUBITS=$00000000<0D>
+sSWVER=3.03.4173<0D>
+sSCENE=PK<0D>
+sFILENAME=PK-357.WAV<0D>
+sTAPE=200722<0D>
+sCIRCLED=FALSE<0D>
+sTRK1=MixL<0D>
+sTRK2=MixR<0D>
+sTRK3=NTG-5<0D>
+sNOTE=<0D>
+"
+      bext:originator = "SoundDev: MixPre-6 QC0317263003"
+      bext:originatorReference = "USSDVQC0317263003200722GaQ000201"
+      bext:originationDate = "2020-07-22"
+      bext:originationTime = "16:36:52"
+      bext:version = "1"
+      bext:codingHistory = "A=PCM,F=48000,W=24,M=multi,R=48000,T=3 Ch;Ambisonics=off<0D>
+"
+
+   iXML:  http://ns.adobe.com/ixml/1.0/  (0x80000000 : schema)
+      iXML:trackList  (0x200 : isArray)
+         [1]  (0x100 : isStruct)
+            iXML:channelIndex = "1"
+            iXML:interleaveIndex = "1"
+            iXML:name = "MixL"
+         [2]  (0x100 : isStruct)
+            iXML:channelIndex = "2"
+            iXML:interleaveIndex = "2"
+            iXML:name = "MixR"
+         [3]  (0x100 : isStruct)
+            iXML:channelIndex = "3"
+            iXML:interleaveIndex = "3"
+            iXML:name = "NTG-5"
+
+[09.01.2022 - 14:47:36] INFO Dumping XMPMeta object ""  (0x0)
+
+   xmpDM:  http://ns.adobe.com/xmp/1.0/DynamicMedia/  (0x80000000 : schema)
+      xmpDM:tapeName = "200722"
+      xmpDM:shotNumber = "357"
+      xmpDM:scene = "PK"
+      xmpDM:projectName = "22-07-20"
+      xmpDM:good = "False"
+      xmpDM:audioSampleRate = "48000"
+      xmpDM:audioSampleType = "24Int"
+      xmpDM:startTimecode  (0x100 : isStruct)
+         xmpDM:timeValue = "16:37:44:13"
+         xmpDM:timeFormat = "25Timecode"
+
+   bext:  http://ns.adobe.com/bwf/bext/1.0/  (0x80000000 : schema)
+      bext:timeReference = "2873496961"
+      bext:description = "sSPEED=025.000-ND<0D>
+sTAKE=357<0D>
+sUBITS=$00000000<0D>
+sSWVER=3.03.4173<0D>
+sSCENE=PK<0D>
+sFILENAME=PK-357.WAV<0D>
+sTAPE=200722<0D>
+sCIRCLED=FALSE<0D>
+sTRK1=MixL<0D>
+sTRK2=MixR<0D>
+sTRK3=NTG-5<0D>
+sNOTE=<0D>
+"
+      bext:originator = "SoundDev: MixPre-6 QC0317263003"
+      bext:originatorReference = "USSDVQC0317263003200722GaQ000201"
+      bext:originationDate = "2020-07-22"
+      bext:originationTime = "16:36:52"
+      bext:version = "1"
+      bext:codingHistory = "A=PCM,F=48000,W=24,M=multi,R=48000,T=3 Ch;Ambisonics=off<0D>
+"
+
+   iXML:  http://ns.adobe.com/ixml/1.0/  (0x80000000 : schema)
+      iXML:trackList  (0x200 : isArray)
+         [1]  (0x100 : isStruct)
+            iXML:channelIndex = "1"
+            iXML:interleaveIndex = "1"
+            iXML:name = "MixL"
+         [2]  (0x100 : isStruct)
+            iXML:channelIndex = "2"
+            iXML:interleaveIndex = "2"
+            iXML:name = "MixR"
+         [3]  (0x100 : isStruct)
+            iXML:channelIndex = "3"
+            iXML:interleaveIndex = "3"
+            iXML:name = "NTG-5"
+
+[09.01.2022 - 14:46:45] INFO 25Timecode
+[09.01.2022 - 14:46:45] INFO 10:37:27:20
+[09.01.2022 - 14:46:45] INFO Dumping XMPMeta object ""  (0x0)
+
+   xmp:  http://ns.adobe.com/xap/1.0/  (0x80000000 : schema)
+      xmp:ModifyDate = "1904-01-01T00:00Z"
+      xmp:MetadataDate = "2022-01-09T00:47:17+01:00"
+      xmp:CreateDate = "1904-01-01T00:00Z"
+
+   xmpDM:  http://ns.adobe.com/xmp/1.0/DynamicMedia/  (0x80000000 : schema)
+      xmpDM:startTimeScale = "12800"
+      xmpDM:startTimeSampleSize = "512"
+      xmpDM:previousTimecode = "this is a test"
+      xmpDM:altTimecode  (0x100 : isStruct)
+         xmpDM:timeValue = "10:37:27:20"
+         xmpDM:timeFormat = "25Timecode"
+         xmpDM:previousTimecode = "13:37:27:20"
+      xmpDM:duration  (0x100 : isStruct)
+         xmpDM:value = "12360"
+         xmpDM:scale = "1/1000"
+
+   xmpMM:  http://ns.adobe.com/xap/1.0/mm/  (0x80000000 : schema)
+      xmpMM:InstanceID = "xmp.iid:f2499757-a39b-2b42-a95c-be6f9fbf3994"
+      xmpMM:DocumentID = "xmp.did:256797a2-7352-aa41-b11a-ccbb955b8b72"
+      xmpMM:OriginalDocumentID = "xmp.did:256797a2-7352-aa41-b11a-ccbb955b8b72"
+      xmpMM:History  (0x600 : isOrdered isArray)
+         [1]  (0x100 : isStruct)
+            stEvt:action = "saved"
+            stEvt:instanceID = "xmp.iid:256797a2-7352-aa41-b11a-ccbb955b8b72"
+            stEvt:when = "2022-01-09T00:14:01+01:00"
+            stEvt:softwareAgent = "Adobe Bridge 2022 (Windows)"
+            stEvt:changed = "/metadata"
+         [2]  (0x100 : isStruct)
+            stEvt:action = "saved"
+            stEvt:instanceID = "xmp.iid:f2499757-a39b-2b42-a95c-be6f9fbf3994"
+            stEvt:when = "2022-01-09T00:47:17+01:00"
+            stEvt:softwareAgent = "Adobe Bridge 2022 (Windows)"
+            stEvt:changed = "/metadata"
+
+   tiff:  http://ns.adobe.com/tiff/1.0/  (0x80000000 : schema)
+      tiff:Orientation = "1"
+
+[09.01.2022 - 14:46:45] INFO Dumping XMPMeta object ""  (0x0)
+
+   xmp:  http://ns.adobe.com/xap/1.0/  (0x80000000 : schema)
+      xmp:ModifyDate = "1904-01-01T00:00Z"
+      xmp:MetadataDate = "2022-01-09T00:47:17+01:00"
+      xmp:CreateDate = "1904-01-01T00:00Z"
+
+   xmpDM:  http://ns.adobe.com/xmp/1.0/DynamicMedia/  (0x80000000 : schema)
+      xmpDM:startTimeScale = "12800"
+      xmpDM:startTimeSampleSize = "512"
+      xmpDM:previousTimecode = "this is a test"
+      xmpDM:altTimecode  (0x100 : isStruct)
+         xmpDM:timeValue = "10:37:27:20"
+         xmpDM:timeFormat = "25Timecode"
+         xmpDM:previousTimecode = "13:37:27:20"
+      xmpDM:duration  (0x100 : isStruct)
+         xmpDM:value = "12360"
+         xmpDM:scale = "1/1000"
+
+   xmpMM:  http://ns.adobe.com/xap/1.0/mm/  (0x80000000 : schema)
+      xmpMM:InstanceID = "xmp.iid:f2499757-a39b-2b42-a95c-be6f9fbf3994"
+      xmpMM:DocumentID = "xmp.did:256797a2-7352-aa41-b11a-ccbb955b8b72"
+      xmpMM:OriginalDocumentID = "xmp.did:256797a2-7352-aa41-b11a-ccbb955b8b72"
+      xmpMM:History  (0x600 : isOrdered isArray)
+         [1]  (0x100 : isStruct)
+            stEvt:action = "saved"
+            stEvt:instanceID = "xmp.iid:256797a2-7352-aa41-b11a-ccbb955b8b72"
+            stEvt:when = "2022-01-09T00:14:01+01:00"
+            stEvt:softwareAgent = "Adobe Bridge 2022 (Windows)"
+            stEvt:changed = "/metadata"
+         [2]  (0x100 : isStruct)
+            stEvt:action = "saved"
+            stEvt:instanceID = "xmp.iid:f2499757-a39b-2b42-a95c-be6f9fbf3994"
+            stEvt:when = "2022-01-09T00:47:17+01:00"
+            stEvt:softwareAgent = "Adobe Bridge 2022 (Windows)"
+            stEvt:changed = "/metadata"
+
+   tiff:  http://ns.adobe.com/tiff/1.0/  (0x80000000 : schema)
+      tiff:Orientation = "1"
+
+[09.01.2022 - 14:33:11] INFO 
