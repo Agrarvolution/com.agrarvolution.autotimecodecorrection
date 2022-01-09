@@ -234,7 +234,7 @@ $.agrarvolution.timecodeCorrection = {
             var timecodeMetadataStruct = thumb.mimeType.match('audio') ? 'startTimecode' : 'altTimecode';
             var item = {};
             item.thumb = thumb;
-            item.fileName = thumb.name;
+            item.filename = thumb.name;
             item.xmp = new XMPMeta(thumb.serializedMetadata.serialize());
 
             item.tcStruct = '';
@@ -256,9 +256,9 @@ $.agrarvolution.timecodeCorrection = {
                         item.framerate = this.DropFrameTimecodes[this.DropFrameTimecodesKeys[i].toString()];
                     }
                 }
-                item.isDropFrame = false;
+                item.isDropframe = false;
                 if (xmpFramerate.toLowercase().match('drop')[0]) {
-                    item.isDropFrame = true;
+                    item.isDropframe = true;
                 }
             }
 
@@ -344,7 +344,7 @@ $.agrarvolution.timecodeCorrection = {
 
         for (i = 0; i < this.timeCodeUpdates.length; i++) {
             for (j = 0; j < this.media.length; j++) {
-                if (this.timeCodeUpdates[i].fileName.toUpperCase() === this.media[j].fileName.toUpperCase() &&
+                if (this.timeCodeUpdates[i].filename.toUpperCase() === this.media[j].filename.toUpperCase() &&
                     (this.ignoreMediaStart ? true : this.compareTimes(this.timeCodeUpdates[i].fileTC.groups, this.media[j].startTime.groups))
                 ) {
                     this.changeStartTime(this.timeCodeUpdates[i], this.media[j]);
@@ -369,7 +369,7 @@ $.agrarvolution.timecodeCorrection = {
     /**    
         * Updates / changes the starttime of a given ProjectItem.
         * @param {audioTC: {text: string, groups: object}} update
-        * @param {projectItem: object, fileName: string, startTime: object} mediaItem
+        * @param {projectItem: object, filename: string, startTime: object} mediaItem
         * @returns {boolean} true on success
         // @Todo -> set flag if conversion should be by total frames or last frames only (premiere one works last frame only)
     */
@@ -383,103 +383,77 @@ $.agrarvolution.timecodeCorrection = {
             mediaItem.framerate = 25;
         }
 
+        var startTime = createTimecodeFromObj(convertFramesToNewFramerate(update.startTime.groups, update.framerate, mediaItem.framerate),
+            mediaItem.isDropframe, mediaItem.framerate);
 
+        mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimeValue", mediaItem.startTime.text);
+        mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", mediaItem.startTime.text);
 
-        var startTime = convertTimeToConvertedFrames(update.startTime.groups, update.framerate, mediaItem.framerate);
-        mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimecode", mediaItem.startTime.text);
-        mediaItem.projectItem.setStartTime(newStartTime.toString());
-        this.logToCEP(mediaItem.fileName + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" +
-            update.audioTC.text + ")", this.logLevels.info);
-        // return true;
-
-
-        this.logToCEP(mediaItem.fileName + " - failed to update start time / timecode. (" + mediaItem.startTime.text + "->" +
-            update.audioTC.text + ")", this.logLevels.error);
-        return false;
-    },
-
-    /**
-     * Converts a time object into total frames.
-     * @param {hours: number, minutes: number, seconds: number, frames: number} time
-     * @param {number} framerate matching framerate to time object
-     * @param {boolean} isDropFrame
-     * @return {number}
-     */
-    convertTimeToFrames: function(time, framerate, isDropFrame) {
-        if (framerate !== '') {
-            return convertTimeToConvertedFrames(time, framerate, ramerate, isDropFrame);
+        try {
+            mediaItem.thumb.synchronousMetadata = new Metadata(mediaItem.xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
+            this.logToCEP(mediaItem.filename + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" +
+                update.audioTC.text + ")", this.logLevels.info);
+        } catch (e) {
+            this.logToCEP(mediaItem.filename + " - failed to update start time / timecode. (" + mediaItem.startTime.text + "->" +
+                update.audioTC.text + ")", this.logLevels.error);
+            this.logToCEP(e, this.logLevels.error);
+            return false;
         }
+        return true;
     },
     /**
-     * Converts a time object into total frames of a new framerate.
      * @param {hours: number, minutes: number, seconds: number, frames: number} time
-     * @param {number} framerate matching framerate to time object
-     * @param {number} framerate matching framerate to time object
-     * @param {boolean} isDropFrame Determines if time object is calculated with drop frames
-     * @return {number} framecount | 0 if framerates are invalid
-     
-     */
-    convertTimeToConvertedFrames: function(time, framerate, newFramerate, isDropframe) {
-        if (Number.parseFloat(framerate) === NaN && Number.parseFloat(newFramerate) === NaN) {
-            return 0;
-        }
-        return ((time.hours * 60 + time.minutes) * 60 + time.seconds + time.frames / framerate) * newFramerate;
-    },
-    /**
-     * Creates a time object from frames with the specified framerate.
-     * Drop frame conversion originates from David Heidelberger.
-     * @see https://www.davidheidelberger.com/2010/06/10/drop-frame-timecode/
-     * @param {number} frames
-     * @param {framerate} framerate
-     * @param {boolean} isDropFrame
+     * @param {number} prevFramerate
+     * @param {number} newFramerate
      * @returns {hours: number, minutes: number, seconds: number, frames: number} always with positive values
      */
-    convertFrameToTime: function(frames, framerate, isDropFrame) {
-        var time = {
-            hours: 0,
-            minutes: 0,
-            seconds: 0,
-            frames: 0
-        };
+    convertFramesToNewFramerate: function(time, prevFramerate, newFramerate) {
+        if (Number.parseFloat(prevFramerate) !== NaN && Number.parseFloat(newFramerate) !== NaN) {
+            time.frames = Math.round(time.frames / prevFramerate * newFramerate);
 
-        if (Number.parseFloat(frames) === NaN || Number.parseFloat(framerate) === NaN) {
-            return time;
-        }
+            if (time.frames === Math.round(newFramerate)) {
+                time.seconds++;
+                time.frames = 0;
+            }
 
-        frames = frames < 0 ? -frames : frames;
+            if (time.seconds === 60) {
+                time.minutes++;
+                time.seconds = 0;
+            }
 
-        if (isDropFrame) {
-            var dropFrames = Math.round(framerate * 0.066666),
-                framesPerHour = Math.round(framerate * 3600),
-                framesPer24Hours = Math.round(framerate * 86400),
-                framesPer10Minutes = Math.round(framerate * 600),
-                d = 0,
-                m = 0;
-            var framesPerMinute = Math.round(framerate * 60) - dropFrames;
-
-            frames = frames % framesPer24Hours;
-
-            d = Math.floor(frames / framesPer10Minutes);
-            m = frames % framesPer10Minutes;
-
-            if (m > dropFrames) {
-                frames = frames + (dropFrames * 9 * d) + dropFrames * ((m - dropFrames) / framesPerMinute);
-            } else {
-                frames = frames + dropFrames * 9 * d;
+            if (time.minutes === 60) {
+                time.hours = time.hours < 23 ? time.hours++ : ;
+                time.minutes = 0;
             }
         }
-
-
-        time.frames = frames % Math.round(framerate);
-        frames -= time.frames;
-        time.seconds = frames % 60;
-        frames -= time.seconds;
-        time.minutes = frames % 60;
-        frames -= time.minutes;
-        time.hours = frames % 24;
-
         return time;
     },
+    /**
+     * Creates a timestring from a given time object. 
+     * 00:00:00:00
+     * @param {hours: number, minutes: number, seconds: number, frames: number} time
+     * @param {number} framerate
+     * @param {boolean} isDropframe determines delimiter
+     */
+    createTimecodeFromObj: function(time, isDropframe, framerate) {
+        var del = isDropframe ? ';' : ':';
+        return padZero(time.hours, 2) + del + padZero(time.minutes, 2) + del + padZero(time.seconds, 2) +
+            del + padZero(time.frames, framerate.toStriong().length);
+    },
+    /**
+     * Pad numbers with leading zeros.
+     * @param {number} number
+     * @param {number} size
+     * @return {string} number with padded zeros
+     */
+    padZero: function(number, size) {
+        number = number.toString();
+        while (number.length < size) {
+            number = '0' + number;
+        }
+        return number;
+    }
+
     /**
      * Create a float value from 1/X strings as commonly seen in XMP Metadata.
      * @param {string} scale in 1/X
@@ -496,12 +470,12 @@ $.agrarvolution.timecodeCorrection = {
     },
     /**
      * Extracts the file ending of a file name.
-     * @param {string} fileName - filename without path
+     * @param {string} filename - filename without path
      * @returns {string} file type without leading dot, returns empty string if nothing was found
      */
-    getFileType: function(fileName) {
-        if (fileName !== undefined || fileName !== '') {
-            var fileType = fileName.match(/\.([\w]){1,}$/gi)
+    getFileType: function(filename) {
+        if (filename !== undefined || filename !== '') {
+            var fileType = filename.match(/\.([\w]){1,}$/gi)
 
             if (fileType[0]) {
                 return fileType[0].replace('.', '').trim();
