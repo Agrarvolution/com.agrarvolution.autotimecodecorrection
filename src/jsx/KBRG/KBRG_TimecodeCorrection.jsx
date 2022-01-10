@@ -395,7 +395,8 @@ $.agrarvolution.timecodeCorrection = {
         }
 
         try {
-            mediaItem.thumb.synchronousMetadata = new Metadata(mediaItem.xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
+            mediaItem.thumb.synchronousMetadata =
+                new Metadata(mediaItem.xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
             this.logToCEP(mediaItem.filename + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" +
                 update.audioTC.text + ")", this.logLevels.info);
         } catch (e) {
