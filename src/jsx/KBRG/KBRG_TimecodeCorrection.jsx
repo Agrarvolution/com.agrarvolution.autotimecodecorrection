@@ -2,9 +2,7 @@
 
 //add XMP context
 if (ExternalObject.AdobeXMPScript === undefined) {
-
     ExternalObject.AdobeXMPScript = new ExternalObject('lib:AdobeXMPScript');
-
 }
 //add event context
 try {
@@ -75,17 +73,13 @@ $.agrarvolution.timecodeCorrection = {
                 var duration = xmp.getStructField(XMPConst.NS_DM, "duration", XMPConst.NS_DM, "value").value;
                 var duration2 = xmp.doesPropertyExist(XMPConst.NS_DM, "startTimecode");
 
-                this.logToCEP(Object.keys(this.DropFrameTimecodes), this.logLevels.info);
-
                 var type = thumb.type;
                 var name = thumb.name;
                 var mimeType = thumb.mimeType;
                 var model = thumb.model;
                 xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimecode", startTime);
                 xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", "10:37:27:20");
-                /*
-                                var changedXMP = xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT);
-                                thumb.synchronousMetadata = new Metadata(changedXMP);*/
+
             }
             return true;
         }
@@ -217,7 +211,8 @@ $.agrarvolution.timecodeCorrection = {
             for (var i = 0; i < mediaLog.length; i++) {
                 mediaLog[i].thumb = "[object ProjectItem]";
             }
-            this.logToCEP(this.media.length + " media files have been discovered in " + method + ": " + JSON.stringify(mediaLog), this.logLevels.info);
+            this.logToCEP(this.media.length + " media files have been discovered in " + method + ": " +
+                JSON.stringify(mediaLog), this.logLevels.info);
         }
         return true;
     },
@@ -428,7 +423,7 @@ $.agrarvolution.timecodeCorrection = {
             }
 
             if (time.minutes === 60) {
-                time.hours = time.hours < 23 ? time.hours++ : ;
+                time.hours = time.hours < 23 ? time.hours++ : time.hours;
                 time.minutes = 0;
             }
         }
@@ -458,7 +453,7 @@ $.agrarvolution.timecodeCorrection = {
             number = '0' + number;
         }
         return number;
-    }
+    },
 
     /**
      * Create a float value from 1/X strings as commonly seen in XMP Metadata.
