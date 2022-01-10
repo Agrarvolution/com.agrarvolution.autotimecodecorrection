@@ -1,4 +1,4 @@
-# Automated Timecode Update for Adobe Premiere Pro  14.5+ (CC 2020)
+# Automated Timecode Update for Adobe Premiere Pro  14.5+ (CC 2020) and Bridge 10.0+ (CC 2020)
 
 *Made for .csv files exported by [Tentacle Timecode Tool 1.16](https://tentaclesync.com/timecode-tool).*
 
@@ -20,11 +20,7 @@ This plugin offers following benefits:
 - **Flexible** - modifying the .csv file in your spreadsheet app of choice offers to possibility to fix timecode drift or add missing timecode if a conversion should have failed. (Out of the box Premiere offers nothing comparable besides changing every file one by one.)
 - **Non destructive** - original start time / time code will not be overwritten
 - **Framerating mixing** - automatically converts different timebases (e.g. from a 25 fps source to a 30 fps file).
-
-### Why can't this plugin not read audio timecode?
-
-It would have drastically widened the scope and it wouldn't ahve been able to be made in the time that it was.
-
+ 
 ## Requirements
 
 Your Premiere Pro has to at least support Adobe CEP plugins.
@@ -33,6 +29,23 @@ Tested with:
 
 - Premiere pro 14.7 (CC 2020)
 - Premiere Pro 14.5 (CC 2020)
+- Bridge 12.0.0.234 (CC 2022)
+
+## Differences between Premiere and Bridge
+
+### Premiere Pro
+
+This version works as the previous update. In further testing it turned out, that Premiere doesn't change metadata permanently. You loose the changes if the files are relinked.
+
+Thus the scope was widened to solve the problem in Bridge. 
+
+### Bridge
+
+Works similarly to the Premiere version. 
+
+They share the same panel, but certain features are deactivated for Premiere
+
+This plugin changes permanently changes the file meta data and can break XMP data, if the script goes wrong.
 
 ## Installation
 
@@ -140,12 +153,22 @@ in progess
 
 | Version   | Date      | Description
 |---------  |------     |------------
+| 0.21      | 10.01.2022 | Rewrite of the extension to be compatible with Bridge
+| 0.20      | 15.01.2021 | Add bridge as a plugin host
 | 0.11      | 05.01.2021 | Mid-test, small fixes (time in ticks, matching of files)
 | 0.10      | 11.12.2020 | Pre-test, non-compiled, but optically finished build
 | 0.00      | 25.11.2020 | Development start
 - - -
 
-### Chagelist
+### Changelist
+- 0.21 <-> 10.01.2022
+
+    - Add Bridge as extension host
+    - Rewrite the pipeline to update timecodes using thumbnail metadata
+    - Add fix for broken xmp metadata (from manual update - Bridge only)
+    - Revert feature (Bridge only)
+    - Ability to create timecode from file creation date (Bridge only)
+
 - 0.10 <-> 11.12.2020
 
    - Pretesting stage (not tested with a production Premiere Pro Project)
@@ -173,9 +196,11 @@ http://localhost:7780/
 
 ## Future
 
-This is considered feature complete. There will only be bug fixes and maintence, since this is just a side project. 
+This is considered not feature complete yet. 
 
-If the plugin breaks on newer Premiere versions it will eventually updated.
+After Bridge is feature complete, then there will only be bug fixes and maintence, since this is just a side project. 
+
+If the plugin breaks on newer Premiere versions it will eventually be updated.
 
 
 ## Reason
