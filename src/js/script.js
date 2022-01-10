@@ -30,7 +30,12 @@ const defaultSettings = {
     logging: false,
     searchRecursive: true,
     searchTarget: 0,
-    ignoreMediaStart: true
+    ignoreMediaStart: true,
+    xmpFix: {
+        framerate: 25,
+        searchTarget: 0,
+        searchRecursive: 0
+    }
 }
 let settings = defaultSettings;
 
