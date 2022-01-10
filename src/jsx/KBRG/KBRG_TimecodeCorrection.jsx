@@ -50,9 +50,6 @@ $.agrarvolution.timecodeCorrection = {
     timeTicks: 25401600, //per second misses 5 digits (zeros)
     logging: true,
 
-
-
-
     metaDataOfSelected: function() {
         if (app.document.selectionLength !== 0) {
             var thumb = app.document.selections[0];
@@ -62,28 +59,209 @@ $.agrarvolution.timecodeCorrection = {
                 // Get the XMP packet as a string and create the XMPMeta object
                 var xmp = new XMPMeta(md.serialize());
 
-                this.logToCEP(xmp.dumpObject(), this.logLevels.info);
 
-                // audio uses startTimecode instead of altTimecode -> switch values around for video?
-
-                var startTime = xmp.getStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue");
-                this.logToCEP(startTime.value, this.logLevels.info);
-                var framerate = xmp.getStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat");
-                this.logToCEP(framerate.value, this.logLevels.info);
-                var duration = xmp.getStructField(XMPConst.NS_DM, "duration", XMPConst.NS_DM, "value").value;
-                var duration2 = xmp.doesPropertyExist(XMPConst.NS_DM, "startTimecode");
-
-                var type = thumb.type;
-                var name = thumb.name;
-                var mimeType = thumb.mimeType;
-                var model = thumb.model;
-                xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimecode", startTime);
-                xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", "10:37:27:20");
-
+                var test = thumb.creationDate,
+                    test2 = thumb.lastModifiedDate;
+                var hours = test.getHours();
             }
             return true;
         }
         return false;
+    },
+    /**
+     * Caches media objects and fixes the xmp timeFormat - when invalid.
+     *@return {boolean} true on success
+     */
+    fixXmpTimeFormat: function(parameters) {
+        if (this.checkFixXmpParameter(parameters) && this.cacheMediaObjects(true) && this.fixTimeFormat(parameters.framerate)) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+    /**
+     * Fixes the xmp property timeFormat with a new value. (InvalidTimecode)
+     * @param {number} framerate
+     * @return {boolean} true on success
+     */
+    fixTimeFormat: function(framerate) {
+        for (var i = 0; i < this.media.length; i++) {
+            var text = "Timecode";
+            if (DropFrameTimecodes[framerate]) {
+                text = "Drop" + text;
+            }
+            text = framerate + Text;
+
+            this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat", text);
+
+            try {
+                this.media[i].thumb.synchronousMetadata =
+                    new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
+                this.logToCEP(this.media[i].filename + " - Time format fixed.", this.logLevels.info);
+            } catch (e) {
+                this.logToCEP(this.media[i].filename + " - failed to fix time format.", this.logLevels.error);
+                this.logToCEP(e, this.logLevels.error);
+            }
+        }
+        return true;
+    },
+    /**
+     * Check parameters for fixing xmp timeFormat.
+     * @return {boolean} true on success
+     */
+    checkFixXmpParameter: function(parameter) {
+        if (Number.parseFloat(parameter.searchTarget) !== NaN && Number.parseFloat(parameter.framerate)) {
+            this.searchTarget = parameter.searchTarget;
+            this.searchRecursive = parameter.recurse;
+            this.logging = parameter.logging;
+        } else {
+            this.logToCEP("Error in parameters before fixing xmp timeFormat.", this.logLevels.info);
+            return false;
+        }
+        return true;
+    },
+    /**
+     * Calls to cache media objects and then reverts timecodes of selected elements.
+     *@return {boolean} true on success
+     */
+    revertChanges: function(parameter) {
+        if (this.checkRevertParameter(parameter) && this.cacheMediaObjects(false) && this.revertTimecodeChanges()) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+    /**
+     * Check parameters for reverting timecode changes.
+     * @return {boolean} true on success
+     */
+    checkRevertParameter: function(parameter) {
+        if (Number.parseFloat(parameter.searchTarget) !== NaN) {
+            this.searchTarget = parameter.searchTarget;
+            this.searchRecursive = parameter.recurse;
+            this.logging = parameter.logging;
+        } else {
+            this.logToCEP("Error in parameters before reverting timecode changes.", this.logLevels.info);
+            return false;
+        }
+        return true;
+    },
+
+    /**
+     * Reverts to the previously stored timecode.
+     * Only uses one history element.
+     * @return {boolean} true on success
+     */
+    revertTimecodeChanges: function() {
+        for (var i = 0; i < this.media.length; i++) {
+            if (this.media[i].prevStartTime && this.media[i].startTime) {
+                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimeValue",
+                    this.media[i].startTime);
+                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", this.media[i].prevStartTime);
+
+                try {
+                    this.media[i].thumb.synchronousMetadata =
+                        new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
+                    this.logToCEP(this.media[i].filename + " - start time / timecode has been updated. (" + this.media[i].startTime + "->" +
+                        this.media[i].prevStartTime + ")", this.logLevels.info);
+                } catch (e) {
+                    this.logToCEP(this.media[i].filename + " - failed to update start time / timecode. (" + this.media[i].startTime + "->" +
+                        this.media[i].prevStartTime + ")", this.logLevels.error);
+                    this.logToCEP(e, this.logLevels.error);
+                }
+            } else {
+                this.logToCEP(this.media[i].filename + " - Timecodes are invalid. (" + tempTC + "->" +
+                    this.media[i].xmp.getStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimeValue") + ")", this.logLevels.error);
+                this.logToCEP(e, this.logLevels.error);
+            }
+        }
+        return true;
+    },
+    /**
+     * Main function to update timecodes from metadata (creation time, last modified date)
+     * @return {boolean} true on success
+     */
+    timeCodeFromMetadata: function(parameter) {
+        if (this.checkMetadataParameter(parameter) && this.cacheMediaObjects(false) && this.updateTimecodesFromMetadata(parameter.source)) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+
+    /**
+     * Check parameters for updating timecodes from metadata and set script flags.
+     * @return {boolean} true on success
+     */
+    checkMetadataParameter: function(parameter) {
+        if (Number.parseFloat(parameter.searchTarget) !== NaN &&
+            Number.parseFloat(parameter.source) !== NaN) {
+            this.searchTarget = parameter.searchTarget;
+            this.logging = parameter.logging;
+        } else {
+            this.logToCEP("Error in parameters for updating timecode from metadata.", this.logLevels.info);
+            return false;
+        }
+        return true;
+    },
+    /**
+     * Update timecode from thumbnail creation date or time of last modification.
+     * @return {boolean} true on success
+     */
+    updateTimecodesFromMetadata: function(source) {
+        for (var i = 0; i < this.media.length; i++) {
+            this.setEmptyStartTimeProperty(this.media[i]);
+
+            var time = Date.now();
+            switch (source) {
+                case 1:
+                    time = this.media[i].thumb.creationDate;
+                    break;
+                case 2:
+                    time = this.media[i].thumb.lastModifiedDate;
+                    break;
+                default:
+                    break;
+            }
+
+            this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "previousTimeValue", this.media[i].startTime);
+            var newTimecode = this.createTimecodeFromDate(time, this.media[i].isDropframe)
+            this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM,
+                "timeValue", newTimecode);
+
+            if (this.media[i].tcStruct === 'startTimecode') {
+                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat",
+                    this.media[i].xmp.getStructField(XMPConst.NS_DM, "startTimecode", XMPConst.NS_DM, "startTimecode"));
+            }
+
+            try {
+                this.media[i].thumb.synchronousMetadata =
+                    new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
+                this.logToCEP(this.media[i].filename + " - start time / timecode has been updated. (" + this.media[i].startTime + "->" +
+                    newTimecode + ")", this.logLevels.info);
+            } catch (e) {
+                this.logToCEP(this.media[i].filename + " - failed to update start time / timecode. (" + this.media[i].startTime + "->" +
+                    newTimecode + ")", this.logLevels.error);
+                this.logToCEP(e, this.logLevels.error);
+            }
+        }
+        return true;
+    },
+    /**
+     * Create timecode form a date object.
+     * @param {Date} date
+     * @param {boolean} isDropframe
+     * @returns {string} 00:00:00:00 or 00;00;00;00
+     */
+    createTimecodeFromDate: function(date, isDropframe) {
+        var timecode = [
+            this.padZero(date.getHours(), 2),
+            this.padZero(date.getMinutes(), 2),
+            this.padZero(date.getSeconds(), 2),
+            '00'
+        ];
+        var delimiter = isDropframe ? ',' : ':';
+        return timecode.concat(delimiter);
     },
     /**
      *Function that start the timecode correction process. Usually called by the gui.
@@ -92,7 +270,7 @@ $.agrarvolution.timecodeCorrection = {
      */
     processInput: function(tcObject) {
         this.logToCEP("Starting host script.", this.logLevels.info);
-        if (this.setValues(tcObject) && this.cacheMediaObjects() && this.updateTimeCodes()) {
+        if (this.setValues(tcObject) && this.cacheMediaObjects(false) && this.updateTimeCodes()) {
             return true;
         }
         return false;
@@ -168,9 +346,10 @@ $.agrarvolution.timecodeCorrection = {
 
     /**
      *Loads media file / clips into a semipermanent cache. This avoids scraping through the app DOM everytime a match has to be found later.
+     *@param {boolean} toggleInvalid determines which media items are cache by the validity of timeFormat
      *@returns {boolean} false - not processed times, thus useless for comparisons, true - everything worked
      */
-    cacheMediaObjects: function() {
+    cacheMediaObjects: function(toggleInvalid) {
         var i = 0;
         this.media = [];
 
@@ -181,7 +360,7 @@ $.agrarvolution.timecodeCorrection = {
         }
 
         for (i = 0; i < app.document.selectionLength; i++) {
-            this.processThumbnail(app.document.selections[i]);
+            this.processThumbnail(app.document.selections[i], toggleInvalid);
         }
 
         if (hasNoSelection) { // remove selection if there was none before
@@ -221,8 +400,9 @@ $.agrarvolution.timecodeCorrection = {
      *If it is a folder, it will call this method for all its children (depending on the settings.)
      *If it is a clip it will store some informations about the thumbnail into this namespace's media array for quicker search later in the process.
      *@param {Object} thumb Bridge folder element, see CEP reference
+     *@param {boolean} addInvalidOnly only cache thumbnail with invalid time formats
      */
-    processThumbnail: function(thumb) {
+    processThumbnail: function(thumb, addInvalidOnly) {
         var thumbFileType = this.getFileType(thumb.name);
 
         if (thumb.type === this.ThumbnailTypes.file && thumb.hasMetadata) {
@@ -246,6 +426,7 @@ $.agrarvolution.timecodeCorrection = {
                 var xmpFramerate = item.xmp.getStructField(XMPConst.NS_DM, item.tcStruct, XMPConst.NS_DM, "timeFormat").value || '';
 
 
+                item.prevStartTime = item.xmp.getStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue").value || '';
 
                 item.framerate = xmpFramerate.match(/\d+/g)[0];
 
@@ -263,7 +444,7 @@ $.agrarvolution.timecodeCorrection = {
                     }
                 }
             }
-            if (addItem) {
+            if (addItem !== addInvalidOnly) {
                 this.media.push(item);
             }
         } else if (thumb.type === this.ThumbnailTypes.folder && this.searchRecursive) {
@@ -279,13 +460,14 @@ $.agrarvolution.timecodeCorrection = {
      */
     splitTimesToNumbers: function() {
         for (var i = 0; i < this.media.length; i++) {
-            var media = this.media[i];
-
             var startTimeMatch = this.splitTimeToNumber(this.media[i].startTime, this.media[i].framerate);
             if (!startTimeMatch) {
                 this.logToCEP(this.media[i].name + " - Couldn't process start time. (" + this.media[i].startTime + ")", this.logLevels.status);
             }
             this.media[i].startTime = startTimeMatch;
+
+            var prevTimeMatch = this.splitTimeToNumber(this.media[i].prevStartTime, this.media[i].framerate);
+            this.media[i].prevStartTime = prevTimeMatch;
         }
         return true;
     },
@@ -377,14 +559,7 @@ $.agrarvolution.timecodeCorrection = {
         // @Todo -> set flag if conversion should be by total frames or last frames only (premiere one works last frame only)
     */
     changeStartTime: function(update, mediaItem) {
-        if (mediaItem.tcStruct === '') {
-            //set to 25fps default
-            mediaItem.xmp.setPropertyField(XMPConst.NS_DM, "startTimeScale", "12800");
-            mediaItem.xmp.setPropertyField(XMPConst.NS_DM, "startTimeSampleSize", "512");
-            mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat", "25Timecode");
-            mediaItem.tcStruct = "altTimecode";
-            mediaItem.framerate = 25;
-        }
+        this.setEmptyStartTimeProperty(mediaItem);
 
         var startTime = createTimecodeFromObj(convertFramesToNewFramerate(update.startTime.groups, update.framerate, mediaItem.framerate),
             mediaItem.isDropframe, mediaItem.framerate);
@@ -409,6 +584,19 @@ $.agrarvolution.timecodeCorrection = {
             return false;
         }
         return true;
+    },
+    /**
+     * Helper function to add default framerate information to an empty file.
+     */
+    setEmptyStartTimeProperty: function(mediaItem) {
+        if (mediaItem.tcStruct === '') {
+            //set to 25fps default
+            mediaItem.xmp.setPropertyField(XMPConst.NS_DM, "startTimeScale", "12800");
+            mediaItem.xmp.setPropertyField(XMPConst.NS_DM, "startTimeSampleSize", "512");
+            mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat", "25Timecode");
+            mediaItem.tcStruct = "altTimecode";
+            mediaItem.framerate = 25;
+        }
     },
     /**
      * @param {hours: number, minutes: number, seconds: number, frames: number} time

@@ -11,6 +11,7 @@ const formIds = {
     fixTarget: 'fix-target',
     fixRecursion: 'fix-recursion'
 }
+let host = '';
 
 var logging = logging || {};
 logging.verboseLogging = false;
@@ -30,6 +31,7 @@ const defaultSettings = {
     logging: false,
     searchRecursive: true,
     searchTarget: 0,
+    source: 0,
     ignoreMediaStart: true,
     xmpFix: {
         framerate: 25,
@@ -56,7 +58,7 @@ $(function () {
     explainer = $('#explainer');
     fileEl = $('#file');
 
-    setHostinDOM();
+    host = setHostinDOM();
     onAppThemeColorChanged();
 
     let csInterface = new CSInterface();
@@ -121,14 +123,28 @@ $(function () {
         lockForm = true;
         let form = document.forms['atc'];
 
-        let validation = validateForm(form);
+        if (host !== 'kbrg' || settings.source === 0) {
+            let validation = validateForm(form);
 
-        if (!validation) {
-            logging.addLog('Process canceled. Inputs are invalid.', logLevels.info);
-            lockForm = false;
+            if (!validation) {
+                logging.addLog('Process canceled. Inputs are invalid.', logLevels.info);
+                lockForm = false;
+            } else {
+                processFile(validation);
+            }
         } else {
-            processFile(validation);
+            timecodeFromMetadata();
         }
+    });
+
+    $('#revert').on('click', function (e) {
+        e.preventDefault();
+        if (lockFormFix || host !== 'kbrg') {
+            return false;
+        }
+        lockForm = true;
+
+        revertTimecodechanges();
     });
 
     $('#cleanup-xmp').on('click'), function (e) {
@@ -136,14 +152,86 @@ $(function () {
         if (lockFormFix) {
             return false;
         }
-        lockForm = true;
+        lockFormFix = true;
 
-        let form = document.forms['fix-xmp'];
+        fixXMP();
     }
 });
+/**
+ * Helper function to call host to fix the XMP value - timeFormat.
+ */
+function fixXMP() {
+    logging.addLog("Starting fixing broken XMP time format.", logLevels.info);
 
+    let csObject = {
+        framerate: settings.xmpFix.framerate,
+        searchTarget: settings.xmpFix.searchTarget,
+        recursive: settings.xmpFix.searchRecursive,
+        logging: settings.logging
+    };
 
+    csInterface.evalScript(`$.agrarvolution.timecodeCorrection.fixXmpTimeFormat(${JSON.stringify(csObject)});`, function (e) {
+        if (e === 'true') {
+            logging.addLog("Time format was repaired.", logLevels.status);
+        } else if (e === 'false') {
+            logging.addLog("Media hasn't been updated. Process stopped.", logLevels.status);
+        }
+        lockForm = false;
+    });
+}
+/**
+ * Revert timecodechanges.
+ * It restores the previous timecode value into the current value. The new value is stored in place of the previous one.
+ * This method only keep one history record and can be called infitively.
+ */
+function revertTimecodechanges() {
+    let csObject = {
+        searchTarget: settings.xmpFix.searchTarget,
+        recursive: settings.xmpFix.searchRecursive,
+        logging: settings.logging
+    };
+    csInterface.evalScript('$.agrarvolution.timecodeCorrection.revertChanges(' +
+        JSON.stringify(csObject) + ');', function (e) {
+            if (e === 'true') {
+                logging.addLog("Timecode changes have been reverted. Old values were stored.", logLevels.status);
+            } else if (e === 'false') {
+                logging.addLog("Media hasn't been updated. Process stopped.", logLevels.status);
+            }
+            lockForm = false;
+        });
+}
+/**
+ * Alternative way of changing timecode.
+ */
+function timecodeFromMetadata() {
+    let logMessage = '';
+    switch (settings.source) {
+        case 2:
+            logMessage = "Creating timecode from creation time.";
+            break;
+        case 3:
+            logMessage = "Creating timecode from time last changed.";
+            break;
+        default:
+            break;
+    }
+    logging.addLog(logMessage, logLevels.info);
 
+    let csObject = {
+        searchTarget: settings.searchTarget,
+        source: settings.source,
+        logging: logging.verboseLogging
+    };
+
+    csInterface.evalScript('$.agrarvolution.timecodeCorrection.timecodesFromMetadata(' + JSON.stringify(csObject) + ');', function (e) {
+        if (e === 'true') {
+            logging.addLog("Media has been updated. Process finished. Select the next file to be processed.", logLevels.status);
+        } else if (e === 'false') {
+            logging.addLog("Media hasn't been updated. Process stopped.", logLevels.status);
+        }
+        lockForm = false;
+    });
+}
 /**
  * Handler for a fileLoaded event. Calls a csv validation and interfaces with Premiere to send the staged media and settings.
  * @param {*} file parsed csv
@@ -162,7 +250,6 @@ function handleFileLoad(file) {
 
     logging.addLog("Media to be updated: " + JSON.stringify(timeCodes), logLevels.info);
 
-    let csInterface = new CSInterface();
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function (e) {
         if (e === 'true') {
             logging.addLog("Media has been updated. Process finished. Select the next file to be processed.", logLevels.status);
@@ -171,7 +258,7 @@ function handleFileLoad(file) {
             logging.addLog("Media hasn't been updated. Process stopped.", logLevels.status);
         }
         lockForm = false;
-    })
+    });
     return true;
 }
 
@@ -597,6 +684,8 @@ function onAppThemeColorChanged() {
 function setHostinDOM() {
     let host = JSON.parse(window.__adobe_cep__.getHostEnvironment()).appId.toLowerCase();
     document.children[0].classList.add(host);
+
+    return host;
 }
 /**
  * Adds a new css style to the style#dynStyle element. This enables dynamic theme updates according to the 

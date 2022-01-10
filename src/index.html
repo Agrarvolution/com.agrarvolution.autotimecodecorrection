@@ -47,8 +47,12 @@
 						<label for="fromFile">Timecode from file</label>
 					</span>
 					<span>
-						<input type="radio" id="fromSource" name="source" value="source">
+						<input type="radio" id="fromSource" name="source" value="creation">
 						<label for="fromSource">Creation time as timecode</label>
+					</span>
+					<span>
+						<input type="radio" id="fromChange" name="source" value="changed">
+						<label for="fromChange">Last changed as timecode</label>
 					</span>
 				</section>
 				<section>
@@ -107,11 +111,11 @@
 				<section id="formradio">
 					<span>
 						<input type="radio" id="fix-all" name="fix-target" value="all">
-						<label for="fix-all">Start in Project bin / folder</label>
+						<label for="fix-all">All thumbnails in folder</label>
 					</span>
 					<span>
 						<input type="radio" id="fix-selection" name="fix-target" value="selection" checked>
-						<label for="fix-selection">Start with Selection</label>
+						<label for="fix-selection">Selection</label>
 					</span>
 				</section>
 				<section>
