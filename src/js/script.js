@@ -38,8 +38,6 @@ let lockForm = false;
 
 
 $(function () {
-    onLoaded();  
-    
     logging.logArea = $('#loggingArea')[0];
     logging.log = $('#log');
     log = $('#log');
@@ -47,35 +45,36 @@ $(function () {
     explainer = $('#explainer');
     fileEl = $('#file');
 
-    onAppThemeColorChanged('');
-    
+    setHostinDOM();
+    onAppThemeColorChanged();
+
     let csInterface = new CSInterface();
     csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, onAppThemeColorChanged);
     csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
-        logging.addLog(e.data.text , e.data.logLevel);
+        logging.addLog(e.data.text, e.data.logLevel);
     });
 
-    $('#xmp').on('click', function(e) {
+    $('#xmp').on('click', function (e) {
         e.preventDefault();
-        logging.addLog("Start xmp" , logLevels.status);
+        logging.addLog("Start xmp", logLevels.status);
         let csInterface = new CSInterface();
         csInterface.evalScript('$.agrarvolution.timecodeCorrection.metaDataOfSelected()', function (e) {
-            logging.addLog(e , logLevels.status);
+            logging.addLog(e, logLevels.status);
         });
     });
-    
+
     //restore settings
     settings = loadSettings();
     changeSettings(settings);
 
-    $('#resetLog').on('click', function(e) {
+    $('#resetLog').on('click', function (e) {
         logging.clearLog();
     });
-    $('#hideLog').on('click', function(e) {
+    $('#hideLog').on('click', function (e) {
         log.addClass('hidden');
     });
 
-    $('#reset').on("click", function(e){
+    $('#reset').on("click", function (e) {
         e.preventDefault();
         changeSettings(defaultSettings);
         $('#source')[0].value = "";
@@ -90,30 +89,30 @@ $(function () {
     $('input:not(#source, #start)').on("click", function (e) {
         if (this.id !== undefined && this.id === 'logging') {
             logging.verboseLogging = this.checked;
-            log.toggleClass('hidden');            
+            log.toggleClass('hidden');
         }
         if (storeSettings(readSettings())) {
             logging.addLog("Settings successfully stored.", logLevels.info);
         };
     });
 
-    $('#start').on("click", function(e){
+    $('#start').on("click", function (e) {
         e.preventDefault();
         if (lockForm) {
             return false;
         }
         lockForm = true;
         let form = document.forms[formId];
-        
+
         let validation = validateForm(form);
 
         if (!validation) {
             logging.addLog('Process canceled. Inputs are invalid.', logLevels.info);
             lockForm = false;
         } else {
-            processFile(validation);        
-        }      
-    });   
+            processFile(validation);
+        }
+    });
 });
 
 
@@ -122,10 +121,10 @@ $(function () {
  * Handler for a fileLoaded event. Calls a csv validation and interfaces with Premiere to send the staged media and settings.
  * @param {*} file parsed csv
  */
-function handleFileLoad (file) {
+function handleFileLoad(file) {
     let timeCodes = [];
     timeCodes = checkCSV(file, csvVersion.ttc116);
-    
+
     let tcObject = {
         timeCodes: timeCodes,
         searchRecursive: settings.searchRecursive,
@@ -135,9 +134,9 @@ function handleFileLoad (file) {
     };
 
     logging.addLog("Media to be updated: " + JSON.stringify(timeCodes), logLevels.info);
-    
+
     let csInterface = new CSInterface();
-    csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function(e) {
+    csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function (e) {
         if (e === 'true') {
             logging.addLog("Media has been updated. Process finished. Select the next file to be processed.", logLevels.status);
             $('#source')[0].value = "";
@@ -176,7 +175,7 @@ function checkCSV(csv, version) {
 
     if (version === csvVersion.ttc116) {
         //check first row
-        if (!(csv[0][0] !== undefined && csv[0][0] === 'File Name' && csv[0][1] !== undefined && csv[0][1] === 'Duration' && 
+        if (!(csv[0][0] !== undefined && csv[0][0] === 'File Name' && csv[0][1] !== undefined && csv[0][1] === 'Duration' &&
             csv[0][2] !== undefined && csv[0][2] === 'File TC' && csv[0][3] !== undefined &&
             csv[0][3] === 'Audio TC' && csv[0][4] !== undefined && csv[0][4] === 'Framerate')) {
             logging.addLog("CSV Headers don't match [TTCT_1.16]", logLevels.status);
@@ -188,10 +187,10 @@ function checkCSV(csv, version) {
             let rowResult = checkCSVrow(csv[i], version, i);
             if (rowResult !== false) {
                 timeCodes.push(rowResult);
-                logging.addLog(rowResult.fileName + " - Parsed and staged at " + rowResult.framerate/100 + " fps. [" +
-                    rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);  
+                logging.addLog(rowResult.fileName + " - Parsed and staged at " + rowResult.framerate / 100 + " fps. [" +
+                    rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);
             }
-            
+
         }
         return timeCodes;
     } else {
@@ -206,28 +205,28 @@ function checkCSV(csv, version) {
  * @param {number} rowNumber 
  * @returns {boolean|array.{fileName: string, framerate: number, duration: object, fileTC: object, audioTC: object}} false on failure
  */
-function checkCSVrow (row, version, rowNumber) {
+function checkCSVrow(row, version, rowNumber) {
     let tcMediaElement = {};
 
     if (version === csvVersion.ttc116) {
         for (let i = 0; i < row.length; i++) {
             if (row[i] === undefined) {
-                logging.addLog("CSV row " + rowNumber + (row[0]!== undefined ? " (" + row[0] + ")" : '') + " is incomplete.", logLevels.error);
+                logging.addLog("CSV row " + rowNumber + (row[0] !== undefined ? " (" + row[0] + ")" : '') + " is incomplete.", logLevels.error);
                 return false;
             }
         }
 
         tcMediaElement.fileName = row[0];
-        
+
         //@todo check if no match - check if values are valid in new function
-        
-        tcMediaElement.framerate = Number(row[4])*100;
+
+        tcMediaElement.framerate = Number(row[4]) * 100;
         if (Number.isNaN(tcMediaElement.framerate)) {
-            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
-            row[4] + ") is invalid.", logLevels.error);
+            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" +
+                row[4] + ") is invalid.", logLevels.error);
             return false;
         }
-        switch ( tcMediaElement.framerate) {
+        switch (tcMediaElement.framerate) {
             case 2400:
             case 2500:
             case 5000:
@@ -236,10 +235,10 @@ function checkCSVrow (row, version, rowNumber) {
             case 3000:
             case 5994:
             case 6000:
-            break;
-            default: 
-                logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" + 
-                row[4] + ") is unexpected.", logLevels.info);
+                break;
+            default:
+                logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" +
+                    row[4] + ") is unexpected.", logLevels.info);
         }
         tcMediaElement.framerate /= 100;
 
@@ -247,8 +246,8 @@ function checkCSVrow (row, version, rowNumber) {
 
         tcMediaElement.duration = hmsfPattern.exec(row[1]);
         if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
-            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - duration (" + 
-            row[1] + ") is invalid.", logLevels.error);
+            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - duration (" +
+                row[1] + ") is invalid.", logLevels.error);
             return false;
         }
         tcMediaElement.duration = compressMatch(tcMediaElement.duration);
@@ -256,30 +255,30 @@ function checkCSVrow (row, version, rowNumber) {
 
         tcMediaElement.fileTC = hmsfPattern.exec(row[2]);
         if (!validateTime(tcMediaElement.fileTC, tcMediaElement.framerate, true)) {
-            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - File TC (" + 
-            row[2] + ") is invalid.", logLevels.error);
+            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - File TC (" +
+                row[2] + ") is invalid.", logLevels.error);
             return false;
         }
         tcMediaElement.fileTC = compressMatch(tcMediaElement.fileTC);
         hmsfPattern.lastIndex = 0;
-        
+
         tcMediaElement.audioTC = hmsfPattern.exec(row[3]);
         if (!validateTime(tcMediaElement.audioTC, tcMediaElement.framerate)) {
-            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Audio TC (" + 
-            row[3] + ") is invalid.", logLevels.error);
+            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Audio TC (" +
+                row[3] + ") is invalid.", logLevels.error);
             return false;
-        } 
+        }
         tcMediaElement.audioTC = compressMatch(tcMediaElement.audioTC);
 
         return tcMediaElement;
-    }  
+    }
 }
 /**
  * Discards unneeded references from a regex match.
  * @param {object} timeMatched 
  * @returns {{text: string, groups: object}}
  */
-function compressMatch (timeMatched) {
+function compressMatch(timeMatched) {
     if (timeMatched !== undefined) {
         return {
             text: timeMatched[0],
@@ -296,7 +295,7 @@ function compressMatch (timeMatched) {
 function validateTime(time, framerate) {
     return validateTime(time, framerate, false);
 }
-function validateTime (time, framerate, blockFrameCheck) {
+function validateTime(time, framerate, blockFrameCheck) {
     if (time === undefined || time == null || time.groups === undefined || time.groups == null) {
         return false;
     }
@@ -310,8 +309,8 @@ function validateTime (time, framerate, blockFrameCheck) {
         return false;
     }
 
-    if (time.groups.hour > 24 || time.groups.minutes > 60 || time.groups.seconds > 60 || (!blockFrameCheck && time.groups.frames !== NaN && 
-         time.groups.frames >= framerate)) {
+    if (time.groups.hour > 24 || time.groups.minutes > 60 || time.groups.seconds > 60 || (!blockFrameCheck && time.groups.frames !== NaN &&
+        time.groups.frames >= framerate)) {
         return false
     }
 
@@ -324,7 +323,7 @@ function validateTime (time, framerate, blockFrameCheck) {
  * @param {string} strDelimiter 
  * @returns {array}
  */
-function CSVToArray (strData, strDelimiter){
+function CSVToArray(strData, strDelimiter) {
     strData = strData.trim();
 
     strDelimiter = (strDelimiter || ",");
@@ -336,29 +335,29 @@ function CSVToArray (strData, strDelimiter){
             "([^\"\\" + strDelimiter + "\\r\\n]*))"
         ),
         "gi"
-        );
+    );
 
 
     let arrData = [[]];
     let arrMatches = null;
     let strMatchedValue = [];
-    while (arrMatches = objPattern.exec(strData)){
+    while (arrMatches = objPattern.exec(strData)) {
 
         let strMatchedDelimiter = arrMatches[1];
 
         if (
             strMatchedDelimiter.length &&
             (strMatchedDelimiter != strDelimiter)
-            ){
+        ) {
             arrData.push([]);
 
         }
 
-        if (arrMatches[2]){
-                strMatchedValue = arrMatches[2].replace(
-                new RegExp( "\"\"", "g" ),
+        if (arrMatches[2]) {
+            strMatchedValue = arrMatches[2].replace(
+                new RegExp("\"\"", "g"),
                 "\""
-                );
+            );
 
         } else {
             strMatchedValue = arrMatches[3];
@@ -368,7 +367,7 @@ function CSVToArray (strData, strDelimiter){
         arrData[arrData.length - 1].push(strMatchedValue);
     }
 
-    return(arrData);
+    return (arrData);
 }
 
 /**
@@ -378,7 +377,7 @@ function CSVToArray (strData, strDelimiter){
 function readSettings() {
     let form = $('form[name="atc"]')[0];
     let settings = {};
-    
+
     logging.addLog('Reading settings.', logLevels.info);
 
     settings.logging = form[loggingId].checked;
@@ -386,10 +385,10 @@ function readSettings() {
 
     settings.ignoreMediaStart = form[mediaStartId].checked;
 
-    for (let i = 0; i <  form[searchTargetId].length; i++) {
-        if(form[searchTargetId][i].checked) {
+    for (let i = 0; i < form[searchTargetId].length; i++) {
+        if (form[searchTargetId][i].checked) {
             settings.searchTarget = i;
-        } 
+        }
     }
     return settings;
 }
@@ -401,12 +400,12 @@ function changeSettings(settings) {
     try {
         let form = $('form[name="atc"]')[0];
 
-        form[loggingId].checked = settings.logging; 
+        form[loggingId].checked = settings.logging;
 
         form[searchRecursionId].checked = settings.searchRecursive;
         form[mediaStartId].checked = settings.ignoreMediaStart;
 
-        for (let i = 0; i <  form[searchTargetId].length; i++) {
+        for (let i = 0; i < form[searchTargetId].length; i++) {
             form[searchTargetId][i].checked = false;
             if (i === settings.searchTarget) {
                 form[searchTargetId][i].checked = true;
@@ -440,7 +439,7 @@ function storeSettings(newSettings) {
  * Loads gui settings from local storage.
  * @returns {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}}
  */
-function loadSettings () {
+function loadSettings() {
     let settings = localStorage.getItem(settingsKey);
     if (settings === null) {
         logging.addLog("No settings have been stored.", logLevels.info);
@@ -459,7 +458,7 @@ function loadSettings () {
  * Validates the source file path.
  * @param {*} form 
  */
-function validateForm (form) {
+function validateForm(form) {
     if (form[sourceId].files.length === 0) {
         logging.addLog('No file has been selected.', logLevels.status);
         return false;
@@ -485,11 +484,11 @@ logging.addLog = function (text, level) {
     if (level === logLevels.error || this.verboseLogging) {
         if (this.log.hasClass('hidden')) {
             this.log.removeClass('hidden');
-        }   
-       
+        }
+
         this.logArea.value = this.timeStamp() + level + " " + text + "\n" + log.children('#loggingArea')[0].value;
     }
-    
+
 }
 /**
  * Clears the log area.
@@ -503,9 +502,9 @@ logging.clearLog = function () {
  */
 logging.timeStamp = function () {
     let date = new Date();
-    return "[" + this.leadingZero(date.getDate()) + "." + this.leadingZero(date.getMonth()+1) + "." + 
-    date.getFullYear() + " - " + this.leadingZero(date.getHours()) + ":" + this.leadingZero(date.getMinutes()) + 
-    ":" + this.leadingZero(date.getSeconds()) + "] ";
+    return "[" + this.leadingZero(date.getDate()) + "." + this.leadingZero(date.getMonth() + 1) + "." +
+        date.getFullYear() + " - " + this.leadingZero(date.getHours()) + ":" + this.leadingZero(date.getMinutes()) +
+        ":" + this.leadingZero(date.getSeconds()) + "] ";
 }
 /**
  * Adds a leading zero to single digit numbers.
@@ -518,17 +517,24 @@ logging.leadingZero = function (number) {
 
 
 /**
- * Retrieves the appSkinInfo from Premiere.
+ * Retrieves the appSkinInfo.
  * @param {*} event 
  */
-function onAppThemeColorChanged(event) {
-	// Should get a latest HostEnvironment object from application.
-	var skinInfo = JSON.parse(window.__adobe_cep__.getHostEnvironment()).appSkinInfo;
-	// Gets the style information such as color info from the skinInfo, 
-	// and redraw all UI controls of your extension according to the style info.
-	updateThemeWithAppSkinInfo(skinInfo);
-} 
+function onAppThemeColorChanged() {
+    // Should get a latest HostEnvironment object from application.
+    let skinInfo = JSON.parse(window.__adobe_cep__.getHostEnvironment()).appSkinInfo;
+    // Gets the style information such as color info from the skinInfo, 
+    // and redraw all UI controls of your extension according to the style info.
+    updateThemeWithAppSkinInfo(skinInfo);
+}
 
+/**
+ * Set host in html as class - e.g. ppro or kbrg
+ */
+function setHostinDOM() {
+    let host = JSON.parse(window.__adobe_cep__.getHostEnvironment()).appId.toLowerCase();
+    document.children[0].classList.add(host);
+}
 /**
  * Adds a new css style to the style#dynStyle element. This enables dynamic theme updates according to the 
  * settings in Premiere.
@@ -536,44 +542,17 @@ function onAppThemeColorChanged(event) {
  */
 function updateThemeWithAppSkinInfo(appSkinInfo) {
 
-	//Update the background color of the panel
+    //Update the background color of the panel
 
-	let panelBackgroundColor = toHex(appSkinInfo.panelBackgroundColor.color);
-	let systemHighlightColor = toHex(appSkinInfo.systemHighlightColor);
+    let panelBackgroundColor = toHex(appSkinInfo.panelBackgroundColor.color);
 
-    let textColor = lightenDarkenColor(panelBackgroundColor, 150);
-        
-    let cssStyle = "[type=checkbox]:not(:checked) + label::before, [type=checkbox]:checked + label::before,\n"+ 
-        "[type=radio]:not(:checked) + label::before, [type=radio]:checked + label::before, section#log,\n" +
-        "input[type=\"file\"]::-webkit-file-upload-button   {\n" +
-            "border-color: " + textColor + ";\n" +
-        "}\n" +
-        "[type=checkbox]:not(:checked) + label::after, [type=checkbox]:checked + label::after, input[type=\"file\"]::-webkit-file-upload-button {\n" +
-            "color: " + textColor +";\n" +
-        "}\n" +
-        ".autotc_gui button:hover, .autotc_gui input[type=submit]:hover , input[type=file]::-webkit-file-upload-button:hover, \n" +
-        ".autotc_gui input:not([type=file]):hover, .autotc_gui input + span:hover, [type=checkbox]:checked:hover + label,\n" +
-        "[type=checkbox]:not(:checked):hover + label, [type=checkbox]:checked:hover + label:before,\n" +
-        "[type=checkbox]:not(:checked):hover + label:before, [type=checkbox]:checked:hover + label:after,\n" +
-        "[type=checkbox]:not(:checked):hover + label:after, [type=radio]:not(:checked):hover + label, \n" +
-        "[type=radio]:checked:hover + label, [type=radio]:checked:hover + label:before, \n" +
-        "[type=radio]:not(:checked):hover + label:before, [type=radio]:checked:hover + label:after, \n" +
-        "[type=radio]:not(:checked):hover + label:after  {\n" +
-            "color: " + systemHighlightColor + ";\n" +
-            "border-color:" + systemHighlightColor + ";\n" +
-        "}\n" +
-        ".file input[type=\"file\"], .autotc_gui textarea#loggingArea {\n" +
-            "color: " + panelBackgroundColor + ";\n" +
-            "background-color: " + textColor + ";\n" +
-        "}\n" +
-        "body.autotc_gui, .autotc_gui button, .autotc_gui input[type=submit], input[type=\"file\"]::-webkit-file-upload-button {\n" +
-            "color: " + textColor + ";\n" +
-            "background-color: " + panelBackgroundColor + ";\n" +
-        "}\n";
+    let cssStyle = `:root {
+        --dark-color: ${panelBackgroundColor};
+        --bright-color: ${lightenDarkenColor(panelBackgroundColor, 150)};
+        --highlight-color: ${toHex(appSkinInfo.systemHighlightColor)}; 
+        --font-size: ${appSkinInfo.baseFontSize}px;  
+    }`;
     $("#dynStyle")[0].textContent = cssStyle;
-	
-	//Update the default text style with pp values
-
 }
 
 /**
@@ -589,23 +568,23 @@ function toHex(color, delta) {
      * @param {number} delta 
      * @return {string} hex value
      */
-	function computeValue(value, delta) {
-		var computedValue = !isNaN(delta) ? value + delta : value;
-		if (computedValue < 0) {
-			computedValue = 0;
-		} else if (computedValue > 255) {
-			computedValue = 255;
-		}
+    function computeValue(value, delta) {
+        var computedValue = !isNaN(delta) ? value + delta : value;
+        if (computedValue < 0) {
+            computedValue = 0;
+        } else if (computedValue > 255) {
+            computedValue = 255;
+        }
 
-		computedValue = Math.round(computedValue).toString(16);
-		return computedValue.length == 1 ? "0" + computedValue : computedValue;
-	}
+        computedValue = Math.round(computedValue).toString(16);
+        return computedValue.length == 1 ? "0" + computedValue : computedValue;
+    }
 
-	var hex = "";
-	if (color) {
-		hex = computeValue(color.red, delta) + computeValue(color.green, delta) + computeValue(color.blue, delta);
-	}
-	return "#" + hex;
+    var hex = "";
+    if (color) {
+        hex = computeValue(color.red, delta) + computeValue(color.green, delta) + computeValue(color.blue, delta);
+    }
+    return "#" + hex;
 }
 /**
  * Lightens and darkens colors in hex format.
@@ -616,31 +595,31 @@ function toHex(color, delta) {
  * @return {string} color as hex string 
  */
 function lightenDarkenColor(col, amt) {
-  
+
     var usePound = false;
-  
+
     if (col[0] == "#") {
         col = col.slice(1);
         usePound = true;
     }
- 
-    var num = parseInt(col,16);
- 
+
+    var num = parseInt(col, 16);
+
     var r = (num >> 16) + amt;
- 
+
     if (r > 255) r = 255;
-    else if  (r < 0) r = 0;
- 
+    else if (r < 0) r = 0;
+
     var b = ((num >> 8) & 0x00FF) + amt;
- 
+
     if (b > 255) b = 255;
-    else if  (b < 0) b = 0;
- 
+    else if (b < 0) b = 0;
+
     var g = (num & 0x0000FF) + amt;
- 
+
     if (g > 255) g = 255;
     else if (g < 0) g = 0;
- 
-    return (usePound?"#":"") + (g | (b << 8) | (r << 16)).toString(16);
-  
+
+    return (usePound ? "#" : "") + (g | (b << 8) | (r << 16)).toString(16);
+
 }

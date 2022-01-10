@@ -41,14 +41,20 @@
 						<input type="file" id="source">
 					</label>
 				</section>
-				<section id="updateTypeRadio">
+				<section class="bridge-only" id="updateTypeRadio">
 					<span>
-						<input type="radio" id="fromFile" name="source" value="file" checked disabled>
-						<label for="fromFile">Start in Project bin</label>
+						<input type="radio" id="fromFile" name="source" value="file" checked>
+						<label for="fromFile">Timecode from file</label>
 					</span>
 					<span>
-						<input type="radio" id="fromSource" name="source" value="source" disabled>
-						<label for="fromSource">Start with Selection</label>
+						<input type="radio" id="fromSource" name="source" value="source">
+						<label for="fromSource">Creation time as timecode</label>
+					</span>
+				</section>
+				<section>
+					<span>
+						<input type="checkbox" id="mediaStart" name="mediaStart">
+						<label for="mediaStart">Disable media start comparison</label>
 					</span>
 				</section>
 				<section id="formradio">
@@ -67,43 +73,61 @@
 						<label for="recursion">Search in sub bins / folders</label>
 					</span>
 					<span>
-						<input type="checkbox" id="mediaStart" name="mediaStart">
-						<label for="mediaStart">Disable media start comparison</label>
-					</span>
-					<span>
 						<input type="checkbox" id="logging" name="logging">
 						<label for="logging">Enable verbose logging</label>
 					</span>
 				</section>
+				<section class="buttons-interface" id="processButtons">
+					<input type="submit" id="start" value="Start">
+					<button class="bridge-only" id="revert">Revert</button>
+					<button id="reset">Reset panel</button>
+									
+				</section>
+			</form>
+		</section>
+		<section class="bridge-only">
+			<form onsubmit="return 0" id="xmp-fix">
+				<h3>Fix broken XMP time values</h3>
 				<section>
-					<hr>
-					<h7>XMP Cleanup only</h7>
 					<span>
 						<select name="framerate" id="framerate">
-							<option value="23.976">23.976</option>
+							<option value="23976">23.976</option>
 							<option value="24">24.00</option>
-							<option value="25">25.00</option>
-							<option value="29.97">29.97</option>
+							<option value="25" selected>25.00</option>
+							<option value="2997">29.97</option>
 							<option value="30">30.00</option>
 							<option value="48">48.00</option>
 							<option value="50">50.00</option>
-							<option value="59.94">59.94</option>
+							<option value="5994">59.94</option>
 							<option value="60">60.00</option>
 						</select>
 						<label for="framerate">Framerate per second</label>
 					</span>
 				</section>
-				<section id="processButtons">
-					<input type="submit" id="start" value="Start">
-					<button id="reset">Reset panel</button>
-					<button id="xmp">XMP</button>
-					<button id="cleanup-xmp">Fix XMP time values</button>
+				<section id="formradio">
+					<span>
+						<input type="radio" id="fix-all" name="fix-target" value="all">
+						<label for="fix-all">Start in Project bin / folder</label>
+					</span>
+					<span>
+						<input type="radio" id="fix-selection" name="fix-target" value="selection" checked>
+						<label for="fix-selection">Start with Selection</label>
+					</span>
+				</section>
+				<section>
+					<span>
+						<input type="checkbox" id="fix-recursion" name="fix-recursion">
+						<label for="fix-recursion">Search in sub bins / folders</label>
+					</span>
+				</section>
+				<section class="buttons-interface">
+					<button id="cleanup-xmp">Fix</button>
 				</section>
 			</form>
 		</section>
 		<section id="log" class="hidden">
 			<h3>Log</h3>
-			<span class="logButtons">
+			<span class="buttons-interface">
 				<button id="resetLog">Reset log</button>
 				<button id="hideLog">Hide log</button>
 			</span>

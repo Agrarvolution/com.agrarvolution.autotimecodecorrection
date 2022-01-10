@@ -1,30 +1,39 @@
+:root {
+	--dark-color: #232323;
+	--bright-color: #b9b9b9;
+	--highlight-color: #0078d7;
+	--font-size: 9pt;
+}
+
+html {
+	font-size: var(--font-size);
+}
+
 .autotc_gui * {
 	font-family: "Adobe Clean UX", Segoe UI, Lucida Grande, Tahoma, sans-serif;
 	text-rendering: optimizeLegibility !important;
 	-webkit-font-smoothing: antialiased !important;
-	font-size: 10pt;
 }
 
 body.autotc_gui {
 	padding: 0 1rem;
-	min-width: 250px; 
-	font-size: 9pt;
-	color:  #b9b9b9;
-	background-color: #232323;
+	min-width: 250px;
+	color: var(--bright-color);
+	background-color: var(--dark-color);
 }
 
 .autotc_gui p {
-	text-align:center;
+	text-align: center;
 }
 
 .autotc_gui a {
-        color: #8080ff;
+	color: var(--highlight-color);
 }
 
 .autotc_gui form section > span {
 	display: block;
-	margin: .15em .5em;
-	padding: .2em;
+	margin: 0.15em 0.5em;
+	padding: 0.2em;
 }
 
 .file {
@@ -33,84 +42,95 @@ body.autotc_gui {
 	cursor: pointer;
 	height: 2.5rem;
 	width: 100%;
-  }
+}
 .file * {
 	margin: auto;
-}  
+}
 .file input[type="file"] {
 	overflow: hidden;
 	display: flex;
-    width: 100%;
-    line-height: 1.5;
-    color: #232323;
-    background-color: #b9b9b9;
-    background-clip: padding-box;
-	border-radius: .25rem;
-	height: 2em;
+	width: 100%;
+	line-height: 1.5;
+	color: var(--dark-color);
+	background-color: var(--bright-color);
+	background-clip: padding-box;
+	border-radius: 0.25rem;
+	height: 2rem;
 	vertical-align: middle;
 }
 
-section#log {
-	border-top: 1px solid #b9b9b9;
+main > section:not(:first-child) {
+	border-top: 1px solid var(--bright-color);
 }
 
 input[type="file"]::-webkit-file-upload-button {
-	padding: .25rem 1rem;
-	color: #b9b9b9;
-	background-color: #232323;
-	border: .075rem solid #b9b9b9;
-	border-radius: .25rem 0 0 .25rem;
+	padding: 0.25rem 1rem;
+	color: var(--bright-color);
+	background-color: var(--dark-color);
+	border: 0.075rem solid var(--bright-color);
+	border-radius: 0.25rem 0 0 0.25rem;
 	height: 100%;
-	font-size: 0.9em;	
+	font-size: 1rem;
 	cursor: pointer;
 }
 
-.autotc_gui button, .autotc_gui input[type=submit] {
-	margin: 1rem auto;
-	font-size: 0.7rem;
-	border:1px solid #b9b9b9;
+.autotc_gui button,
+.autotc_gui input[type="submit"] {
+	font-size: 1rem;
+	line-height: 0.8;
+	border: 1px solid var(--bright-color);
 	border-radius: 50px;
 	background-color: transparent;
 	background-image: none;
-	padding: 0.5em 1em 0.5em;
-	width: 100px; 
+	padding: 0.9rem 1rem;
+	width: 100px;
 	height: 100%;
-	display:block;
-	color: #b9b9b9;
+	display: block;
+	color: var(--bright-color);
 }
 
-.autotc_gui button:hover, .autotc_gui input[type=submit]:hover , input[type=file]::-webkit-file-upload-button:hover, 
-	.autotc_gui input:not([type=file]):hover, .autotc_gui input + span:hover, [type=checkbox]:checked:hover + label,
-	[type=checkbox]:not(:checked):hover + label, [type=checkbox]:checked:hover + label:before,
-	[type=checkbox]:not(:checked):hover + label:before, [type=checkbox]:checked:hover + label:after,
-	[type=checkbox]:not(:checked):hover + label:after, [type=radio]:not(:checked):hover + label, 
-	[type=radio]:checked:hover + label, [type=radio]:checked:hover + label:before, 
-	[type=radio]:not(:checked):hover + label:before, [type=radio]:checked:hover + label:after, 
-	[type=radio]:not(:checked):hover + label:after {
-	color: #0078d7;
-	border-color: #0078d7;
-	transition: all .25s;
+button:hover,
+input[type="submit"]:hover,
+input[type="file"]::-webkit-file-upload-button:hover,
+input:not([type="file"]):hover,
+[type="checkbox"]:checked:hover + label,
+[type="checkbox"]:not(:checked):hover + label,
+[type="checkbox"]:checked:hover + label:before,
+[type="checkbox"]:not(:checked):hover + label:before,
+[type="checkbox"]:checked:hover + label:after,
+[type="checkbox"]:not(:checked):hover + label:after,
+[type="radio"]:not(:checked):hover + label,
+[type="radio"]:checked:hover + label,
+[type="radio"]:checked:hover + label:before,
+[type="radio"]:not(:checked):hover + label:before,
+[type="radio"]:checked:hover + label:after,
+[type="radio"]:not(:checked):hover + label:after {
+	color: var(--highlight-color);
+	border-color: var(--highlight-color);
+	transition: all 0.25s;
 }
 
-.autotc_gui button:focus, .autotc_gui input[type=submit]:focus , input[type="file"]::-webkit-file-upload-button:focus, input {
+.autotc_gui button:focus,
+.autotc_gui input[type="submit"]:focus,
+input[type="file"]::-webkit-file-upload-button:focus,
+input {
 	outline: 0;
 }
-.autotc_gui button:active, input[type="file"]::-webkit-file-upload-button:active, 
-	.autotc_gui input:not([type=file]):active, .autotc_gui input + span:active {
+.autotc_gui button:active,
+input[type="file"]::-webkit-file-upload-button:active,
+.autotc_gui input:not([type="file"]):active,
+.autotc_gui input + span:active {
 	filter: brightness(90%);
 }
 
-.autotc_gui button, .autotc_gui input, .autotc_gui input + span {
+.autotc_gui button,
+.autotc_gui input,
+.autotc_gui input + span {
 	cursor: pointer;
 }
 
-.logButtons, #processButtons {
-	display:block;
-	margin: 1rem auto;
-	width: fit-content;
-}
-.logButtons button, #processButtons button,  #processButtons input[type="submit"] {
-	margin: .2rem .25rem;
+.buttons-interface button,
+.buttons-interface input[type="submit"] {
 	display: inline;
 }
 
@@ -120,37 +140,37 @@ input[type="file"]::-webkit-file-upload-button {
 	height: 50px;
 	white-space: nowrap;
 	font-family: monospace;
-	color:darkgray;
-	font-size: 1em;
-	border-radius: .25rem;
+	color: darkgray;
+	font-size: 1rem;
+	border-radius: 0.25rem;
 }
 
 .autotc_gui input {
-	height:1rem;
+	height: 1rem;
 }
 
 #content {
-	margin-right:auto;
-	margin-left:auto;
-	vertical-align:middle;
-	width:100%;
+	margin-right: auto;
+	margin-left: auto;
+	vertical-align: middle;
+	width: 100%;
 }
 
 #content ul {
-	padding:0px;
+	padding: 0px;
 }
 
 #content ul li {
-	margin:3px 0px 3px 0px;
+	margin: 3px 0px 3px 0px;
 }
 
 .hidden {
-    display: none;
+	display: none;
 }
 
 .autotc_gui h3 {
-	padding: .25em 0;
-	font-size: 1em;
+	padding: 0.25em 0;
+	font-size: 1rem;
 	font-weight: bold;
 	margin: 1em 0;
 	text-align: center;
@@ -159,84 +179,122 @@ input[type="file"]::-webkit-file-upload-button {
 .autotc_gui label:not(.file) {
 	height: 1em;
 }
-.autotc_gui input[type=checkbox], .autotc_gui input[type=radio], 
-	.autotc_gui input[type=checkbox]:checked + span, .autotc_gui input[type=checkbox]:not(:checked) + span,
-	.autotc_gui input[type=radio]:checked + span, .autotc_gui input[type=radio]:not(:checked) + span {
+.autotc_gui input[type="checkbox"],
+.autotc_gui input[type="radio"],
+.autotc_gui input[type="checkbox"]:checked + span,
+.autotc_gui input[type="checkbox"]:not(:checked) + span,
+.autotc_gui input[type="radio"]:checked + span,
+.autotc_gui input[type="radio"]:not(:checked) + span {
 	margin: auto;
-	vertical-align:middle;
+	vertical-align: middle;
 }
 
-
+.buttons-interface {
+	display: flex;
+	gap: 0.5rem;
+	margin: 1rem auto;
+	width: fit-content;
+}
 
 /*Custom radio and checkboxes*/
 
-
-[type=checkbox], [type=radio] {
+[type="checkbox"],
+[type="radio"] {
 	visibility: hidden;
 	transform: scale(0);
 	position: absolute;
 	left: -9999px;
 }
 
-[type=checkbox]:not(:checked) + label, [type=checkbox]:checked + label, 
-	[type=radio]:not(:checked) + label, [type=radio]:checked + label {
+[type="checkbox"]:not(:checked) + label,
+[type="checkbox"]:checked + label,
+[type="radio"]:not(:checked) + label,
+[type="radio"]:checked + label {
 	position: relative;
 	padding-left: 1.95em;
 	cursor: pointer;
 	margin: auto 0;
 }
-[type=checkbox]:not(:checked) + label::after {
+[type="checkbox"]:not(:checked) + label::after {
 	opacity: 0;
-	 transform: scale(0);
+	transform: scale(0);
 }
-[type=checkbox]:checked + label::after {
+[type="checkbox"]:checked + label::after {
 	opacity: 1;
-	 transform: scale(1);
+	transform: scale(1);
 }
 
-[type=checkbox]:not(:checked) + label::before, [type=checkbox]:checked + label::before, 
-	[type=radio]:not(:checked) + label::before, [type=radio]:checked + label::before {
+[type="checkbox"]:not(:checked) + label::before,
+[type="checkbox"]:checked + label::before,
+[type="radio"]:not(:checked) + label::before,
+[type="radio"]:checked + label::before {
 	box-sizing: border-box;
-	content: '';
+	content: "";
 	position: absolute;
-	left: 0; top: .2em;
-	font-size: 1em;
-	width: 1.1em; height: 1.1em;
-	border: 1px solid #b9b9b9;
+	left: 0;
+	top: 0.2em;
+	font-size: 1rem;
+	width: 1.1em;
+	height: 1.1em;
+	border: 1px solid var(--bright-color);
 	background: transparent;
-	transition: all .25s;
+	transition: all 0.25s;
 }
-[type=checkbox]:not(:checked) + label::before, [type=checkbox]:checked + label::before {
+[type="checkbox"]:not(:checked) + label::before,
+[type="checkbox"]:checked + label::before {
 	border-radius: 4px;
 }
 
-[type=radio]:not(:checked) + label::before, [type=radio]:checked + label::before {
+[type="radio"]:not(:checked) + label::before,
+[type="radio"]:checked + label::before {
 	border-radius: 50px;
-	
 }
 
-[type=checkbox]:not(:checked) + label::after, [type=checkbox]:checked + label::after {
-	content: '\2716\0020';
+[type="checkbox"]:not(:checked) + label::after,
+[type="checkbox"]:checked + label::after {
+	content: "\2716\0020";
 	position: absolute;
 	margin: auto;
-	font-size: 0.7em;
-	left: .4em; top: .6em;
-	line-height: 0.8;
-	color: #b9b9b9;
-	transition: all .25s;
-	width: 10px; height: 10px;
-	font-family: 'Segoe UI', 'Lucida Sans Unicode', 'Arial Unicode MS', Arial;
-	
+	font-size: 0.7rem;
+	left: 0.3rem;
+	line-height: 2;
+	color: var(--bright-color);
+	transition: all 0.25s;
+	width: 0.8rem;
+	height: 0.8rem;
+	font-family: "Segoe UI", "Lucida Sans Unicode", "Arial Unicode MS", Arial;
 }
-input[type=checkbox]:not(:checked) + label::after, input[type=checkbox]:checked + label::after {
+input[type="checkbox"]:not(:checked) + label::after,
+input[type="checkbox"]:checked + label::after {
 	border-radius: 3px;
 }
 
-[type=radio]:checked + label::before {
-	border: 4px solid #b9b9b9;
+[type="radio"]:checked + label::before {
+	border: 4px solid var(--bright-color);
 }
 
-[type=checkbox]:checked + label::before {
-	border: 2px solid #b9b9b9;
+[type="checkbox"]:checked + label::before {
+	border: 2px solid var(--bright-color);
 }
 
+select {
+	border-radius: 0.25rem;
+	color: var(--dark-color);
+	background-color: var(--bright-color);
+}
+
+select::after {
+	color: var(--dark-color);
+}
+
+/**
+* Host exclusive interface parts
+*/
+
+.bridge-only {
+	display: none;
+}
+
+.kbrg .bridge-only {
+	display: block;
+}
