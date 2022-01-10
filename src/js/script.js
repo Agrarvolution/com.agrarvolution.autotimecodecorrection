@@ -1,11 +1,16 @@
 'use strict';
 //Define form names
-let formId = 'atc';
 let sourceId = 'source';
-let searchTargetId = 'target';
-let searchRecursionId = 'recursion';
-let loggingId = 'logging';
-let mediaStartId = 'mediaStart';
+const formIds = {
+    target: 'target',
+    recursion: 'recursion',
+    logging: 'logging',
+    mediaStart: 'mediaStart',
+    source: 'source',
+    fixFramerate: 'framerate',
+    fixTarget: 'fix-target',
+    fixRecursion: 'fix-recursion'
+}
 
 var logging = logging || {};
 logging.verboseLogging = false;
@@ -34,7 +39,8 @@ const csvVersion = {
     ttc116: 'tentacletimecodetool_1.16'
 };
 
-let lockForm = false;
+let lockForm = false,
+    lockFormFix = false;
 
 
 $(function () {
@@ -54,13 +60,12 @@ $(function () {
         logging.addLog(e.data.text, e.data.logLevel);
     });
 
-    $('#xmp').on('click', function (e) {
+    $('#revert').on('click', function (e) {
         e.preventDefault();
-        logging.addLog("Start xmp", logLevels.status);
-        let csInterface = new CSInterface();
-        csInterface.evalScript('$.agrarvolution.timecodeCorrection.metaDataOfSelected()', function (e) {
+        logging.addLog("Revert timecodes to previously stored timecodes.", logLevels.status);
+        /*csInterface.evalScript('$.agrarvolution.timecodeCorrection.metaDataOfSelected()', function (e) {
             logging.addLog(e, logLevels.status);
-        });
+        });*/
     });
 
     //restore settings
@@ -91,10 +96,17 @@ $(function () {
             logging.verboseLogging = this.checked;
             log.toggleClass('hidden');
         }
+        settingHandler();
+    });
+    $('select').on('change', function (e) {
+        settingHandler();
+    })
+
+    function settingHandler() {
         if (storeSettings(readSettings())) {
             logging.addLog("Settings successfully stored.", logLevels.info);
         };
-    });
+    }
 
     $('#start').on("click", function (e) {
         e.preventDefault();
@@ -102,7 +114,7 @@ $(function () {
             return false;
         }
         lockForm = true;
-        let form = document.forms[formId];
+        let form = document.forms['atc'];
 
         let validation = validateForm(form);
 
@@ -113,6 +125,16 @@ $(function () {
             processFile(validation);
         }
     });
+
+    $('#cleanup-xmp').on('click'), function (e) {
+        e.preventDefault();
+        if (lockFormFix) {
+            return false;
+        }
+        lockForm = true;
+
+        let form = document.forms['fix-xmp'];
+    }
 });
 
 
@@ -375,21 +397,37 @@ function CSVToArray(strData, strDelimiter) {
  * @returns {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}}
  */
 function readSettings() {
-    let form = $('form[name="atc"]')[0];
+    let form = document.forms[0];
+    let fixForm = document.forms[1];
     let settings = {};
 
     logging.addLog('Reading settings.', logLevels.info);
 
-    settings.logging = form[loggingId].checked;
-    settings.searchRecursive = form[searchRecursionId].checked;
+    settings.logging = form[formIds.logging].checked;
+    settings.searchRecursive = form[formIds.recursion].checked;
 
-    settings.ignoreMediaStart = form[mediaStartId].checked;
+    settings.ignoreMediaStart = form[formIds.mediaStart].checked;
 
-    for (let i = 0; i < form[searchTargetId].length; i++) {
-        if (form[searchTargetId][i].checked) {
+    for (let i = 0; i < form[formIds.target].length; i++) {
+        if (form[formIds.target][i].checked) {
             settings.searchTarget = i;
         }
     }
+
+    for (let i = 0; i < form[formIds.source].length; i++) {
+        if (form[formIds.source][i].checked) {
+            settings.source = i;
+        }
+    }
+
+    settings.xmpFix = {};
+    for (let i = 0; i < fixForm[formIds.fixTarget].length; i++) {
+        if (fixForm[formIds.fixTarget][i].checked) {
+            settings.xmpFix.searchTarget = i;
+        }
+    }
+    settings.xmpFix.searchRecursive = fixForm[formIds.fixRecursion].checked;
+    settings.xmpFix.framerate = fixForm[formIds.fixFramerate].value;
     return settings;
 }
 /**
@@ -398,19 +436,39 @@ function readSettings() {
  */
 function changeSettings(settings) {
     try {
-        let form = $('form[name="atc"]')[0];
+        console.log(settings)
+        let form = document.forms[0];
+        let fixForm = document.forms[1];
 
-        form[loggingId].checked = settings.logging;
+        form[formIds.logging].checked = settings.logging || false;
 
-        form[searchRecursionId].checked = settings.searchRecursive;
-        form[mediaStartId].checked = settings.ignoreMediaStart;
+        form[formIds.recursion].checked = settings.searchRecursive || false;
+        form[formIds.mediaStart].checked = settings.ignoreMediaStart || false;
 
-        for (let i = 0; i < form[searchTargetId].length; i++) {
-            form[searchTargetId][i].checked = false;
+        for (let i = 0; i < form[formIds.target].length; i++) {
+            form[formIds.target][i].checked = false;
             if (i === settings.searchTarget) {
-                form[searchTargetId][i].checked = true;
+                form[formIds.target][i].checked = true;
             }
         }
+
+        for (let i = 0; i < form[formIds.source].length; i++) {
+            form[formIds.source][i].checked = false;
+            if (i === settings.source) {
+                form[formIds.source][i].checked = true;
+            }
+        }
+
+        for (let i = 0; i < fixForm[formIds.fixTarget].length; i++) {
+            fixForm[formIds.fixTarget][i].checked = false;
+            if (i === (settings?.xmpFix.searchTarget || 0)) {
+                fixForm[formIds.fixTarget][i].checked = true;
+            }
+        }
+        fixForm[formIds.fixRecursion].checked = settings?.xmpFix.searchRecursive || false;
+        fixForm[formIds.fixFramerate].value = settings?.xmpFix.framerate || 25;
+
+
         logging.verboseLogging = settings.logging;
         logging.addLog("Settings successfully updated.", logLevels.info);
     } catch {

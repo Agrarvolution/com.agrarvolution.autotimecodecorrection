@@ -33,7 +33,7 @@
 			<a id="refresh" href="javascript:history.go(0)">Refresh panel</a>
 
 
-			<form name="atc" onsubmit="return 0" method="post">
+			<form id="atc" name="atc" onsubmit="return 0" method="post">
 				<p id="explainer">Select .csv file to start.</p>
 				<p id="errorDisplay"></p>
 				<section>
@@ -117,7 +117,7 @@
 				<section>
 					<span>
 						<input type="checkbox" id="fix-recursion" name="fix-recursion">
-						<label for="fix-recursion">Search in sub bins / folders</label>
+						<label for="fix-recursion">Search in sub folders</label>
 					</span>
 				</section>
 				<section class="buttons-interface">
