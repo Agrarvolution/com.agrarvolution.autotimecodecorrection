@@ -239,25 +239,33 @@ $.agrarvolution.timecodeCorrection = {
                 item.tcStruct = "startTimecode";
             }
 
+            var addItem = true;
 
             if (tcStruct !== '') {
                 item.startTime = item.xmp.getStructField(XMPConst.NS_DM, item.tcStruct, XMPConst.NS_DM, "timeValue").value || '';
                 var xmpFramerate = item.xmp.getStructField(XMPConst.NS_DM, item.tcStruct, XMPConst.NS_DM, "timeFormat").value || '';
 
-                item.framerate = xmpFramerate.match(/\d+/g)[0] || '';
 
-                for (var i = 0; i < this.DropFrameTimecodesKeys.length; i++) {
-                    if (this.DropFrameTimecodesKeys[i] === item.framerate) {
-                        item.framerate = this.DropFrameTimecodes[this.DropFrameTimecodesKeys[i].toString()];
+
+                item.framerate = xmpFramerate.match(/\d+/g)[0];
+
+                if (item.framerate === undefined && xmpFramerate.length > 0) {
+                    addItem = false;
+                } else {
+                    for (var i = 0; i < this.DropFrameTimecodesKeys.length; i++) {
+                        if (this.DropFrameTimecodesKeys[i] === item.framerate) {
+                            item.framerate = this.DropFrameTimecodes[this.DropFrameTimecodesKeys[i].toString()];
+                        }
+                    }
+                    item.isDropframe = false;
+                    if (xmpFramerate.toLowercase().match('drop')[0]) {
+                        item.isDropframe = true;
                     }
                 }
-                item.isDropframe = false;
-                if (xmpFramerate.toLowercase().match('drop')[0]) {
-                    item.isDropframe = true;
-                }
             }
-
-            this.media.push(item);
+            if (addItem) {
+                this.media.push(item);
+            }
         } else if (thumb.type === this.ThumbnailTypes.folder && this.searchRecursive) {
             for (var i = 0; i < thumb.children.length; i++) {
                 this.processThumbnail(thumb.children[i]);
