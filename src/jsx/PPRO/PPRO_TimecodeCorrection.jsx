@@ -195,7 +195,7 @@ $.agrarvolution.timecodeCorrection = {
         if (!projectItem.isSequence() && projectItem.type === this.ProjectItemTypes.clip) {
             var item = {};
             item.projectItem = projectItem;
-            item.fileName = projectItem.name;
+            item.filename = projectItem.name;
             item.nodeId = projectItem.nodeId;
 
             var projectItemXMP = new XMPMeta(projectItem.getProjectMetadata());
@@ -317,7 +317,7 @@ $.agrarvolution.timecodeCorrection = {
 
         for (i = 0; i < this.timeCodeUpdates.length; i++) {
             for (j = 0; j < this.media.length; j++) {            
-                if (this.timeCodeUpdates[i].fileName.toUpperCase() === this.media[j].fileName.toUpperCase() && 
+                if (this.timeCodeUpdates[i].filename.toUpperCase() === this.media[j].filename.toUpperCase() && 
                     this.compareTimes(this.timeCodeUpdates[i].duration.groups, this.media[j].duration.groups) && 
                     (this.ignoreMediaStart ? true : this.compareTimes(this.timeCodeUpdates[i].fileTC.groups, this.media[j].startTime.groups))
                 ) {
@@ -343,7 +343,7 @@ $.agrarvolution.timecodeCorrection = {
     /**    
         *Updates / changes the starttime of a given ProjectItem.
         *@param {audioTC: {text: string, groups: object}} update
-        *@param {projectItem: object, fileName: string, startTime: object} mediaItem
+        *@param {projectItem: object, filename: string, startTime: object} mediaItem
         *@returns {boolean} true on success
     */
     changeStartTime: function(update, mediaItem) {
@@ -352,12 +352,12 @@ $.agrarvolution.timecodeCorrection = {
         newStartTime *= 10000;
         if (newStartTime) {
             mediaItem.projectItem.setStartTime(newStartTime.toString());
-            this.logToCEP(mediaItem.fileName + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" + 
+            this.logToCEP(mediaItem.filename + " - start time / timecode has been updated. (" + mediaItem.startTime.text + "->" + 
                 update.audioTC.text + ")", this.logLevels.info);
             return true;
         }
 
-        this.logToCEP(mediaItem.fileName + " - failed to update start time / timecode. (" + mediaItem.startTime.text + "->" + 
+        this.logToCEP(mediaItem.filename + " - failed to update start time / timecode. (" + mediaItem.startTime.text + "->" + 
                 update.audioTC.text + ")", this.logLevels.error);
         return false;
     },
