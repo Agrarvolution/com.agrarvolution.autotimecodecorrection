@@ -3,7 +3,7 @@
 var tcObject = {
     timeCodes: [
         {
-            "fileName": "NZ6_0394.MOV",
+            "filename": "NZ6_0394.MOV",
             "framerate": 2500,
             "duration": {
                 "text": "00:00:05",
