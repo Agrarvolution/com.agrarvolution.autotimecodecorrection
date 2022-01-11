@@ -3,7 +3,7 @@
 ExtensionBundleName="Bridge Automatic Timecode Correction" 
 ExtensionBundleVersion="1.0" Version="7.0">
 	<ExtensionList>
-		<Extension Id="com.agrarvolution.autoTimecodeCorrection.panel" Version="0.1.0" />
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection.panel" Version="0.2.0" />
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
