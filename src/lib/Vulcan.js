@@ -20,8 +20,7 @@
  * to the Vulcan. Allows you to launch CC applications
  * and discover information about them.
  */
-function Vulcan()
-{
+function Vulcan() {
 }
 
 /**
@@ -29,10 +28,9 @@ function Vulcan()
  *
  * @return The array of all available application specifiers.
  */
-Vulcan.prototype.getTargetSpecifiers = function()
-{
-	var params = {};
-	return JSON.parse(window.__adobe_cep__.invokeSync("vulcanGetTargetSpecifiers", JSON.stringify(params)));
+Vulcan.prototype.getTargetSpecifiers = function () {
+    var params = {};
+    return JSON.parse(window.__adobe_cep__.invokeSync("vulcanGetTargetSpecifiers", JSON.stringify(params)));
 };
 
 /**
@@ -51,19 +49,17 @@ Vulcan.prototype.getTargetSpecifiers = function()
  * @param cmdLine         Optional, command-line parameters to supply to the launch command.
  * @return True if the app can be launched, false otherwise.
  */
-Vulcan.prototype.launchApp = function(targetSpecifier, focus, cmdLine)
-{
-    if(!requiredParamsValid(targetSpecifier))
-    {
+Vulcan.prototype.launchApp = function (targetSpecifier, focus, cmdLine) {
+    if (!requiredParamsValid(targetSpecifier)) {
         return false;
     }
 
-	var params = {};
-	params.targetSpecifier = targetSpecifier;
-	params.focus = focus ? "true" : "false";
-	params.cmdLine = requiredParamsValid(cmdLine) ? cmdLine : "";
+    var params = {};
+    params.targetSpecifier = targetSpecifier;
+    params.focus = focus ? "true" : "false";
+    params.cmdLine = requiredParamsValid(cmdLine) ? cmdLine : "";
 
-	return JSON.parse(window.__adobe_cep__.invokeSync("vulcanLaunchApp", JSON.stringify(params))).result;
+    return JSON.parse(window.__adobe_cep__.invokeSync("vulcanLaunchApp", JSON.stringify(params))).result;
 };
 
 /**
@@ -80,17 +76,15 @@ Vulcan.prototype.launchApp = function(targetSpecifier, focus, cmdLine)
  *        In other platforms there is no such issue, so we can use "photoshop" or "photoshop-70" as specifier.
  * @return True if the app is running, false otherwise.
  */
-Vulcan.prototype.isAppRunning = function(targetSpecifier)
-{
-    if(!requiredParamsValid(targetSpecifier))
-    {
+Vulcan.prototype.isAppRunning = function (targetSpecifier) {
+    if (!requiredParamsValid(targetSpecifier)) {
         return false;
     }
 
-	var params = {};
-	params.targetSpecifier = targetSpecifier;
+    var params = {};
+    params.targetSpecifier = targetSpecifier;
 
-	return JSON.parse(window.__adobe_cep__.invokeSync("vulcanIsAppRunning", JSON.stringify(params))).result;
+    return JSON.parse(window.__adobe_cep__.invokeSync("vulcanIsAppRunning", JSON.stringify(params))).result;
 };
 
 /**
@@ -107,17 +101,15 @@ Vulcan.prototype.isAppRunning = function(targetSpecifier)
  *        In other platforms there is no such issue, so we can use "photoshop" or "photoshop-70" as specifier.
  * @return True if the app is installed, false otherwise.
  */
-Vulcan.prototype.isAppInstalled = function(targetSpecifier)
-{
-    if(!requiredParamsValid(targetSpecifier))
-    {
+Vulcan.prototype.isAppInstalled = function (targetSpecifier) {
+    if (!requiredParamsValid(targetSpecifier)) {
         return false;
     }
 
-	var params = {};
-	params.targetSpecifier = targetSpecifier;
+    var params = {};
+    params.targetSpecifier = targetSpecifier;
 
-	return JSON.parse(window.__adobe_cep__.invokeSync("vulcanIsAppInstalled", JSON.stringify(params))).result;
+    return JSON.parse(window.__adobe_cep__.invokeSync("vulcanIsAppInstalled", JSON.stringify(params))).result;
 };
 
 /**
@@ -134,17 +126,15 @@ Vulcan.prototype.isAppInstalled = function(targetSpecifier)
  *        In other platforms there is no such issue, so we can use "photoshop" or "photoshop-70" as specifier.
  * @return The path string if the application is found, "" otherwise.
  */
-Vulcan.prototype.getAppPath = function(targetSpecifier)
-{
-    if(!requiredParamsValid(targetSpecifier))
-    {
+Vulcan.prototype.getAppPath = function (targetSpecifier) {
+    if (!requiredParamsValid(targetSpecifier)) {
         return "";
     }
 
-	var params = {};
-	params.targetSpecifier = targetSpecifier;
+    var params = {};
+    params.targetSpecifier = targetSpecifier;
 
-	return JSON.parse(window.__adobe_cep__.invokeSync("vulcanGetAppPath", JSON.stringify(params))).result;
+    return JSON.parse(window.__adobe_cep__.invokeSync("vulcanGetAppPath", JSON.stringify(params))).result;
 };
 
 /**
@@ -156,17 +146,15 @@ Vulcan.prototype.getAppPath = function(targetSpecifier)
  * @param obj             Optional, the object containing the callback method, if any.
  *                        Default is null.
  */
-Vulcan.prototype.addMessageListener = function(type, callback, obj)
-{
-    if(!requiredParamsValid(type, callback) || !strStartsWith(type, VulcanMessage.TYPE_PREFIX))
-    {
+Vulcan.prototype.addMessageListener = function (type, callback, obj) {
+    if (!requiredParamsValid(type, callback) || !strStartsWith(type, VulcanMessage.TYPE_PREFIX)) {
         return;
     }
 
-	var params = {};
-	params.type = type;
+    var params = {};
+    params.type = type;
 
-	window.__adobe_cep__.invokeAsync("vulcanAddMessageListener", JSON.stringify(params), callback, obj);
+    window.__adobe_cep__.invokeAsync("vulcanAddMessageListener", JSON.stringify(params), callback, obj);
 };
 
 /**
@@ -178,10 +166,8 @@ Vulcan.prototype.addMessageListener = function(type, callback, obj)
  * @param obj             Optional, the object containing the callback method, if any.
  *                        Default is null.
  */
-Vulcan.prototype.removeMessageListener = function(type, callback, obj)
-{
-    if(!requiredParamsValid(type, callback) || !strStartsWith(type, VulcanMessage.TYPE_PREFIX))
-    {
+Vulcan.prototype.removeMessageListener = function (type, callback, obj) {
+    if (!requiredParamsValid(type, callback) || !strStartsWith(type, VulcanMessage.TYPE_PREFIX)) {
         return;
     }
 
@@ -196,19 +182,17 @@ Vulcan.prototype.removeMessageListener = function(type, callback, obj)
  *
  * @param vulcanMessage   The message object.
  */
-Vulcan.prototype.dispatchMessage = function(vulcanMessage)
-{
-    if(!requiredParamsValid(vulcanMessage) || !strStartsWith(vulcanMessage.type, VulcanMessage.TYPE_PREFIX))
-    {
+Vulcan.prototype.dispatchMessage = function (vulcanMessage) {
+    if (!requiredParamsValid(vulcanMessage) || !strStartsWith(vulcanMessage.type, VulcanMessage.TYPE_PREFIX)) {
         return;
     }
 
-	var params = {};
-	var message = new VulcanMessage(vulcanMessage.type);
-	message.initialize(vulcanMessage);
-	params.vulcanMessage = message;
+    var params = {};
+    var message = new VulcanMessage(vulcanMessage.type);
+    message.initialize(vulcanMessage);
+    params.vulcanMessage = message;
 
-	window.__adobe_cep__.invokeSync("vulcanDispatchMessage", JSON.stringify(params));
+    window.__adobe_cep__.invokeSync("vulcanDispatchMessage", JSON.stringify(params));
 };
 
 /**
@@ -217,16 +201,14 @@ Vulcan.prototype.dispatchMessage = function(vulcanMessage)
  * @param vulcanMessage   The message object.
  * @return                A string containing the message payload.
  */
-Vulcan.prototype.getPayload = function(vulcanMessage)
-{
-    if(!requiredParamsValid(vulcanMessage) || !strStartsWith(vulcanMessage.type, VulcanMessage.TYPE_PREFIX))
-    {
+Vulcan.prototype.getPayload = function (vulcanMessage) {
+    if (!requiredParamsValid(vulcanMessage) || !strStartsWith(vulcanMessage.type, VulcanMessage.TYPE_PREFIX)) {
         return null;
     }
 
-	var message = new VulcanMessage(vulcanMessage.type);
-	message.initialize(vulcanMessage);
-	return message.getPayload();
+    var message = new VulcanMessage(vulcanMessage.type);
+    message.initialize(vulcanMessage);
+    return message.getPayload();
 };
 
 /**
@@ -241,10 +223,9 @@ Vulcan.prototype.getPayload = function(vulcanMessage)
  *   <appVersion>16.1.0</appVersion>
  * </endPoint>
  */
-Vulcan.prototype.getEndPoints = function()
-{
-	var params = {};
-	return JSON.parse(window.__adobe_cep__.invokeSync("vulcanGetEndPoints", JSON.stringify(params)));
+Vulcan.prototype.getEndPoints = function () {
+    var params = {};
+    return JSON.parse(window.__adobe_cep__.invokeSync("vulcanGetEndPoints", JSON.stringify(params)));
 };
 
 /**
@@ -254,10 +235,9 @@ Vulcan.prototype.getEndPoints = function()
  *
  * @return                The endpoint string for itself.
  */
-Vulcan.prototype.getSelfEndPoint = function()
-{
-	var params = {};
-	return window.__adobe_cep__.invokeSync("vulcanGetSelfEndPoint", JSON.stringify(params));
+Vulcan.prototype.getSelfEndPoint = function () {
+    var params = {};
+    return window.__adobe_cep__.invokeSync("vulcanGetSelfEndPoint", JSON.stringify(params));
 };
 
 /** Singleton instance of Vulcan **/
@@ -280,17 +260,16 @@ var VulcanInterface = new Vulcan();
  * @param appVersion      The peer appVersion.
  *
  */
-function VulcanMessage(type, appId, appVersion)
-{
+function VulcanMessage(type, appId, appVersion) {
     this.type = type;
     this.scope = VulcanMessage.SCOPE_SUITE;
     this.appId = requiredParamsValid(appId) ? appId : VulcanMessage.DEFAULT_APP_ID;
-	this.appVersion = requiredParamsValid(appVersion) ? appVersion : VulcanMessage.DEFAULT_APP_VERSION;
+    this.appVersion = requiredParamsValid(appVersion) ? appVersion : VulcanMessage.DEFAULT_APP_VERSION;
     this.data = VulcanMessage.DEFAULT_DATA;
 }
 
-VulcanMessage.TYPE_PREFIX    = "vulcan.SuiteMessage.";
-VulcanMessage.SCOPE_SUITE    = "GLOBAL";
+VulcanMessage.TYPE_PREFIX = "vulcan.SuiteMessage.";
+VulcanMessage.SCOPE_SUITE = "GLOBAL";
 VulcanMessage.DEFAULT_APP_ID = "UNKNOWN";
 VulcanMessage.DEFAULT_APP_VERSION = "UNKNOWN";
 VulcanMessage.DEFAULT_DATA = "<data><payload></payload></data>";
@@ -302,8 +281,7 @@ VulcanMessage.payloadTemplate = "<payload>{0}</payload>";
  *
  * @param message         A \c message instance to use for initialization.
  */
-VulcanMessage.prototype.initialize = function(message)
-{
+VulcanMessage.prototype.initialize = function (message) {
     this.type = message.type;
     this.scope = message.scope;
     this.appId = message.appId;
@@ -316,13 +294,11 @@ VulcanMessage.prototype.initialize = function(message)
  *
  * @return A data string in XML format.
  */
-VulcanMessage.prototype.xmlData = function()
-{
-    if(this.data === undefined)
-    {
+VulcanMessage.prototype.xmlData = function () {
+    if (this.data === undefined) {
         var str = "";
-		str = String.format(VulcanMessage.payloadTemplate, str);
-		this.data = String.format(VulcanMessage.dataTemplate, str);
+        str = String.format(VulcanMessage.payloadTemplate, str);
+        this.data = String.format(VulcanMessage.dataTemplate, str);
     }
     return this.data;
 };
@@ -332,8 +308,7 @@ VulcanMessage.prototype.xmlData = function()
  *
  * @param payload         A string containing the message payload.
  */
-VulcanMessage.prototype.setPayload = function(payload)
-{
+VulcanMessage.prototype.setPayload = function (payload) {
     var str = cep.encoding.convertion.utf8_to_b64(payload);
     str = String.format(VulcanMessage.payloadTemplate, str);
     this.data = String.format(VulcanMessage.dataTemplate, str);
@@ -344,11 +319,9 @@ VulcanMessage.prototype.setPayload = function(payload)
  *
  * @return                A string containing the message payload.
  */
-VulcanMessage.prototype.getPayload = function()
-{
+VulcanMessage.prototype.getPayload = function () {
     var str = GetValueByKey(this.data, "payload");
-    if(str !== null)
-    {
+    if (str !== null) {
         return cep.encoding.convertion.b64_to_utf8(str);
     }
     return null;
@@ -359,8 +332,7 @@ VulcanMessage.prototype.getPayload = function()
  *
  * @return The string version of this instance.
  */
-VulcanMessage.prototype.toString = function()
-{
+VulcanMessage.prototype.toString = function () {
     var str = "type=" + this.type;
     str += ", scope=" + this.scope;
     str += ", appId=" + this.appId;
@@ -378,17 +350,15 @@ VulcanMessage.prototype.toString = function()
  *
  * @return The formatted string
  */
-String.format = function(src)
-{
-    if (arguments.length === 0)
-    {
+String.format = function (src) {
+    if (arguments.length === 0) {
         return null;
     }
 
     var args = Array.prototype.slice.call(arguments, 1);
-    return src.replace(/\{(\d+)\}/g, function(m, i){
+    return src.replace(/\{(\d+)\}/g, function (m, i) {
         return args[i];
-  });
+    });
 };
 
 /**
@@ -400,22 +370,17 @@ String.format = function(src)
  * @return          The content of the tag, or the empty string
  *                  if such tag is not found or the tag has no content.
  */
-function GetValueByKey(xmlStr, key)
-{
-    if(window.DOMParser)
-    {
+function GetValueByKey(xmlStr, key) {
+    if (window.DOMParser) {
         var parser = new window.DOMParser();
-        try
-        {
+        try {
             var xmlDoc = parser.parseFromString(xmlStr, "text/xml");
             var node = xmlDoc.getElementsByTagName(key)[0];
-            if(node && node.childNodes[0])
-            {
+            if (node && node.childNodes[0]) {
                 return node.childNodes[0].nodeValue;
             }
         }
-        catch(e)
-        {
+        catch (e) {
             //log the error
         }
     }
@@ -428,13 +393,10 @@ function GetValueByKey(xmlStr, key)
  * @return    True if all required parameters are valid,
  *            false if any of the required parameters are invalid.
  */
-function requiredParamsValid()
-{
-    for(var i = 0; i < arguments.length; i++)
-    {
+function requiredParamsValid() {
+    for (var i = 0; i < arguments.length; i++) {
         var argument = arguments[i];
-        if(argument === undefined || argument === null)
-        {
+        if (argument === undefined || argument === null) {
             return false;
         }
     }
@@ -449,10 +411,8 @@ function requiredParamsValid()
  *
  * @return          True if the string has the prefix, false if not.
  */
-function strStartsWith(str, prefix)
-{
-    if(typeof str != "string")
-    {
+function strStartsWith(str, prefix) {
+    if (typeof str != "string") {
         return false;
     }
     return str.indexOf(prefix) === 0;

@@ -1,3 +1,5 @@
+
+
 /**************************************************************************************************
 *
 * ADOBE SYSTEMS INCORPORATED
@@ -44,7 +46,7 @@ if (!cep.util) {
         return GetLastError();
     }
 
-    function getErrorResult(){
+    function getErrorResult() {
         var result = {err: getLastError()};
         return result;
     }
