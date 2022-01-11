@@ -50,6 +50,7 @@ let lockForm = false,
     lockFormFix = false;
 
 
+
 $(function () {
     logging.logArea = $('#loggingArea')[0];
     logging.log = $('#log');
@@ -65,14 +66,6 @@ $(function () {
     csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, onAppThemeColorChanged);
     csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
         logging.addLog(e.data.text, e.data.logLevel);
-    });
-
-    $('#revert').on('click', function (e) {
-        e.preventDefault();
-        logging.addLog("Revert timecodes to previously stored timecodes.", logLevels.status);
-        /*csInterface.evalScript('$.agrarvolution.timecodeCorrection.metaDataOfSelected()', function (e) {
-            logging.addLog(e, logLevels.status);
-        });*/
     });
 
     //restore settings
@@ -123,11 +116,11 @@ $(function () {
         lockForm = true;
         let form = document.forms['atc'];
 
-        if (host !== 'kbrg' || settings.source === 0) {
+        if (host !== 'kbrg' || settings.source === 1) {
             let validation = validateForm(form);
 
             if (!validation) {
-                logging.addLog('Process canceled. Inputs are invalid.', logLevels.info);
+                logging.addLog('Process canceled. Inputs are invalid.', logLevels.status);
                 lockForm = false;
             } else {
                 processFile(validation);
@@ -144,32 +137,49 @@ $(function () {
         }
         lockForm = true;
 
+        logging.addLog("Revert timecodes to previously stored timecodes.", logLevels.status);
         revertTimecodechanges();
     });
 
-    $('#cleanup-xmp').on('click'), function (e) {
+    $('#update-xmp-timevalue').on('click', function (e) {
         e.preventDefault();
         if (lockFormFix) {
             return false;
         }
         lockFormFix = true;
 
-        fixXMP();
-    }
+        fixXMP(false);
+    });
+
+    $('#cleanup-xmp').on('click', function (e) {
+        e.preventDefault();
+        if (lockFormFix) {
+            return false;
+        }
+        lockFormFix = true;
+
+        fixXMP(true);
+    });
 });
 /**
  * Helper function to call host to fix the XMP value - timeFormat.
  */
-function fixXMP() {
-    logging.addLog("Starting fixing broken XMP time format.", logLevels.info);
+function fixXMP(type) {
+    if (type) {
+        logging.addLog("Fixing broken XMP timecode time format.", logLevels.status);
+    } else {
+        logging.addLog("Update timecode time format.", logLevels.status);
+    }
 
     let csObject = {
         framerate: settings.xmpFix.framerate,
         searchTarget: settings.xmpFix.searchTarget,
         recursive: settings.xmpFix.searchRecursive,
-        logging: settings.logging
+        logging: settings.logging,
+        errorOnly: type
     };
 
+    let csInterface = new CSInterface();
     csInterface.evalScript(`$.agrarvolution.timecodeCorrection.fixXmpTimeFormat(${JSON.stringify(csObject)});`, function (e) {
         if (e === 'true') {
             logging.addLog("Time format was repaired.", logLevels.status);
@@ -190,6 +200,8 @@ function revertTimecodechanges() {
         recursive: settings.xmpFix.searchRecursive,
         logging: settings.logging
     };
+
+    let csInterface = new CSInterface();
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.revertChanges(' +
         JSON.stringify(csObject) + ');', function (e) {
             if (e === 'true') {
@@ -213,9 +225,11 @@ function timecodeFromMetadata() {
             logMessage = "Creating timecode from time last changed.";
             break;
         default:
-            break;
+            logging.addLog('Code took wrong path - erroneously in metadata path.', logLevels.error);
+            lockForm = false;
+            return false;
     }
-    logging.addLog(logMessage, logLevels.info);
+    logging.addLog(logMessage, logLevels.status);
 
     let csObject = {
         searchTarget: settings.searchTarget,
@@ -250,6 +264,11 @@ function handleFileLoad(file) {
 
     logging.addLog("Media to be updated: " + JSON.stringify(timeCodes), logLevels.info);
 
+    let csInterface = new CSInterface();
+    csInterface.evalScript('$', function(result) {
+        logging.addLog(result, logLevels.info);
+    });
+    
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function (e) {
         if (e === 'true') {
             logging.addLog("Media has been updated. Process finished. Select the next file to be processed.", logLevels.status);
@@ -282,7 +301,7 @@ function processFile(file) {
  * Validates parsed csv. Creates an array of timecode objects.
  * @param {array} csv 
  * @param {string} version 
- * @returns {boolean|array.{fileName: string, framerate: number, duration: object, fileTC: object, audioTC: object}} false on failure
+ * @returns {boolean|array.{filename: string, framerate: number, duration: object, fileTC: object, audioTC: object}} false on failure
  */
 function checkCSV(csv, version) {
     let timeCodes = [];
@@ -301,7 +320,7 @@ function checkCSV(csv, version) {
             let rowResult = checkCSVrow(csv[i], version, i);
             if (rowResult !== false) {
                 timeCodes.push(rowResult);
-                logging.addLog(rowResult.fileName + " - Parsed and staged at " + rowResult.framerate / 100 + " fps. [" +
+                logging.addLog(rowResult.filename + " - Parsed and staged at " + rowResult.framerate / 100 + " fps. [" +
                     rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", logLevels.info);
             }
 
@@ -317,7 +336,7 @@ function checkCSV(csv, version) {
  * @param {array} row 
  * @param {string} version 
  * @param {number} rowNumber 
- * @returns {boolean|array.{fileName: string, framerate: number, duration: object, fileTC: object, audioTC: object}} false on failure
+ * @returns {boolean|array.{filename: string, framerate: number, duration: object, fileTC: object, audioTC: object}} false on failure
  */
 function checkCSVrow(row, version, rowNumber) {
     let tcMediaElement = {};
@@ -330,13 +349,13 @@ function checkCSVrow(row, version, rowNumber) {
             }
         }
 
-        tcMediaElement.fileName = row[0];
+        tcMediaElement.filename = row[0];
 
         //@todo check if no match - check if values are valid in new function
 
         tcMediaElement.framerate = Number(row[4]) * 100;
         if (Number.isNaN(tcMediaElement.framerate)) {
-            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" +
+            logging.addLog(tcMediaElement.filename + " at row " + rowNumber + " - Framerate (" +
                 row[4] + ") is invalid.", logLevels.error);
             return false;
         }
@@ -351,7 +370,7 @@ function checkCSVrow(row, version, rowNumber) {
             case 6000:
                 break;
             default:
-                logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Framerate (" +
+                logging.addLog(tcMediaElement.filename + " at row " + rowNumber + " - Framerate (" +
                     row[4] + ") is unexpected.", logLevels.info);
         }
         tcMediaElement.framerate /= 100;
@@ -360,7 +379,7 @@ function checkCSVrow(row, version, rowNumber) {
 
         tcMediaElement.duration = hmsfPattern.exec(row[1]);
         if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
-            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - duration (" +
+            logging.addLog(tcMediaElement.filename + " at row " + rowNumber + " - duration (" +
                 row[1] + ") is invalid.", logLevels.error);
             return false;
         }
@@ -369,7 +388,7 @@ function checkCSVrow(row, version, rowNumber) {
 
         tcMediaElement.fileTC = hmsfPattern.exec(row[2]);
         if (!validateTime(tcMediaElement.fileTC, tcMediaElement.framerate, true)) {
-            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - File TC (" +
+            logging.addLog(tcMediaElement.filename + " at row " + rowNumber + " - File TC (" +
                 row[2] + ") is invalid.", logLevels.error);
             return false;
         }
@@ -378,7 +397,7 @@ function checkCSVrow(row, version, rowNumber) {
 
         tcMediaElement.audioTC = hmsfPattern.exec(row[3]);
         if (!validateTime(tcMediaElement.audioTC, tcMediaElement.framerate)) {
-            logging.addLog(tcMediaElement.fileName + " at row " + rowNumber + " - Audio TC (" +
+            logging.addLog(tcMediaElement.filename + " at row " + rowNumber + " - Audio TC (" +
                 row[3] + ") is invalid.", logLevels.error);
             return false;
         }
@@ -528,7 +547,6 @@ function readSettings() {
  */
 function changeSettings(settings) {
     try {
-        console.log(settings)
         let form = document.forms[0];
         let fixForm = document.forms[1];
 
@@ -609,16 +627,16 @@ function loadSettings() {
  * @param {*} form 
  */
 function validateForm(form) {
-    if (form[sourceId].files.length === 0) {
+    if (form[0].files.length === 0) {
         logging.addLog('No file has been selected.', logLevels.status);
         return false;
-    } else if (form[sourceId].files[0].size === 0) {
+    } else if (form[0].files[0].size === 0) {
         logging.addLog('Selection is not a file.', logLevels.status);
         return false;
-    } else if (!(form[sourceId].files[0].type === 'text/csv' || form[sourceId].files[0].type === 'application/vnd.ms-excel')) {
+    } else if (!(form[0].files[0].type === 'text/csv' || form[0].files[0].type === 'application/vnd.ms-excel')) {
         logging.addLog('File type does not match.', logLevels.info);
     }
-    return form[sourceId].files[0];
+    return form[0].files[0];
 }
 
 /**

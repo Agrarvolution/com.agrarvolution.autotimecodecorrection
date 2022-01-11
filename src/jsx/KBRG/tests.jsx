@@ -1,8 +1,6 @@
-//#include 'KBRG_TimecodeCorrection.jsx';
+#include 'KBRG_TimecodeCorrection.jsx';
 
-
-
-//var timeCorrection = $.agrarvolution.timecodeCorrection;
+var timeCorrection = $.agrarvolution.timecodeCorrection;
 
 //timeCorrection.cacheMediaObjects();
 //timeCorrection.processInput(tcObject);
@@ -24,4 +22,19 @@ timeCorrection.processInput({
     searchTarget: 2,
     ignoreMediaStart: true,
     logging: true
+});*/
+
+/*
+timeCorrection.revertChanges({
+    searchTarget: 2,
+    recursive: true,
+    logging: true
+});*/
+/*
+timeCorrection.fixXmpTimeFormat({
+    framerate: 25,
+    searchTarget: 2,
+    recursive: 1,
+    logging: true,
+    errorOnly: false
 });*/
