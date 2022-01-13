@@ -276,7 +276,6 @@ $.agrarvolution.timecodeCorrection = {
      *@returns {boolean} true on success | false on failure  
      */
     processInput: function(tcObject) {
-        alert('Starting host script!!');
         this.logToCEP("Starting host script.", this.logLevels.info);
         this.processedMedia = 0;
         if (this.setValues(tcObject) && this.cacheMediaObjects(false) && this.updateTimeCodes()) {
@@ -363,7 +362,7 @@ $.agrarvolution.timecodeCorrection = {
         this.media = [];
 
         var hasNoSelection = app.document.selectionLength === 0;
-        if (hasNoSelection && this.searchTarget === 1) { //process root - get all thumbnails if there is no selection
+        if (hasNoSelection || this.searchTarget === 1) { //process root - get all thumbnails if there is no selection
             app.document.selectAll();
         }
 
@@ -371,7 +370,7 @@ $.agrarvolution.timecodeCorrection = {
             this.processThumbnail(app.document.selections[i], toggleInvalid);
         }
 
-        if (hasNoSelection && this.searchTarget === 1) { // remove selection if there was none before
+        if (hasNoSelection || this.searchTarget === 1) { // remove selection if there was none before
             app.document.deselectAll()
         }
 
@@ -439,6 +438,7 @@ $.agrarvolution.timecodeCorrection = {
                 if (item.framerate === undefined && xmpFramerate.length > 0) {
                     addItem = false;
                 } else {
+                    item.framerate = Number(item.framerate[0]);
                     for (var i = 0; i < this.DropFrameTimecodesKeys.length; i++) {
                         if (this.DropFrameTimecodesKeys[i] === item.framerate) {
                             item.framerate = this.DropFrameTimecodes[this.DropFrameTimecodesKeys[i].toString()];
@@ -538,7 +538,7 @@ $.agrarvolution.timecodeCorrection = {
         if (!(this.timeCodeUpdates !== undefined && this.media !== undefined) || this.media.length === 0) {
             return false;
         }
-
+        
         for (i = 0; i < this.timeCodeUpdates.length; i++) {
             for (j = 0; j < this.media.length; j++) {
                 if (this.timeCodeUpdates[i].filename.toUpperCase() === this.media[j].filename.toUpperCase() &&
@@ -651,7 +651,7 @@ $.agrarvolution.timecodeCorrection = {
     createTimecodeFromObj: function(time, isDropframe, framerate) {
         var del = isDropframe ? ';' : ':';
         return this.padZero(time.hours, 2) + del + this.padZero(time.minutes, 2) + del + this.padZero(time.seconds, 2) +
-            del + this.padZero(time.frames, framerate.toString().length);
+            del + this.padZero(time.frames, Math.floor(framerate).toString().length);
     },
     /**
      * Pad numbers with leading zeros.
