@@ -88,9 +88,7 @@ $.agrarvolution.timecodeCorrection = {
      */
     fixTimeFormat: function(framerate) {
         this.processedMedia = 0;
-        this.logToCEP("vor loop", this.logLevels.status);
         for (var i = 0; i < this.media.length; i++) {
-            this.logToCEP(i, this.logLevels.status);
             var text = "Timecode";
             if (this.DropFrameTimecodes[framerate]) {
                 text = "Drop" + text;
@@ -100,13 +98,13 @@ $.agrarvolution.timecodeCorrection = {
             this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat", text);
 
             try {
-                this.media[i].thumb.synchronousMetadata =
-                    new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
+                var newMetadata = new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
+                this.media[i].thumb.synchronousMetadata = newMetadata;
                 this.logToCEP(this.media[i].filename + " - Time format fixed.", this.logLevels.info);
                 this.processedMedia++;
             } catch (e) {
                 this.logToCEP(this.media[i].filename + " - failed to fix time format.", this.logLevels.error);
-                this.logToCEP(e, this.logLevels.error);
+                this.logToCEP(JSON.stringify(e), this.logLevels.error);
             }
         }
         return true;
@@ -437,7 +435,7 @@ $.agrarvolution.timecodeCorrection = {
 
                 if (item.framerate === undefined && xmpFramerate.length > 0) {
                     addItem = false;
-                } else {
+                } else if (item.framerate !== null) {
                     item.framerate = Number(item.framerate[0]);
                     for (var i = 0; i < this.DropFrameTimecodesKeys.length; i++) {
                         if (this.DropFrameTimecodesKeys[i] === item.framerate) {
@@ -449,6 +447,9 @@ $.agrarvolution.timecodeCorrection = {
                     if (xmpFramerate.toLowerCase().match('drop')) {
                         item.isDropframe = true;
                     }
+                } else {
+                    item.framerate = '';
+                    item.isDropframe = false;
                 }
             }
             if (addItem !== addInvalidOnly) {
@@ -538,7 +539,7 @@ $.agrarvolution.timecodeCorrection = {
         if (!(this.timeCodeUpdates !== undefined && this.media !== undefined) || this.media.length === 0) {
             return false;
         }
-        
+
         for (i = 0; i < this.timeCodeUpdates.length; i++) {
             for (j = 0; j < this.media.length; j++) {
                 if (this.timeCodeUpdates[i].filename.toUpperCase() === this.media[j].filename.toUpperCase() &&
