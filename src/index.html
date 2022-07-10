@@ -41,51 +41,53 @@
 						<input type="file" id="source">
 					</label>
 				</section>
-				<section class="bridge-only" id="updateTypeRadio">
-					<span>
-						<input type="radio" id="fromFile" name="source" value="file" checked>
-						<label for="fromFile">Timecode from file</label>
-					</span>
-					<span>
-						<input type="radio" id="fromSource" name="source" value="creation">
-						<label for="fromSource">Creation time as timecode</label>
-					</span>
-					<span>
-						<input type="radio" id="fromChange" name="source" value="changed">
-						<label for="fromChange">Last changed as timecode</label>
-					</span>
-				</section>
-				<section>
-					<span>
-						<input type="checkbox" id="mediaStart" name="mediaStart">
-						<label for="mediaStart">Disable media start comparison</label>
-					</span>
-				</section>
-				<section id="formradio">
-					<span>
-						<input type="radio" id="all" name="target" value="all">
-						<label for="all">Start in Project bin / folder</label>
-					</span>
-					<span>
-						<input type="radio" id="selection" name="target" value="selection" checked>
-						<label for="selection">Start with Selection</label>
-					</span>
-				</section>
-				<section>
-					<span>
-						<input type="checkbox" id="recursion" name="recursion">
-						<label for="recursion">Search in sub bins / folders</label>
-					</span>
-					<span>
-						<input type="checkbox" id="logging" name="logging">
-						<label for="logging">Enable verbose logging</label>
-					</span>
+				<section class="atc-from-content--settings">
+					<div class="bridge-only" id="updateTypeRadio">
+						<span>
+							<input type="radio" id="fromFile" name="source" value="file" checked>
+							<label for="fromFile">Timecode from file</label>
+						</span>
+						<span>
+							<input type="radio" id="fromSource" name="source" value="creation">
+							<label for="fromSource">Creation time as timecode</label>
+						</span>
+						<span>
+							<input type="radio" id="fromChange" name="source" value="changed">
+							<label for="fromChange">Last changed as timecode</label>
+						</span>
+					</div>
+					<div>
+						<span>
+							<input type="checkbox" id="mediaStart" name="mediaStart">
+							<label for="mediaStart">Disable media start comparison</label>
+						</span>
+					</div>
+					<div id="formradio">
+						<span>
+							<input type="radio" id="all" name="target" value="all">
+							<label for="all">Start in Project bin / folder</label>
+						</span>
+						<span>
+							<input type="radio" id="selection" name="target" value="selection" checked>
+							<label for="selection">Start with Selection</label>
+						</span>
+					</div>
+					<div>
+						<span>
+							<input type="checkbox" id="recursion" name="recursion">
+							<label for="recursion">Search in sub bins / folders</label>
+						</span>
+						<span>
+							<input type="checkbox" id="logging" name="logging">
+							<label for="logging">Enable verbose logging</label>
+						</span>
+					</div>
 				</section>
 				<section class="buttons-interface" id="processButtons">
 					<input type="submit" id="start" value="Start">
 					<button class="bridge-only" id="revert">Revert</button>
 					<button id="reset">Reset panel</button>
-									
+
 				</section>
 			</form>
 		</section>

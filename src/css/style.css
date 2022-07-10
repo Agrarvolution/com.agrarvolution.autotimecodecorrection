@@ -1,8 +1,10 @@
 :root {
 	--dark-color: #232323;
 	--bright-color: #b9b9b9;
+	--form-background-color: darkgray;
 	--highlight-color: #0078d7;
 	--font-size: 9pt;
+	--button-width: 8rem;
 }
 
 html {
@@ -17,7 +19,6 @@ html {
 
 body.autotc_gui {
 	padding: 0 1rem;
-	min-width: 250px;
 	color: var(--bright-color);
 	background-color: var(--dark-color);
 }
@@ -30,10 +31,26 @@ body.autotc_gui {
 	color: var(--highlight-color);
 }
 
-.autotc_gui form section > span {
+.autotc_gui form section>span,
+.atc-from-content--settings>div>span {
 	display: block;
 	margin: 0.15em 0.5em;
 	padding: 0.2em;
+}
+
+#errorDisplay {
+	font-weight: bold;
+}
+
+.atc-from-content--settings>div:not(:last-of-type) {
+	margin-bottom: 0.5rem;
+}
+
+.atc-from-content--settings {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+	align-items: center;
+	grid-auto-flow: row dense;
 }
 
 .file {
@@ -43,9 +60,11 @@ body.autotc_gui {
 	height: 2.5rem;
 	width: 100%;
 }
+
 .file * {
 	margin: auto;
 }
+
 .file input[type="file"] {
 	overflow: hidden;
 	display: flex;
@@ -59,7 +78,7 @@ body.autotc_gui {
 	vertical-align: middle;
 }
 
-main > section:not(:first-child) {
+main>section:not(:first-child) {
 	border-top: 1px solid var(--bright-color);
 }
 
@@ -93,18 +112,18 @@ button:hover,
 input[type="submit"]:hover,
 input[type="file"]::-webkit-file-upload-button:hover,
 input:not([type="file"]):hover,
-[type="checkbox"]:checked:hover + label,
-[type="checkbox"]:not(:checked):hover + label,
-[type="checkbox"]:checked:hover + label:before,
-[type="checkbox"]:not(:checked):hover + label:before,
-[type="checkbox"]:checked:hover + label:after,
-[type="checkbox"]:not(:checked):hover + label:after,
-[type="radio"]:not(:checked):hover + label,
-[type="radio"]:checked:hover + label,
-[type="radio"]:checked:hover + label:before,
-[type="radio"]:not(:checked):hover + label:before,
-[type="radio"]:checked:hover + label:after,
-[type="radio"]:not(:checked):hover + label:after {
+[type="checkbox"]:checked:hover+label,
+[type="checkbox"]:not(:checked):hover+label,
+[type="checkbox"]:checked:hover+label:before,
+[type="checkbox"]:not(:checked):hover+label:before,
+[type="checkbox"]:checked:hover+label:after,
+[type="checkbox"]:not(:checked):hover+label:after,
+[type="radio"]:not(:checked):hover+label,
+[type="radio"]:checked:hover+label,
+[type="radio"]:checked:hover+label:before,
+[type="radio"]:not(:checked):hover+label:before,
+[type="radio"]:checked:hover+label:after,
+[type="radio"]:not(:checked):hover+label:after {
 	color: var(--highlight-color);
 	border-color: var(--highlight-color);
 	transition: all 0.25s;
@@ -116,22 +135,25 @@ input[type="file"]::-webkit-file-upload-button:focus,
 input {
 	outline: 0;
 }
+
 .autotc_gui button:active,
 input[type="file"]::-webkit-file-upload-button:active,
 .autotc_gui input:not([type="file"]):active,
-.autotc_gui input + span:active {
+.autotc_gui input+span:active {
 	filter: brightness(90%);
 }
 
 .autotc_gui button,
 .autotc_gui input,
-.autotc_gui input + span {
+.autotc_gui input+span {
 	cursor: pointer;
 }
 
 .buttons-interface button,
 .buttons-interface input[type="submit"] {
 	display: inline;
+	width: var(--button-width);
+	flex-shrink: 0;
 }
 
 .autotc_gui textarea {
@@ -140,7 +162,7 @@ input[type="file"]::-webkit-file-upload-button:active,
 	height: 100px;
 	white-space: nowrap;
 	font-family: monospace;
-	color: darkgray;
+	color: var(--form-background-color);
 	font-size: 1rem;
 	border-radius: 0.25rem;
 }
@@ -179,12 +201,13 @@ input[type="file"]::-webkit-file-upload-button:active,
 .autotc_gui label:not(.file) {
 	height: 1em;
 }
+
 .autotc_gui input[type="checkbox"],
 .autotc_gui input[type="radio"],
-.autotc_gui input[type="checkbox"]:checked + span,
-.autotc_gui input[type="checkbox"]:not(:checked) + span,
-.autotc_gui input[type="radio"]:checked + span,
-.autotc_gui input[type="radio"]:not(:checked) + span {
+.autotc_gui input[type="checkbox"]:checked+span,
+.autotc_gui input[type="checkbox"]:not(:checked)+span,
+.autotc_gui input[type="radio"]:checked+span,
+.autotc_gui input[type="radio"]:not(:checked)+span {
 	margin: auto;
 	vertical-align: middle;
 }
@@ -193,7 +216,9 @@ input[type="file"]::-webkit-file-upload-button:active,
 	display: flex;
 	gap: 0.5rem;
 	margin: 1rem auto;
-	width: fit-content;
+	width: 100%;
+	justify-content: center;
+	flex-wrap: wrap;
 }
 
 /*Custom radio and checkboxes*/
@@ -206,28 +231,30 @@ input[type="file"]::-webkit-file-upload-button:active,
 	left: -9999px;
 }
 
-[type="checkbox"]:not(:checked) + label,
-[type="checkbox"]:checked + label,
-[type="radio"]:not(:checked) + label,
-[type="radio"]:checked + label {
+[type="checkbox"]:not(:checked)+label,
+[type="checkbox"]:checked+label,
+[type="radio"]:not(:checked)+label,
+[type="radio"]:checked+label {
 	position: relative;
 	padding-left: 1.95em;
 	cursor: pointer;
 	margin: auto 0;
 }
-[type="checkbox"]:not(:checked) + label::after {
+
+[type="checkbox"]:not(:checked)+label::after {
 	opacity: 0;
 	transform: scale(0);
 }
-[type="checkbox"]:checked + label::after {
+
+[type="checkbox"]:checked+label::after {
 	opacity: 1;
 	transform: scale(1);
 }
 
-[type="checkbox"]:not(:checked) + label::before,
-[type="checkbox"]:checked + label::before,
-[type="radio"]:not(:checked) + label::before,
-[type="radio"]:checked + label::before {
+[type="checkbox"]:not(:checked)+label::before,
+[type="checkbox"]:checked+label::before,
+[type="radio"]:not(:checked)+label::before,
+[type="radio"]:checked+label::before {
 	box-sizing: border-box;
 	content: "";
 	position: absolute;
@@ -240,18 +267,19 @@ input[type="file"]::-webkit-file-upload-button:active,
 	background: transparent;
 	transition: all 0.25s;
 }
-[type="checkbox"]:not(:checked) + label::before,
-[type="checkbox"]:checked + label::before {
+
+[type="checkbox"]:not(:checked)+label::before,
+[type="checkbox"]:checked+label::before {
 	border-radius: 4px;
 }
 
-[type="radio"]:not(:checked) + label::before,
-[type="radio"]:checked + label::before {
+[type="radio"]:not(:checked)+label::before,
+[type="radio"]:checked+label::before {
 	border-radius: 50px;
 }
 
-[type="checkbox"]:not(:checked) + label::after,
-[type="checkbox"]:checked + label::after {
+[type="checkbox"]:not(:checked)+label::after,
+[type="checkbox"]:checked+label::after {
 	content: "\2716\0020";
 	position: absolute;
 	margin: auto;
@@ -264,16 +292,17 @@ input[type="file"]::-webkit-file-upload-button:active,
 	height: 0.8rem;
 	font-family: "Segoe UI", "Lucida Sans Unicode", "Arial Unicode MS", Arial;
 }
-input[type="checkbox"]:not(:checked) + label::after,
-input[type="checkbox"]:checked + label::after {
+
+input[type="checkbox"]:not(:checked)+label::after,
+input[type="checkbox"]:checked+label::after {
 	border-radius: 3px;
 }
 
-[type="radio"]:checked + label::before {
+[type="radio"]:checked+label::before {
 	border: 4px solid var(--bright-color);
 }
 
-[type="checkbox"]:checked + label::before {
+[type="checkbox"]:checked+label::before {
 	border: 2px solid var(--bright-color);
 }
 
