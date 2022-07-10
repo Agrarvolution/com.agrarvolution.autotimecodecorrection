@@ -360,7 +360,7 @@ $.agrarvolution.timecodeCorrection = {
         this.media = [];
 
         var hasNoSelection = app.document.selectionLength === 0;
-        if (hasNoSelection || this.searchTarget === 1) { //process root - get all thumbnails if there is no selection
+        if (hasNoSelection || this.searchTarget === 0) { //process root - get all thumbnails if there is no selection
             app.document.selectAll();
         }
 
@@ -368,7 +368,7 @@ $.agrarvolution.timecodeCorrection = {
             this.processThumbnail(app.document.selections[i], toggleInvalid);
         }
 
-        if (hasNoSelection || this.searchTarget === 1) { // remove selection if there was none before
+        if (hasNoSelection || this.searchTarget === 0) { // remove selection if there was none before
             app.document.deselectAll()
         }
 
