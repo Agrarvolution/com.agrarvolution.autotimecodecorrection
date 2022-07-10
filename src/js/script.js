@@ -31,7 +31,7 @@ const defaultSettings = {
     logging: false,
     searchRecursive: true,
     searchTarget: 0,
-    source: 0,
+    source: 1,
     ignoreMediaStart: true,
     xmpFix: {
         framerate: 25,
@@ -91,6 +91,7 @@ $(function () {
         logging.addLog("Default settings are restored.", logLevels.info);
         explainer.removeClass('hidden');
         error.addClass('hidden');
+        this.blur();
     });
 
     $('input:not(#source, #start)').on("click", function (e) {
@@ -649,6 +650,7 @@ function validateForm(form) {
 logging.addLog = function (text, level) {
     if (level === logLevels.status) {
         explainer.addClass('hidden');
+        error.removeClass('hidden');
         error.text(text);
     }
     if (level === logLevels.error || this.verboseLogging) {
