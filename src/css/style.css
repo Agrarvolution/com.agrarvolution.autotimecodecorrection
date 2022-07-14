@@ -221,6 +221,9 @@ input[type="file"]::-webkit-file-upload-button:active,
 	flex-wrap: wrap;
 }
 
+label:not(.file), select, button, h3 {
+	user-select: none;  
+}
 /*Custom radio and checkboxes*/
 
 [type="checkbox"],
