@@ -10,6 +10,8 @@ try {
 } catch (e) {
     alert(e);
 }
+//fix missing const value
+XMPConst.NS_BWF = "http://ns.adobe.com/bwf/bext/1.0/";
 
 //define namespace
 $.agrarvolution = $.agrarvolution || {};
@@ -422,8 +424,29 @@ $.agrarvolution.timecodeCorrection = {
                 item.tcStruct = "startTimecode";
             }
 
+            //audio metadata
+            if (item.xmp.doesPropertyExist(XMPConst.NS_BWF, "codingHistory")) {
+                var audioEncoding = item.xmp.getProperty(XMPConst.NS_BWF, "codingHistory").value || '';
+                var sampleFrequency = audioEncoding.match(/F=\d+/g);
+
+                if (sampleFrequency !== undefined && sampleFrequency.length > 0) {
+                    item.sampleFrequency = Number(sampleFrequency[0].replace('F=', ''));
+                }
+
+                var bitRate = audioEncoding.match(/W=\d+/g);
+                if (bitRate !== undefined && bitRate.length > 0) {
+                    item.bitRate = Number(bitRate[0].replace('W=', ''));
+                }
+            }
+
+            if (item.xmp.doesPropertyExist(XMPConst.NS_BWF, "timeReference")) {
+                item.timeReference = item.xmp.getProperty(XMPConst.NS_BWF, "timeReference", XMPConst.INTEGER);
+            }
+
+
             var addItem = true;
 
+            //timecode metadata
             if (item.tcStruct !== '') {
                 item.startTime = item.xmp.getStructField(XMPConst.NS_DM, item.tcStruct, XMPConst.NS_DM, "timeValue").value || '';
                 var xmpFramerate = item.xmp.getStructField(XMPConst.NS_DM, item.tcStruct, XMPConst.NS_DM, "timeFormat").value || '';
