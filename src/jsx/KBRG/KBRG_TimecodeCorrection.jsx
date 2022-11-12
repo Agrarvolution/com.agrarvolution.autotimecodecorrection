@@ -361,9 +361,13 @@ $.agrarvolution.timecodeCorrection = {
         var i = 0;
         this.media = [];
 
+
         var hasNoSelection = app.document.selectionLength === 0;
         if (hasNoSelection || this.searchTarget === 0) { //process root - get all thumbnails if there is no selection
+            this.logToCEP("Start searching for all media items.", this.logLevels.status);
             app.document.selectAll();
+        } else {
+            this.logToCEP("Start searching for selected media items.", this.logLevels.status);
         }
 
         for (i = 0; i < app.document.selectionLength; i++) {
@@ -440,7 +444,7 @@ $.agrarvolution.timecodeCorrection = {
             }
 
             if (item.xmp.doesPropertyExist(XMPConst.NS_BWF, "timeReference")) {
-                item.timeReference = item.xmp.getProperty(XMPConst.NS_BWF, "timeReference", XMPConst.INTEGER);
+                item.timeReference = item.xmp.getProperty(XMPConst.NS_BWF, "timeReference");
             }
 
 
@@ -611,9 +615,15 @@ $.agrarvolution.timecodeCorrection = {
                 mediaItem.xmp.getStructField(XMPConst.NS_DM, "startTimecode", XMPConst.NS_DM, "startTimecode").value);
         }
 
-        this.logToCEP(mediaItem.xmp.dumpObject(), this.logLevels.info);
+        if (mediaItem.sampleFrequency !== undefined) {
+            mediaItem.xmp.setProperty(XMPConst.NS_BWF, "timeReference",
+                this.timeToSamples(update.audioTC.groups, update.framerate, mediaItem.sampleFrequency).toString(), XMPConst.STRING);
+        }
 
         try {
+            if (mediaItem.thumb.locked) {
+                throw "Thumbnail is locked!";
+            }
             mediaItem.thumb.synchronousMetadata =
                 new Metadata(mediaItem.xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
             this.logToCEP(mediaItem.filename + " - start time / timecode has been updated. (" + mediaItem.startTime.text + " -> " +
@@ -691,6 +701,15 @@ $.agrarvolution.timecodeCorrection = {
             number = '0' + number;
         }
         return number;
+    },
+    /**
+     * Timecode is converted into samples.
+     * @param {Object} time
+     * @param {number} sampleFrequency
+     * @return {number} samples
+     */
+    timeToSamples: function(time, frameRate, sampleFrequency) {
+        return ((((time.hours * 60) + time.minutes) * 60) + time.seconds + time.frames / frameRate) * sampleFrequency;
     },
 
     /**
