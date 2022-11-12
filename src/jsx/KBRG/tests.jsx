@@ -42,11 +42,11 @@ timeCorrection.fixXmpTimeFormat({
 
 //Check WAV not saving metadata
 
-csvTimecodes = JSON.parse('[{"filename":"221111_001.WAV","framerate":25,"duration":{"text":"00:00:22","groups":{"hours":0,"minutes":0,"seconds":22,"frames":null}},"fileTC":{"text":"00:00:00:00","groups":{"hours":0,"minutes":0,"seconds":0,"frames":0}},"audioTC":{"text":"21:49:58:18","groups":{"hours":21,"minutes":49,"seconds":58,"frames":18}}},{"filename":"NZ6_3653.MOV","framerate":25,"duration":{"text":"00:00:14","groups":{"hours":0,"minutes":0,"seconds":14,"frames":null}},"fileTC":{"text":"20:47:36:10","groups":{"hours":20,"minutes":47,"seconds":36,"frames":10}},"audioTC":{"text":"21:50:03:08","groups":{"hours":21,"minutes":50,"seconds":3,"frames":8}}}]');
+/*csvTimecodes = JSON.parse('[{"filename":"221111_001.WAV","framerate":25,"duration":{"text":"00:00:22","groups":{"hours":0,"minutes":0,"seconds":22,"frames":null}},"fileTC":{"text":"00:00:00:00","groups":{"hours":0,"minutes":0,"seconds":0,"frames":0}},"audioTC":{"text":"21:50:58:18","groups":{"hours":21,"minutes":50,"seconds":58,"frames":18}}},{"filename":"NZ6_3653.MOV","framerate":25,"duration":{"text":"00:00:14","groups":{"hours":0,"minutes":0,"seconds":14,"frames":null}},"fileTC":{"text":"20:47:36:10","groups":{"hours":20,"minutes":47,"seconds":36,"frames":10}},"audioTC":{"text":"21:50:03:08","groups":{"hours":21,"minutes":50,"seconds":3,"frames":8}}}]');
 timeCorrection.processInput({
     timeCodes: csvTimecodes,
     searchRecursive: true,
     searchTarget: 2,
     ignoreMediaStart: true,
     logging: true
-});
+});*/
