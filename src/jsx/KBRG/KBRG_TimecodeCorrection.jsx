@@ -230,7 +230,7 @@ $.agrarvolution.timecodeCorrection = {
                     return false;
             }
             this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, this.previousTimeValue, this.media[i].startTime.text);
-            var newTimecode = this.createTimecodeFromDate(time, this.media[i].framerate, this.media[i].isDropframe)
+            var newTimecode = this.createTimecodeFromDate(time, this.media[i].framerate, this.media[i].isDropframe);
             this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM,
                 "timeValue", newTimecode);
 
@@ -253,7 +253,7 @@ $.agrarvolution.timecodeCorrection = {
         return true;
     },
     /**
-     * Create timecode form a date object.
+     * Create timecode from a date object.
      * @param {Date} date
      * @param {boolean} isDropframe
      * @returns {string} 00:00:00:00 or 00;00;00;00
@@ -587,6 +587,8 @@ $.agrarvolution.timecodeCorrection = {
             mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat",
                 mediaItem.xmp.getStructField(XMPConst.NS_DM, "startTimecode", XMPConst.NS_DM, "startTimecode").value);
         }
+
+        this.logToCEP(mediaItem.xmp.dumpObject(), this.logLevels.info);
 
         try {
             mediaItem.thumb.synchronousMetadata =
