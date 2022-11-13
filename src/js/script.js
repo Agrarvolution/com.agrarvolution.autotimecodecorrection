@@ -204,7 +204,9 @@ function fixXMP(type) {
         lockForm = false;
     });
 }
-
+/**
+ * Helper function to gather relevant metadata of the selected files and stores them in a .csv file similar to a tentacle sync timecode tool output.
+ */
 function exportCSV() {
     let csObject = {
         searchTarget: settings.xmpFix.searchTarget,
@@ -215,25 +217,30 @@ function exportCSV() {
     let csInterface = new CSInterface();
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.gatherTimecodes(' +
         JSON.stringify(csObject) + ');', async function (e) {
-            e = JSON.parse(e);
-            if (e.csv === undefined || e.path === undefined) {
-                e === 'false';
-            }
-            alert(e);
-
-            if (e === 'false') {
-                logging.addLog("Fail to retrieve any timecodes.", logLevels.status);
-            } else {
-                logging.addLog("Timecodes successfully arrived on the frontend.", logLevels.status);
-
-                let writeResult = window.cep.fs.writeFile(e.path + "\\timecode.csv", e.csv)
-                if (writeResult.err != 0) {
-                    logging.addLog("Timecode metadata has been saved.", logLevels.status);
-
-                } else {
-                    logging.addLog("Can't save metadata - file system not available.", logLevels.status);
+            logging.addLog("Timecodes arrived in frontend.", logLevels.status);
+            try {
+                e = JSON.parse(e);
+                if (e.csv === undefined || e.path === undefined) {
+                    e === 'false';
                 }
 
+                if (e === 'false') {
+                    logging.addLog("Fail to retrieve any timecodes.", logLevels.status);
+                } else {
+
+
+                    let writeResult = window.cep.fs.writeFile(e.path + "\\timecode.csv", e.csv)
+                    if (writeResult.err === 0) {
+                        logging.addLog("Saving metadata is finished.", logLevels.status);
+
+                    } else {
+                        console.log(writeResult);
+                        logging.addLog("Failed to save timecode csv.", logLevels.status);
+                    }
+
+                }
+            } catch (e) {
+                logging.addLog("Error parsing file metadata.", logLevels.status);
             }
             lockForm = false;
         });

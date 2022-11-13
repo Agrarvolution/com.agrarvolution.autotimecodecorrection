@@ -186,7 +186,10 @@ $.agrarvolution.timecodeCorrection = {
         return true;
     },
 
-
+    /**
+     * Caches media objects and writes calls timecodeFromCache() to create a new .csv of selected metadata.
+     * @return {Object} 
+     */
     gatherTimecodes: function(parameter) {
         if (this.checkRevertParameter(parameter) && this.cacheMediaObjects(false)) {
             var csvData = this.timecodeFromCache();
@@ -198,21 +201,27 @@ $.agrarvolution.timecodeCorrection = {
                 path: app.document.presentationPath
             });
         } else {
-            return false;
+            return {};
         }
     },
 
+    /**
+     * Copies selected metadata from cached mediaItems.
+     * @return {array}
+     */
     timecodeFromCache: function() {
         this.processedMedia = 0;
         var data = [
             'File Name',
             'File TC',
+            'Framerate',
             '\n'
         ].join(',');
         for (var i = 0; i < this.media.length; i++) {
             data += [
                 this.media[i].filename,
                 this.media[i].startTime.text,
+                this.media[i].framerate || 0,
                 '\n'
             ].join(',');
             this.processedMedia++;
