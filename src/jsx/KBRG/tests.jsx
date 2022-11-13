@@ -50,3 +50,11 @@ timeCorrection.processInput({
     ignoreMediaStart: true,
     logging: true
 });*/
+
+//get csv data
+/*
+timeCorrection.gatherTimecodes({
+    searchTarget: 2,
+    recursive: true,
+    logging: true
+});*/

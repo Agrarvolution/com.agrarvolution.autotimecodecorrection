@@ -185,6 +185,36 @@ $.agrarvolution.timecodeCorrection = {
         }
         return true;
     },
+
+
+    gatherTimecodes: function(parameter) {
+        if (this.checkRevertParameter(parameter) && this.cacheMediaObjects(false)) {
+            var csvData = this.timecodeFromCache();
+            this.logToCEP("Gathered timecodes from " + this.processedMedia + " media thumbnails.", this.logLevels.status);
+            $.writeln(csvData);
+            return csvData;
+        } else {
+            return false;
+        }
+    },
+
+    timecodeFromCache: function() {
+        this.processedMedia = 0;
+        var data = [
+            'File Name',
+            'File TC',
+            '\n'
+        ].join(',');
+        for (var i = 0; i < this.media.length; i++) {
+            data += [
+                this.media[i].filename,
+                this.media[i].startTime.text,
+                '\n'
+            ].join(',');
+            this.processedMedia++;
+        }
+        return data;
+    },
     /**
      * Main function to update timecodes from metadata (creation time, last modified date)
      * @return {boolean} true on success
@@ -267,7 +297,7 @@ $.agrarvolution.timecodeCorrection = {
             this.padZero(date.getSeconds(), 2),
             this.padZero(Math.floor(date.getMilliseconds() / 1000 * framerate), 2),
         ];
-        var delimiter = isDropframe ? ',' : ':';
+        var delimiter = isDropframe ? ';' : ':';
         return timecode.join(delimiter);
     },
     /**
@@ -354,7 +384,7 @@ $.agrarvolution.timecodeCorrection = {
 
     /**
      *Loads media file / clips into a semipermanent cache. This avoids scraping through the app DOM everytime a match has to be found later.
-     *@param {boolean} toggleInvalid determines which media items are cache by the validity of timeFormat
+     *@param {boolean} toggleInvalid either caches every thumbnail or only thumbnails with invalid timecodes
      *@returns {boolean} false - not processed times, thus useless for comparisons, true - everything worked
      */
     cacheMediaObjects: function(toggleInvalid) {
@@ -453,6 +483,7 @@ $.agrarvolution.timecodeCorrection = {
             //timecode metadata
             if (item.tcStruct !== '') {
                 item.startTime = item.xmp.getStructField(XMPConst.NS_DM, item.tcStruct, XMPConst.NS_DM, "timeValue").value || '';
+
                 var xmpFramerate = item.xmp.getStructField(XMPConst.NS_DM, item.tcStruct, XMPConst.NS_DM, "timeFormat").value || '';
 
 
@@ -479,6 +510,13 @@ $.agrarvolution.timecodeCorrection = {
                     item.isDropframe = false;
                 }
             }
+
+            if (item.startTime === undefined && item.timeReference !== undefined && item.sampleFrequency !== undefined) {
+                item.startTime = this.samplesToTime(item.timeReference, item.sampleFrequency, 25, false);
+            } else if (item.startTime === undefined) {
+                item.startTime = "00:00:00:00";
+            }
+
             if (addItem !== addInvalidOnly) {
                 this.media.push(item);
             }
@@ -710,6 +748,28 @@ $.agrarvolution.timecodeCorrection = {
      */
     timeToSamples: function(time, frameRate, sampleFrequency) {
         return ((((time.hours * 60) + time.minutes) * 60) + time.seconds + time.frames / frameRate) * sampleFrequency;
+    },
+    /**
+     *Convert samples into a timecode string.
+     *@param {number} samples
+     *@param {number} sampleFrequency
+     *@param {number} frameRate
+     *@param {boolean} isDropFrame
+     *@return {string} 00:00:00:00 or 00;00;00;00
+     */
+    samplesToTime: function(samples, sampleFrequency, frameRate, isDropframe) {
+        var sumSeconds = Math.floor(samples / sampleFrequency);
+        var sumMinutes = Math.floor(sumSeconds / 60);
+
+        var timecode = [
+            this.padZero(Math.floor(sumMinutes / 60), 2),
+            this.padZero(Math.floor(sumMinutes % 60), 2),
+            this.padZero(Math.floor(sumSeconds % 60), 2),
+            this.padZero(Math.round(samples % sampleFrequency / sampleFrequency * frameRate), 2)
+        ];
+
+        var delimiter = isDropframe ? ';' : ':';
+        return timecode.join(delimiter);
     },
 
     /**

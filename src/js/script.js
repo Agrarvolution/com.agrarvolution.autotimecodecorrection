@@ -52,7 +52,7 @@ let lockForm = false,
 
 
 $(function () {
-    onLoaded(); 
+    onLoaded();
 
     logging.logArea = $('#loggingArea')[0];
     logging.log = $('#log');
@@ -144,6 +144,14 @@ $(function () {
         revertTimecodechanges();
     });
 
+    $('#csv').on('click', function (e) {
+        e.preventDefault();
+        if (lockFormFix || host !== 'kbrg') {
+            return false;
+        }
+        logging.addLog("Exporting timecodes stored in metadata.", logLevels.status);
+        exportCSV();
+    });
     $('#update-xmp-timevalue').on('click', function (e) {
         e.preventDefault();
         if (lockFormFix) {
@@ -191,6 +199,25 @@ function fixXMP(type) {
         }
         lockForm = false;
     });
+}
+
+function exportCSV() {
+    let csObject = {
+        searchTarget: settings.xmpFix.searchTarget,
+        recursive: settings.xmpFix.searchRecursive,
+        logging: settings.logging
+    };
+
+    let csInterface = new CSInterface();
+    csInterface.evalScript('$.agrarvolution.timecodeCorrection.gatherTimecodes(' +
+        JSON.stringify(csObject) + ');', function (e) {
+            if (e === 'false') {
+                logging.addLog("Fail to retrieve any timecodes.", logLevels.status);
+            } else {
+                logging.addLog("Timecodes successfully arrived on the frontend.", logLevels.status);
+            }
+            lockForm = false;
+        });
 }
 /**
  * Revert timecodechanges.
@@ -268,10 +295,10 @@ function handleFileLoad(file) {
     logging.addLog("Media to be updated: " + JSON.stringify(timeCodes), logLevels.info);
 
     let csInterface = new CSInterface();
-    csInterface.evalScript('$', function(result) {
+    csInterface.evalScript('$', function (result) {
         logging.addLog(result, logLevels.info);
     });
-    
+
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function (e) {
         if (e === 'true') {
             logging.addLog("Media has been updated. Process finished. Select the next file to be processed.", logLevels.status);
@@ -641,6 +668,7 @@ function validateForm(form) {
     }
     return form[0].files[0];
 }
+
 
 /**
  * Adds a new log message to the log text area.
