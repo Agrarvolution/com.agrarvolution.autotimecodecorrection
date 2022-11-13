@@ -9,7 +9,10 @@ This CEP HTML plugin changes start times of media files (can be any, except sequ
 
 There is no guarantee every editing software is capable of interpreting Adobe XMP metadata.
 
-![Default panel look](payloads/panel_1.png)
+![Panel in Premiere Pro](payloads/panel_1.png)
+![Panel in Bridge](payloads/panel_3.png)
+
+*Panel in Premiere Pro vs Bridge*
 
 
 ## Why would you need that?
@@ -46,7 +49,13 @@ Works similarly to the Premiere version.
 
 They share the same panel, but certain features are deactivated for Premiere
 
-This plugin changes permanently changes the file meta data and can break XMP data, if the script goes wrong.
+This plugin changes permanently changes the file meta data.
+
+#### Additional Features
+
+- Export timecode stored in metadata to csv
+- Revert changed timecodes to previous values
+- Fix broken timecodes (fixes a problem that happens when timecodes are added in Premiere Pro)
 
 ## Installation
 
@@ -122,7 +131,7 @@ The .csv string is as following:
 
 ```csv
 File Name,Duration,File TC,Audio TC,Framerate
-"TestName.MOV","00:00:05","15:21:06:07","08:22:12:18","25.00",
+"TestName.MOV","00:00:05","15:21:06:07","08:22:12:18","25.00"
 ```
 
 
@@ -145,6 +154,9 @@ At the end every successful change will be logged only if verbose logging is ena
 - **High Framerate Files don't match**
 File duration is used to pick the correct files. Tentacle only outputs duration down to the second. Which can lead to rounding errors in combination with highframerate footage. In this case the duration in the .csv should be rounded down.
 
+- **WAV Files don't update their metadata**
+The metadata is always changed by the plugin. For an yet unknown reason Bridge doesn't retain the changed metadata, even after the new one was provided.
+Currently Metadata of wav files can be changed after a restart of Bridge.
 ## Version history
 
 ### Current
@@ -152,17 +164,26 @@ in progess
 
 ### Previous
 
-| Version   | Date      | Description
-|---------  |------     |------------
-| 0.21      | 10.01.2022 | Rewrite of the extension to be compatible with Bridge
-| 0.20      | 15.01.2021 | Add bridge as a plugin host
-| 0.11      | 05.01.2021 | Mid-test, small fixes (time in ticks, matching of files)
-| 0.10      | 11.12.2020 | Pre-test, non-compiled, but optically finished build
-| 0.00      | 25.11.2020 | Development start
+| Version    | Date      | Description
+|---------   |------     |------------
+| 0.2.2      | 13.11.2022 | Adds csv export of metadata, small fixes, updated style
+| 0.2.1      | 10.01.2022 | Rewrite of the extension to be compatible with Bridge
+| 0.2.0      | 15.01.2021 | Adds bridge as a plugin host
+| 0.1.1      | 05.01.2021 | Mid-test, small fixes (time in ticks, matching of files)
+| 0.1.0      | 11.12.2020 | Pre-test, non-compiled, but optically finished build
+| 0.0.0      | 25.11.2020 | Development start
 - - -
 
 ### Changelist
-- 0.21 <-> 10.01.2022
+- 0.2.2 <-> 13.11.2022
+    - Timecode metadata can now be exported to csv (Bridge only)
+    - Timecode related metadata in audio files is handled better (Bridge only)
+    - Missing timecodes are no longer "undefined" -> 00:00:00:00 (Bridge only)
+    - Paneltext can't be accidentally selected anymore
+    - Selection and root start was switched (Bridge only)
+    - CSS tweaks
+
+- 0.2.1 <-> 10.01.2022
 
     - Add Bridge as extension host
     - Rewrite the pipeline to update timecodes using thumbnail metadata
@@ -170,15 +191,17 @@ in progess
     - Revert feature (Bridge only)
     - Ability to create timecode from file creation date (Bridge only)
 
-- 0.10 <-> 11.12.2020
+- 0.1.0 <-> 11.12.2020
 
    - Pretesting stage (not tested with a production Premiere Pro Project)
    - CSS design is basically finished
    - Severe bugs have been caught
 
-- 0.00 <-> 25.11.2020
+- 0.0.0 <-> 25.11.2020
     
-    Development start
+    -Development start
+
+
 ## Maintenance
 
 This plugin will not be thoroughly maintained. If any bugs occur, it might take a while for them to be fixed. It is just a side project of myself.

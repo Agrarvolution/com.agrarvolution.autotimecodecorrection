@@ -4,7 +4,6 @@
 	ExtensionBundleVersion="1.0" Version="7.0">
 	<ExtensionList>
 		<Extension Id="com.agrarvolution.autoTimecodeCorrection.panel" Version="0.2.2" />
-		<Extension Id="com.agrarvolution.autoTimecodeCorrection.server" Version="0.0.1" />
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
