@@ -21,7 +21,7 @@ This plugin offers following benefits:
 
 - **Fast** - it is multiple times faster then baking the timecode with a conversion or manual timecode updates
 - **Flexible** - modifying the .csv file in your spreadsheet app of choice offers to possibility to fix timecode drift or add missing timecode if a conversion should have failed. (Out of the box Premiere offers nothing comparable besides changing every file one by one.)
-- **Non destructive** - original start time / time code will not be overwritten
+- **Non destructive** - original start time / time code will not be overwritten (when possible)
 - **Framerating mixing** - automatically converts different timebases (e.g. from a 25 fps source to a 30 fps file).
  
 ## Requirements
@@ -30,7 +30,7 @@ Your Premiere Pro has to at least support Adobe CEP plugins.
 
 Tested with:
 
-- Premiere pro 14.7 (CC 2020)
+- Premiere Pro 14.7 (CC 2020)
 - Premiere Pro 14.5 (CC 2020)
 - Bridge 12.0.0.234 (CC 2022)
 - Bridge 13.0.0.562 (CC 2023)
