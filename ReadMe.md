@@ -10,8 +10,11 @@ This CEP HTML plugin changes start times of media files (can be any, except sequ
 There is no guarantee every editing software is capable of interpreting Adobe XMP metadata.
 
 ![Panel in Premiere Pro](payloads/panel_1.png)
+
 *Panel in Premiere Pro*
+
 ![Panel in Bridge](payloads/panel_3.png)
+
 *Panel in Bridge*
 
 
