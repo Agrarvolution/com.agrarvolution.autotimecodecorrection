@@ -214,16 +214,14 @@ $.agrarvolution.timecodeCorrection = {
         var data = [
             'File Name',
             'File TC',
-            'Framerate',
-            '\n'
-        ].join(',');
+            'Framerate'
+        ].join(',') + '\n';
         for (var i = 0; i < this.media.length; i++) {
             data += [
                 this.media[i].filename,
                 this.media[i].startTime.text,
-                this.media[i].framerate || 0,
-                '\n'
-            ].join(',');
+                this.media[i].framerate || 0
+            ].join(',') + '\n';
             this.processedMedia++;
         }
         return data;

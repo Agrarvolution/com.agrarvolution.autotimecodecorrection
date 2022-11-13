@@ -30,6 +30,7 @@ Tested with:
 - Premiere pro 14.7 (CC 2020)
 - Premiere Pro 14.5 (CC 2020)
 - Bridge 12.0.0.234 (CC 2022)
+- Bridge 13.0.0.562 (CC 2023)
 
 ## Differences between Premiere and Bridge
 
