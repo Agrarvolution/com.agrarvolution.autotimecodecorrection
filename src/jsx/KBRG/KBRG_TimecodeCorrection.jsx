@@ -191,8 +191,12 @@ $.agrarvolution.timecodeCorrection = {
         if (this.checkRevertParameter(parameter) && this.cacheMediaObjects(false)) {
             var csvData = this.timecodeFromCache();
             this.logToCEP("Gathered timecodes from " + this.processedMedia + " media thumbnails.", this.logLevels.status);
+
             $.writeln(csvData);
-            return csvData;
+            return JSON.stringify({
+                csv: csvData,
+                path: app.document.presentationPath
+            });
         } else {
             return false;
         }
@@ -215,6 +219,7 @@ $.agrarvolution.timecodeCorrection = {
         }
         return data;
     },
+
     /**
      * Main function to update timecodes from metadata (creation time, last modified date)
      * @return {boolean} true on success

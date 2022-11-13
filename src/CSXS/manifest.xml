@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone='yes'?>
-<ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ExtensionBundleId="com.agrarvolution.autoTimecodeCorrection" 
-ExtensionBundleName="Bridge Automatic Timecode Correction" 
-ExtensionBundleVersion="1.0" Version="7.0">
+<ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ExtensionBundleId="com.agrarvolution.autoTimecodeCorrection"
+	ExtensionBundleName="Bridge Automatic Timecode Correction"
+	ExtensionBundleVersion="1.0" Version="7.0">
 	<ExtensionList>
-		<Extension Id="com.agrarvolution.autoTimecodeCorrection.panel" Version="0.2.1" />
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection.panel" Version="0.2.2" />
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection.server" Version="0.0.1" />
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
-			<Host Name="KBRG" Version="[8.0,99.9]"/>
-			<Host Name="PPRO" Version="[9.0,99.9]"/>
+			<Host Name="KBRG" Version="[9.0,99.9]" />
+			<Host Name="PPRO" Version="[9.0,99.9]" />
 		</HostList>
 		<LocaleList>
 			<Locale Code="All" />
@@ -20,7 +21,7 @@ ExtensionBundleVersion="1.0" Version="7.0">
 
 	<DispatchInfoList>
 		<Extension Id="com.agrarvolution.autoTimecodeCorrection.panel">
-			<DispatchInfo >
+			<DispatchInfo>
 				<Resources>
 					<MainPath>./index.html</MainPath>
 					<ScriptPath>./autoTimecodeCorrection.jsx</ScriptPath>
@@ -31,8 +32,8 @@ ExtensionBundleVersion="1.0" Version="7.0">
 				<Lifecycle>
 					<AutoVisible>true</AutoVisible>
 					<StartOn>
-                        <Event>applicationActivate</Event>
-                    </StartOn>
+						<Event>applicationActivate</Event>
+					</StartOn>
 				</Lifecycle>
 				<UI>
 					<Type>Panel</Type>
@@ -60,8 +61,8 @@ ExtensionBundleVersion="1.0" Version="7.0">
 				<Lifecycle>
 					<AutoVisible>true</AutoVisible>
 					<StartOn>
-                        <Event>applicationActivate</Event>
-                    </StartOn>
+						<Event>applicationActivate</Event>
+					</StartOn>
 				</Lifecycle>
 				<UI>
 					<Type>Embedded</Type>
@@ -90,8 +91,8 @@ ExtensionBundleVersion="1.0" Version="7.0">
 				<Lifecycle>
 					<AutoVisible>true</AutoVisible>
 					<StartOn>
-                        <Event>applicationActivate</Event>
-                    </StartOn>
+						<Event>applicationActivate</Event>
+					</StartOn>
 				</Lifecycle>
 				<UI>
 					<Type>Panel</Type>

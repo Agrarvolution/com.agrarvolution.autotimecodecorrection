@@ -25,6 +25,7 @@ let log = null;
 let error = null;
 let explainer = null;
 let fileEl = null;
+let csvLink = null;
 
 const settingsKey = "autoTimecodeCorrection.settings";
 const defaultSettings = {
@@ -60,6 +61,7 @@ $(function () {
     error = $('#errorDisplay');
     explainer = $('#explainer');
     fileEl = $('#file');
+    csvLink = $('#csvDownload');
 
     host = setHostinDOM();
     onAppThemeColorChanged();
@@ -69,6 +71,8 @@ $(function () {
     csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
         logging.addLog(e.data.text, e.data.logLevel);
     });
+    csInterface.requestOpenExtension("com.agrarvolution.autoTimecodeCorrection.server", "");
+    //localServer = cep_node.require(__dirname + '/server/main.js')();
 
     //restore settings
     settings = loadSettings();
@@ -210,15 +214,31 @@ function exportCSV() {
 
     let csInterface = new CSInterface();
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.gatherTimecodes(' +
-        JSON.stringify(csObject) + ');', function (e) {
+        JSON.stringify(csObject) + ');', async function (e) {
+            e = JSON.parse(e);
+            if (e.csv === undefined || e.path === undefined) {
+                e === 'false';
+            }
+            alert(e);
+
             if (e === 'false') {
                 logging.addLog("Fail to retrieve any timecodes.", logLevels.status);
             } else {
                 logging.addLog("Timecodes successfully arrived on the frontend.", logLevels.status);
+
+                let writeResult = window.cep.fs.writeFile(e.path + "\\timecode.csv", e.csv)
+                if (writeResult.err != 0) {
+                    logging.addLog("Timecode metadata has been saved.", logLevels.status);
+
+                } else {
+                    logging.addLog("Can't save metadata - file system not available.", logLevels.status);
+                }
+
             }
             lockForm = false;
         });
 }
+
 /**
  * Revert timecodechanges.
  * It restores the previous timecode value into the current value. The new value is stored in place of the previous one.
