@@ -14,7 +14,7 @@ const formIds = {
 
 const TIMECODE_SOURCE = {
     file: 1,
-    creation: 2,
+    created: 2,
     lastChanged: 3
 };
 
@@ -282,7 +282,7 @@ function revertTimecodechanges() {
 function timecodeFromMetadata() {
     let logMessage = '';
     switch (settings.source) {
-        case TIMECODE_SOURCE.creation:
+        case TIMECODE_SOURCE.created:
             logMessage = "Creating timecode from creation time.";
             break;
         case TIMECODE_SOURCE.lastChanged:
@@ -301,6 +301,7 @@ function timecodeFromMetadata() {
         logging: logging.verboseLogging
     };
 
+    let csInterface = new CSInterface();
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.timecodesFromMetadata(' + JSON.stringify(csObject) + ');', function (e) {
         if (e === 'true') {
             logging.addLog("Media has been updated. Process finished. Select the next file to be processed.", logLevels.status);

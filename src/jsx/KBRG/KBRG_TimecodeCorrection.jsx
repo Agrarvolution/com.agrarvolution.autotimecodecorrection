@@ -44,9 +44,9 @@ $.agrarvolution.timecodeCorrection = {
         info: "INFO",
         error: "ERR "
     },
-    TIMECODE_SOURCE = {
+    TIMECODE_SOURCE: {
         file: 1,
-        creation: 2,
+        created: 2,
         lastChanged: 3
     },
     media: [],
@@ -270,10 +270,10 @@ $.agrarvolution.timecodeCorrection = {
 
             var time = Date.now();
             switch (source) {
-                case TIMECODE_SOURCE.created:
-                    time = this.media[i].thumb.creationDate;
+                case this.TIMECODE_SOURCE.created:
+                    time = this.media[i].thumb.bestCreationDate;
                     break;
-                case TIMECODE_SOURCE.lastChanged:
+                case this.TIMECODE_SOURCE.lastChanged:
                     time = this.media[i].thumb.lastModifiedDate;
                     break;
                 default:
