@@ -44,6 +44,11 @@ $.agrarvolution.timecodeCorrection = {
         info: "INFO",
         error: "ERR "
     },
+    TIMECODE_SOURCE = {
+        file: 1,
+        creation: 2,
+        lastChanged: 3
+    },
     media: [],
     timeCodeUpdates: [],
     searchRecursive: true,
@@ -248,6 +253,7 @@ $.agrarvolution.timecodeCorrection = {
             Number(parameter.source) !== NaN) {
             this.searchTarget = parameter.searchTarget;
             this.logging = parameter.logging;
+            this.logToCEP("Metadata parameter have been set.", this.logLevels.info);
         } else {
             this.logToCEP("Error in parameters for updating timecode from metadata.", this.logLevels.error);
             return false;
@@ -264,10 +270,10 @@ $.agrarvolution.timecodeCorrection = {
 
             var time = Date.now();
             switch (source) {
-                case 2:
+                case TIMECODE_SOURCE.created:
                     time = this.media[i].thumb.creationDate;
                     break;
-                case 3:
+                case TIMECODE_SOURCE.lastChanged:
                     time = this.media[i].thumb.lastModifiedDate;
                     break;
                 default:
