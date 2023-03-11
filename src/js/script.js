@@ -11,6 +11,13 @@ const formIds = {
     fixTarget: 'fix-target',
     fixRecursion: 'fix-recursion'
 }
+
+const TIMECODE_SOURCE = {
+    file: 1,
+    creation: 2,
+    lastChanged: 3
+};
+
 let host = '';
 
 var logging = logging || {};
@@ -123,7 +130,7 @@ $(function () {
         lockForm = true;
         let form = document.forms['atc'];
 
-        if (host !== 'kbrg' || settings.source === 1) {
+        if (host !== 'kbrg' || settings.source === TIMECODE_SOURCE.file) {
             let validation = validateForm(form);
 
             if (!validation) {
@@ -275,10 +282,10 @@ function revertTimecodechanges() {
 function timecodeFromMetadata() {
     let logMessage = '';
     switch (settings.source) {
-        case 2:
+        case TIMECODE_SOURCE.creation:
             logMessage = "Creating timecode from creation time.";
             break;
-        case 3:
+        case TIMECODE_SOURCE.lastChanged:
             logMessage = "Creating timecode from time last changed.";
             break;
         default:
