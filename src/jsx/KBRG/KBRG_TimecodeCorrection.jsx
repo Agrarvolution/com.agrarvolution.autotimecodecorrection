@@ -45,9 +45,13 @@ $.agrarvolution.timecodeCorrection = {
         error: "ERR "
     },
     TIMECODE_SOURCE: {
-        file: 1,
-        created: 2,
-        lastChanged: 3
+        file: 0,
+        created: 1,
+        lastChanged: 2
+    },
+    SCAN_TARGET: {
+        folder: 0,
+        selection: 1
     },
     media: [],
     timeCodeUpdates: [],
@@ -411,7 +415,7 @@ $.agrarvolution.timecodeCorrection = {
 
 
         var hasNoSelection = app.document.selectionLength === 0;
-        if (hasNoSelection || this.searchTarget === 0) { //process root - get all thumbnails if there is no selection
+        if (hasNoSelection || this.searchTarget === this.SCAN_TARGET.folder) { //process root - get all thumbnails if there is no selection
             this.logToCEP("Start searching for all media items.", this.logLevels.status);
             app.document.selectAll();
         } else {
@@ -422,7 +426,7 @@ $.agrarvolution.timecodeCorrection = {
             this.processThumbnail(app.document.selections[i], toggleInvalid);
         }
 
-        if (hasNoSelection || this.searchTarget === 0) { // remove selection if there was none before
+        if (hasNoSelection || this.searchTarget === this.SCAN_TARGET.folder) { // remove selection if there was none before
             app.document.deselectAll()
         }
 

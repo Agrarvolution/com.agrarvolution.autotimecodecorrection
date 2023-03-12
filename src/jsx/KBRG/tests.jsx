@@ -9,8 +9,8 @@ var timeCorrection = $.agrarvolution.timecodeCorrection;
 //timeCorrection.metaDataOfSelected();
 
 // timeCorrection.timecodesFromMetadata({
-//     searchTarget: $.agrarvolution.timecodeCorrection.TIMECODE_SOURCE.created,
-//     source: 2,
+//     searchTarget: 2,
+//     source: $.agrarvolution.timecodeCorrection.TIMECODE_SOURCE.created,
 //     logging: true
 // });
 
@@ -30,15 +30,15 @@ timeCorrection.revertChanges({
     recursive: true,
     logging: true
 });*/
-/*
-timeCorrection.fixXmpTimeFormat({
-    framerate: 25,
-    searchTarget: 2,
-    recursive: 1,
-    logging: true,
-    errorOnly: false
-});
-*/
+
+// timeCorrection.fixXmpTimeFormat({
+//     framerate: 25,
+//     searchTarget: $.agrarvolution.timecodeCorrection.SCAN_TARGET.selection,
+//     recursive: 1,
+//     logging: true,
+//     errorOnly: true
+// });
+
 
 //Check WAV not saving metadata
 
