@@ -317,7 +317,15 @@ function timecodeFromMetadata() {
  */
 function handleFileLoad(file) {
     let timeCodes = [];
-    timeCodes = checkCSV(file, csvVersion.ttc116);
+
+    try {
+        timeCodes = checkCSV(file, csvVersion.ttc116);
+    } catch (e) {
+        logging.addLog(e, logLevels.error);
+        lockForm = false;
+        return false;
+    }
+    
 
     let tcObject = {
         timeCodes: timeCodes,
@@ -377,7 +385,7 @@ function checkCSV(csv, version) {
             csv[0][2] !== undefined && csv[0][2] === 'File TC' && csv[0][3] !== undefined &&
             csv[0][3] === 'Audio TC' && csv[0][4] !== undefined && csv[0][4] === 'Framerate')) {
             logging.addLog("CSV Headers don't match [TTCT_1.16]", logLevels.status);
-            return [];
+            throw new Error("No valid csv. Check csv headers!");
         }
 
         //check rows + copy data
