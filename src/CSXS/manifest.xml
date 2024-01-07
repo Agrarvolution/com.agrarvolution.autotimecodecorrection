@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone='yes'?>
-<ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ExtensionBundleId="com.agrarvolution.autoTimecodeCorrection"
+<ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	ExtensionBundleId="com.agrarvolution.autoTimecodeCorrection"
 	ExtensionBundleName="Bridge Automatic Timecode Correction"
 	ExtensionBundleVersion="1.0" Version="7.0">
 	<ExtensionList>
-		<Extension Id="com.agrarvolution.autoTimecodeCorrection.panel" Version="0.2.2" />
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection.correction.panel" Version="0.3.0"/>
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection.repair.panel" Version="0.1.0"/>
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
-			<Host Name="KBRG" Version="[9.0,99.9]" />
-			<Host Name="PPRO" Version="[9.0,99.9]" />
+			<Host Name="KBRG" Version="[9.0,99.9]"/>
+			<Host Name="PPRO" Version="[9.0,99.9]"/>
 		</HostList>
 		<LocaleList>
 			<Locale Code="All" />
@@ -19,10 +21,10 @@
 	</ExecutionEnvironment>
 
 	<DispatchInfoList>
-		<Extension Id="com.agrarvolution.autoTimecodeCorrection.panel">
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection.correction.panel">
 			<DispatchInfo>
 				<Resources>
-					<MainPath>./index.html</MainPath>
+					<MainPath>./panels/ltcCorrection.html</MainPath>
 					<ScriptPath>./autoTimecodeCorrection.jsx</ScriptPath>
 					<CEFCommandLine>
 						<Parameter>--high-dpi-support=1</Parameter>
@@ -30,13 +32,10 @@
 				</Resources>
 				<Lifecycle>
 					<AutoVisible>true</AutoVisible>
-					<StartOn>
-						<Event>applicationActivate</Event>
-					</StartOn>
 				</Lifecycle>
 				<UI>
 					<Type>Panel</Type>
-					<Menu>%ATC_PANEL_NAME</Menu>
+					<Menu>%ATC_CORRECTION_PANEL_NAME</Menu>
 					<Geometry>
 						<Size>
 							<Height>500</Height>
@@ -50,8 +49,26 @@
 				</UI>
 			</DispatchInfo>
 			<DispatchInfo Host="KBRG">
+				<Lifecycle>
+					<AutoVisible>true</AutoVisible>
+				</Lifecycle>
+				<UI>
+					<Type>Embedded</Type>
+				</UI>
+			</DispatchInfo>
+			<DispatchInfo Host="PPRO">
 				<Resources>
-					<MainPath>./index.html</MainPath>
+					<CEFCommandLine>
+						<Parameter>--allow-file-access</Parameter>
+						<Parameter>--high-dpi-support=1</Parameter>
+					</CEFCommandLine>
+				</Resources>
+			</DispatchInfo>
+		</Extension>
+		<Extension Id="com.agrarvolution.autoTimecodeCorrection.repair.panel">
+			<DispatchInfo>
+				<Resources>
+					<MainPath>./panels/ltcRepair.html</MainPath>
 					<ScriptPath>./autoTimecodeCorrection.jsx</ScriptPath>
 					<CEFCommandLine>
 						<Parameter>--high-dpi-support=1</Parameter>
@@ -59,13 +76,10 @@
 				</Resources>
 				<Lifecycle>
 					<AutoVisible>true</AutoVisible>
-					<StartOn>
-						<Event>applicationActivate</Event>
-					</StartOn>
 				</Lifecycle>
 				<UI>
-					<Type>Embedded</Type>
-					<Menu>%ATC_PANEL_NAME</Menu>
+					<Type>Panel</Type>
+					<Menu>%ATC_REPAIR_PANEL_NAME</Menu>
 					<Geometry>
 						<Size>
 							<Height>500</Height>
@@ -78,34 +92,9 @@
 					</Geometry>
 				</UI>
 			</DispatchInfo>
-			<DispatchInfo Host="PPRO">
-				<Resources>
-					<MainPath>./index.html</MainPath>
-					<ScriptPath>./autoTimecodeCorrection.jsx</ScriptPath>
-					<CEFCommandLine>
-						<Parameter>--allow-file-access</Parameter>
-						<Parameter>--high-dpi-support=1</Parameter>
-					</CEFCommandLine>
-				</Resources>
-				<Lifecycle>
-					<AutoVisible>true</AutoVisible>
-					<StartOn>
-						<Event>applicationActivate</Event>
-					</StartOn>
-				</Lifecycle>
+			<DispatchInfo Host="KBRG">
 				<UI>
-					<Type>Panel</Type>
-					<Menu>%ATC_PANEL_NAME</Menu>
-					<Geometry>
-						<Size>
-							<Height>500</Height>
-							<Width>350</Width>
-						</Size>
-						<MinSize>
-							<Height>400</Height>
-							<Width>200</Width>
-						</MinSize>
-					</Geometry>
+					<Type>Embedded</Type>
 				</UI>
 			</DispatchInfo>
 		</Extension>

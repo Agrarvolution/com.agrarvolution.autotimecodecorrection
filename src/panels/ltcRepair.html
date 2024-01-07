@@ -1,0 +1,148 @@
+<!doctype html>
+<!--
+/*************************************************************************
+* ADOBE CONFIDENTIAL
+* ___________________
+*
+* Copyright 2020 Adobe
+* All Rights Reserved.
+*
+* NOTICE: Adobe permits you to use, modify, and distribute this file in
+* accordance with the terms of the Adobe license agreement accompanying
+* it. If you have received this file from a source other than Adobe,
+* then your use, modification, or distribution of it requires the prior
+* written permission of Adobe.
+**************************************************************************/
+-->
+<html>
+<title>Auto Timecode Correction</title>
+
+<head>
+	<meta charset="utf-8">
+	<script src="../js/ext.js"></script>
+	<script src="../lib/CSInterface.js"></script>
+	<script src="../lib/jquery-3.5.1.min.js"></script>
+	<script src="../js/script.js"></script>
+	<link id="ppstyle" href="css/style.css" rel="stylesheet" type="text/css">
+	<style id="dynStyle" type="text/css"></style>
+</head>
+
+<body class="autotc_gui">
+	<main>
+		<section id="process">
+			<a id="refresh" href="javascript:history.go(0)">Refresh panel</a>
+
+
+			<form id="atc" name="atc" onsubmit="return 0" method="post">
+				<p id="explainer">Select .csv file to start.</p>
+				<p id="errorDisplay"></p>
+				<section>
+					<label id="file" class="file">
+						<input type="file" id="source">
+					</label>
+				</section>
+				<section class="atc-from-content--settings">
+					<div class="bridge-only" id="updateTypeRadio">
+						<span>
+							<input type="radio" id="fromFile" name="source" value="file" checked>
+							<label for="fromFile">Timecode from file</label>
+						</span>
+						<span>
+							<input type="radio" id="fromSource" name="source" value="creation">
+							<label for="fromSource">Creation time as timecode</label>
+						</span>
+						<span>
+							<input type="radio" id="fromChange" name="source" value="changed">
+							<label for="fromChange">Last changed as timecode</label>
+						</span>
+					</div>
+					<div>
+						<span>
+							<input type="checkbox" id="mediaStart" name="mediaStart">
+							<label for="mediaStart">Disable media start comparison</label>
+						</span>
+					</div>
+					<div id="formradio">
+						<span>
+							<input type="radio" id="all" name="target" value="all">
+							<label for="all">Start in Project bin / folder</label>
+						</span>
+						<span>
+							<input type="radio" id="selection" name="target" value="selection" checked>
+							<label for="selection">Start with Selection</label>
+						</span>
+					</div>
+					<div>
+						<span>
+							<input type="checkbox" id="recursion" name="recursion">
+							<label for="recursion">Search in sub bins / folders</label>
+						</span>
+						<span>
+							<input type="checkbox" id="logging" name="logging">
+							<label for="logging">Enable verbose logging</label>
+						</span>
+					</div>
+				</section>
+				<section class="buttons-interface" id="processButtons">
+					<input type="submit" id="start" value="Start">	
+					<button class="bridge-only" id="revert">Revert</button>
+					<button class="bridge-only" id="csv">Save CSV</button>
+					<button id="reset">Reset panel</button>
+
+				</section>
+			</form>
+		</section>
+		<section class="bridge-only">
+			<form onsubmit="return 0" id="xmp-fix">
+				<h3>Fix broken XMP time values</h3>
+				<section>
+					<span>
+						<select name="framerate" id="framerate">
+							<option value="23976">23.976</option>
+							<option value="24">24.00</option>
+							<option value="25" selected>25.00</option>
+							<option value="2997">29.97</option>
+							<option value="30">30.00</option>
+							<option value="48">48.00</option>
+							<option value="50">50.00</option>
+							<option value="5994">59.94</option>
+							<option value="60">60.00</option>
+						</select>
+						<label for="framerate">Framerate per second</label>
+					</span>
+				</section>
+				<section id="formradio">
+					<span>
+						<input type="radio" id="fix-all" name="fix-target" value="all">
+						<label for="fix-all">All thumbnails in folder</label>
+					</span>
+					<span>
+						<input type="radio" id="fix-selection" name="fix-target" value="selection" checked>
+						<label for="fix-selection">Selection</label>
+					</span>
+				</section>
+				<section>
+					<span>
+						<input type="checkbox" id="fix-recursion" name="fix-recursion">
+						<label for="fix-recursion">Search in sub folders</label>
+					</span>
+				</section>
+				<section class="buttons-interface">
+					<button id="cleanup-xmp">Only errors</button>
+					<button id="update-xmp-timevalue">Update</button>
+				</section>
+			</form>
+		</section>
+		<section id="log" class="hidden">
+			<h3>Log</h3>
+			<span class="buttons-interface">
+				<button id="resetLog">Reset log</button>
+				<button id="hideLog">Hide log</button>
+			</span>
+			<textarea id='loggingArea' spellcheck="false"></textarea>
+		</section>
+	</main>
+	<footer></footer>
+</body>
+
+</html>

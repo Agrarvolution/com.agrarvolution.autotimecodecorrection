@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ExtensionList>
-    <Extension Id="com.agrarvolution.autoTimecodeCorrection.panel">
+    <Extension Id="com.agrarvolution.autoTimecodeCorrection.correction.panel">
         <HostList>
             <Host Name="PPRO" Port="7781"/>
             <Host Name="KBRG" Port="7780"/>
+        </HostList>
+    </Extension>
+    <Extension Id="com.agrarvolution.autoTimecodeCorrection.repair.panel">
+        <HostList>
+            <Host Name="KBRG" Port="7790"/>
         </HostList>
     </Extension>
 </ExtensionList>
