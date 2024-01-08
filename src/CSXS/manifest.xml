@@ -66,7 +66,7 @@
 			</DispatchInfo>
 		</Extension>
 		<Extension Id="com.agrarvolution.autoTimecodeCorrection.repair.panel">
-			<DispatchInfo>
+			<DispatchInfo Host="KBRG">
 				<Resources>
 					<MainPath>./panels/ltcRepair.html</MainPath>
 					<ScriptPath>./autoTimecodeCorrection.jsx</ScriptPath>
@@ -78,7 +78,7 @@
 					<AutoVisible>true</AutoVisible>
 				</Lifecycle>
 				<UI>
-					<Type>Panel</Type>
+					<Type>Embedded</Type>
 					<Menu>%ATC_REPAIR_PANEL_NAME</Menu>
 					<Geometry>
 						<Size>
@@ -90,11 +90,6 @@
 							<Width>200</Width>
 						</MinSize>
 					</Geometry>
-				</UI>
-			</DispatchInfo>
-			<DispatchInfo Host="KBRG">
-				<UI>
-					<Type>Embedded</Type>
 				</UI>
 			</DispatchInfo>
 		</Extension>
