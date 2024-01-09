@@ -60,7 +60,7 @@ $(function () {
     host = setHostinDOM();
     onAppThemeColorChanged();
 
-    let csInterface = new CSInterface();
+    const csInterface = new CSInterface();
     csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, onAppThemeColorChanged);
     csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
         logger.addLog(e.data.text, e.data.logLevel);
@@ -157,13 +157,13 @@ $(function () {
  * Helper function to gather relevant metadata of the selected files and stores them in a .csv file similar to a tentacle sync timecode tool output.
  */
 function exportCSV() {
-    let csObject = {
-        searchTarget: settings.xmpFix.searchTarget,
-        recursive: settings.xmpFix.searchRecursive,
+    const csObject = {
+        searchTarget: settings.searchTarget,
+        recursive: settings.searchRecursive,
         logging: settings.logging
     };
 
-    let csInterface = new CSInterface();
+    const csInterface = new CSInterface();
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.gatherTimecodes(' +
         JSON.stringify(csObject) + ');', async function (e) {
             logger.addLog("Timecodes arrived in frontend.", Logger.LOG_LEVELS.status);
@@ -201,13 +201,13 @@ function exportCSV() {
  * This method only keep one history record and can be called infitively.
  */
 function revertTimecodechanges() {
-    let csObject = {
+    const csObject = {
         searchTarget: settings.xmpFix.searchTarget,
         recursive: settings.xmpFix.searchRecursive,
         logging: settings.logging
     };
 
-    let csInterface = new CSInterface();
+    const csInterface = new CSInterface();
     csInterface.evalScript('$.agrarvolution.timecodeCorrection.revertChanges(' +
         JSON.stringify(csObject) + ');', function (e) {
             if (e === 'true') {
