@@ -253,20 +253,3 @@ function loadSettings() {
     }
     return settings;
 }
-/**
- * Validates the source file path.
- * @param {*} form 
- */
-function validateForm(form) {
-    if (form[0].files.length === 0) {
-        logger.addLog('No file has been selected.', Logger.LOG_LEVELS.status);
-        return false;
-    } else if (form[0].files[0].size === 0) {
-        logger.addLog('Selection is not a file.', Logger.LOG_LEVELS.status);
-        return false;
-    } else if (!(form[0].files[0].type === 'text/csv' || form[0].files[0].type === 'application/vnd.ms-excel')) {
-        logger.addLog('File type does not match.', Logger.LOG_LEVELS.info);
-    }
-    return form[0].files[0];
-}
-
