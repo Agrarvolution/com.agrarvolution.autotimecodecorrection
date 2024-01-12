@@ -69,16 +69,6 @@ class Logger {
     }
 
     /**
-     * Set log status outside of logging area.
-
-     * @param {string} text 
-     * @param {string} level 
-     */
-    static setLogStatus(explainer, error, text, level) {
-
-    }
-
-    /**
      * Clears the log area.
      */
     clearLog() {
@@ -86,6 +76,8 @@ class Logger {
             return;
         }
         this.logArea.value = '';
+        this.error.addClass('hidden');
+        this.explainer.removeClass('hidden');
     }
 
     /**

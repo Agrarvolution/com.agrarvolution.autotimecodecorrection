@@ -84,8 +84,6 @@ $(function () {
         storeSettings(defaultSettings);
         logger.clearLog();
         logger.addLog("Default settings are restored.", Logger.LOG_LEVELS.info);
-        explainer.removeClass('hidden');
-        error.addClass('hidden');
         this.blur();
     });
 
@@ -198,8 +196,8 @@ function exportCSV() {
  */
 function revertTimecodechanges() {
     const csObject = {
-        searchTarget: settings.xmpFix.searchTarget,
-        recursive: settings.xmpFix.searchRecursive,
+        searchTarget: settings.searchTarget,
+        recursive: settings.searchRecursive,
         logging: settings.logging
     };
 
