@@ -1,6 +1,8 @@
 class Logger {
     log; //log parent Node
     logArea; //logging textArea
+    explainer;
+    error;
     verboseLogging = false;
     #initialized = false;
 
@@ -17,22 +19,29 @@ class Logger {
     Logger() {
     }
     /**
-     * Constructor
+     * Constructor     
      * @param {JQuery-Object} logElement 
      * @param {DOM-Object} logAreaElement 
-     */
-    Logger(logElement, logAreaElement) {
-        this.init(logElement, logAreaElement);
+     * @param {jQuery-Object} explainerElement
+     * @param {jQuery-Object} errorElement 
+    */
+    Logger(logElement, logAreaElement, explainerElement, errorElement) {
+        this.init(logElement, logAreaElement, explainerElement, errorElement);
     }
+
 
     /**
      * Initialize object
      * @param {JQuery-Object} logElement 
      * @param {DOM-Object} logAreaElement 
+     * @param {jQuery-Object} explainerElement
+     * @param {jQuery-Object} errorElement 
      */
-    init(logElement, logAreaElement) {
+    init(logElement, logAreaElement, explainerElement, errorElement) {
         this.log = logElement;
         this.logArea = logAreaElement;
+        this.explainer = explainerElement;
+        this.error = errorElement;
         this.#initialized = true;
     }
     /**
@@ -51,22 +60,22 @@ class Logger {
 
             this.logArea.value = this.#timeStamp() + level + " " + text + "\n" + this.logArea.value;
         }
+        if (level === Logger.LOG_LEVELS.status) {
+            this.explainer.addClass('hidden');
+            this.error.removeClass('hidden');
+            this.error.text(text);
+        }
         return level;
     }
 
     /**
      * Set log status outside of logging area.
-     * @param {jQuery-Object} explainer 
-     * @param {jQuery-Object} error 
+
      * @param {string} text 
      * @param {string} level 
      */
     static setLogStatus(explainer, error, text, level) {
-        if (level === Logger.LOG_LEVELS.status) {
-            explainer.addClass('hidden');
-            error.removeClass('hidden');
-            error.text(text);
-        }
+
     }
 
     /**

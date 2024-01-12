@@ -25,8 +25,6 @@ let host = '';
 
 const logger = new Logger();
 
-let error = null;
-let explainer = null;
 let fileEl = null;
 let csvLink = null;
 
@@ -49,10 +47,8 @@ let lockForm = false,
 
 $(function () {
     onLoaded();
-    logger.init($('#log'), $('#loggingArea')[0]);
+    logger.init($('#log'), $('#loggingArea')[0], $('#explainer'), $('#errorDisplay'));
 
-    error = $('#errorDisplay');
-    explainer = $('#explainer');
     fileEl = $('#file');
     csvLink = $('#csvDownload');
 
