@@ -1,6 +1,5 @@
 'use strict';
 //Define form names
-const sourceId = 'source';
 const formIds = {
     target: 'target',
     recursion: 'recursion',
@@ -11,15 +10,6 @@ const formIds = {
     fixTarget: 'fix-target',
     fixRecursion: 'fix-recursion'
 }
-const SELECTION = {
-    all: 0,
-    selection: 1
-}
-const TIMECODE_SOURCE = {
-    file: 1,
-    created: 2,
-    lastChanged: 3
-};
 
 let host = '';
 

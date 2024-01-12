@@ -8,16 +8,6 @@ const formIds = {
     mediaStart: 'mediaStart',
     source: 'source',
 }
-const SELECTION = {
-    all: 0,
-    selection: 1
-}
-
-const TIMECODE_SOURCE = {
-    file: 1,
-    created: 2,
-    lastChanged: 3
-};
 
 let host = '';
 
