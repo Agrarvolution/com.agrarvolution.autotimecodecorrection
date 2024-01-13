@@ -195,7 +195,6 @@ function readSettings() {
  * @param {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}} settings 
  */
 function changeSettings(settings) {
-    //try {
     const form = document.forms[0];
 
     form[formIds.logging].checked = settings.logging || false;
@@ -212,44 +211,4 @@ function changeSettings(settings) {
 
     logger.verboseLogging = settings.logging;
     logger.addLog("Settings successfully updated.", Logger.LOG_LEVELS.info);
-    // } catch (e) {
-    //     logger.addLog("Failed to update settings. " + e, Logger.LOG_LEVELS.error);
-    // }
-}
-/**
- * Stores settings in local storage.
- * @param {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}} newSettings 
- * @returns {boolean} true on success
- */
-function storeSettings(newSettings) {
-    let settingsTxt = "";
-    try {
-        settingsTxt = JSON.stringify(newSettings);
-    } catch (e) {
-        logger.addLog("Failed to create settings string.", Logger.LOG_LEVELS.critical);
-        return false;
-    }
-
-    settings = newSettings;
-    localStorage.setItem(settingsKey, settingsTxt);
-    return true;
-}
-/**
- * Loads gui settings from local storage.
- * @returns {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}}
- */
-function loadSettings() {
-    let settings = localStorage.getItem(settingsKey);
-    if (settings === null) {
-        logger.addLog("No settings have been stored.", Logger.LOG_LEVELS.info);
-        settings = defaultSettings;
-    } else {
-        try {
-            settings = JSON.parse(settings);
-        } catch {
-            logger.addLog("Failed to create settings object.", Logger.LOG_LEVELS.critical);
-            settings = defaultSettings;
-        }
-    }
-    return settings;
-}
+} 

@@ -125,7 +125,43 @@ class Logger {
 }
 
 
+/**
+ * Stores settings in local storage.
+ * @param {Object} newSettings 
+ * @returns {boolean} true on success
+ */
+function storeSettings(newSettings) {
+    let settingsTxt = "";
+    try {
+        settingsTxt = JSON.stringify(newSettings);
+    } catch (e) {
+        logger.addLog("Failed to create settings string.", Logger.LOG_LEVELS.critical);
+        return false;
+    }
 
+    settings = newSettings;
+    localStorage.setItem(settingsKey, settingsTxt);
+    return true;
+}
+/**
+ * Loads gui settings from local storage.
+ * @returns {Object}
+ */
+function loadSettings() {
+    let settings = localStorage.getItem(settingsKey);
+    if (settings === null) {
+        logger.addLog("No settings have been stored.", Logger.LOG_LEVELS.info);
+        settings = defaultSettings;
+    } else {
+        try {
+            settings = JSON.parse(settings);
+        } catch {
+            logger.addLog("Failed to create settings object.", Logger.LOG_LEVELS.critical);
+            settings = defaultSettings;
+        }
+    }
+    return settings;
+}
 
 
 
