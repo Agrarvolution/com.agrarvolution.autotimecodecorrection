@@ -317,11 +317,11 @@ function checkCSV(csv, version) {
 
     if (version === csvVersion.ttc116) {
         //check first row
-        if (!(csv[0][csvColumnNumbers.fileName] !== undefined && csv[0][csvColumnNumbers.fileName] === csvColumnNames[csvColumnNumbers.fileName] &&
-            csv[0][csvColumnNumbers.duration] !== undefined && csv[0][csvColumnNumbers.duration] === csvColumnNames[csvColumnNumbers.duration] &&
-            csv[0][csvColumnNumbers.fileTimecode] !== undefined && csv[0][csvColumnNumbers.fileTimecode] === csvColumnNames[csvColumnNumbers.fileTimecode] &&
-            csv[0][csvColumnNumbers.audioTimecode] !== undefined && csv[0][csvColumnNumbers.audioTimecode] === csvColumnNames[csvColumnNumbers.audioTimecode] &&
-            csv[0][csvColumnNumbers.framerate] !== undefined && csv[0][csvColumnNumbers.framerate] === csvColumnNames[csvColumnNumbers.framerate])) {
+        if (!(csv?.[0]?.[0] === csvColumnNames[csvColumnNumbers.fileName] &&
+            csv?.[0]?.[1] === csvColumnNames[csvColumnNumbers.duration] &&
+            csv?.[0]?.[2] === csvColumnNames[csvColumnNumbers.fileTimecode] &&
+            csv?.[0]?.[3] === csvColumnNames[csvColumnNumbers.audioTimecode] &&
+            csv?.[0]?.[4] === csvColumnNames[csvColumnNumbers.framerate])) {
             logger.addLog("CSV Headers don't match [TTCT_1.16]", Logger.LOG_LEVELS.status);
             throw new Error("No valid csv. Check csv headers!");
         }
