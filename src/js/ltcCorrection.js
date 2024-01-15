@@ -176,8 +176,6 @@ function exportCSV() {
                     console.log(writeResult);
                     logger.addLog("Failed to save timecode csv.", Logger.LOG_LEVELS.status);
                 }
-
-
             } catch (e) {
                 logger.addLog("Error parsing file metadata.", Logger.LOG_LEVELS.status);
             }
@@ -461,13 +459,12 @@ function createZeroTimeCode(addFrames, framerate) {
  * @param {object} timeMatched 
  * @returns {{text: string, groups: object}}
  */
-function compressMatch(timeMatched) {
-    if (timeMatched !== undefined) {
-        return {
-            text: timeMatched[0],
-            groups: timeMatched.groups
-        }
+function compressMatch(timeMatched) {a
+    return {
+        text: timeMatched?.[0],
+        groups: timeMatched?.groups
     }
+
 }
 /**
  * Validates a regex matched time string and converts its part into numbers.
@@ -512,7 +509,7 @@ function CSVToArray(strData, strDelimiter) {
 
     strDelimiter = (strDelimiter || ",");
 
-    let objPattern = new RegExp(
+    const objPattern = new RegExp(
         (
             "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
             "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
