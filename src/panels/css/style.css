@@ -187,7 +187,7 @@ input[type="file"]::-webkit-file-upload-button:active,
 }
 
 .hidden {
-	display: none;
+	display: none !important;
 }
 
 .autotc_gui h3 {
@@ -221,9 +221,14 @@ input[type="file"]::-webkit-file-upload-button:active,
 	flex-wrap: wrap;
 }
 
-label:not(.file), select, button, h3 {
-	user-select: none;  
+label:not(.file),
+select,
+button,
+h3 {
+	user-select: none;
 }
+
+
 /*Custom radio and checkboxes*/
 
 [type="checkbox"],
@@ -329,4 +334,8 @@ select::after {
 
 .kbrg .bridge-only {
 	display: block;
+}
+
+#updateTypeRadio {
+	margin-block: 1rem;
 }

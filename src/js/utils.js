@@ -3,9 +3,9 @@ const SELECTION = {
     selection: 1
 }
 const TIMECODE_SOURCE = {
-    file: 1,
-    created: 2,
-    lastChanged: 3
+    file: 0,
+    created: 1,
+    lastChanged: 2
 };
 
 class Logger {

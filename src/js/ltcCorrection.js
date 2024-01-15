@@ -7,6 +7,7 @@ const formIds = {
     logging: 'logging',
     mediaStart: 'mediaStart',
     source: 'source',
+    framerate: 'framerate',
 }
 
 let host = '';
@@ -23,6 +24,7 @@ const defaultSettings = {
     searchTarget: SELECTION.all,
     source: TIMECODE_SOURCE.file,
     ignoreMediaStart: true,
+    framerate: 25
 }
 const csvColumnNumbers = {
     fileName: 0,
@@ -100,6 +102,7 @@ $(function () {
 
     function settingHandler() {
         if (storeSettings(readSettings())) {
+            updateSourceInterface();
             logger.addLog("Settings successfully stored.", Logger.LOG_LEVELS.info);
         };
     }
@@ -459,7 +462,8 @@ function createZeroTimeCode(addFrames, framerate) {
  * @param {object} timeMatched 
  * @returns {{text: string, groups: object}}
  */
-function compressMatch(timeMatched) {a
+function compressMatch(timeMatched) {
+    a
     return {
         text: timeMatched?.[0],
         groups: timeMatched?.groups
@@ -565,6 +569,7 @@ function readSettings() {
     settings.searchRecursive = form[formIds.recursion].checked;
 
     settings.ignoreMediaStart = form[formIds.mediaStart].checked;
+    settings.framerate = form[formIds.framerate].value;
 
     for (let i = 0; i < form[formIds.target].length; i++) {
         if (form[formIds.target][i].checked) {
@@ -584,13 +589,13 @@ function readSettings() {
  * @param {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}} settings 
  */
 function changeSettings(settings) {
-    // try {
-    let form = document.forms[0];
+    const form = document.forms[0];
 
     form[formIds.logging].checked = settings.logging || false;
 
     form[formIds.recursion].checked = settings.searchRecursive || false;
     form[formIds.mediaStart].checked = settings.ignoreMediaStart || false;
+    form[formIds.framerate].value = settings?.framerate || 25;
 
     for (let i = 0; i < form[formIds.target].length; i++) {
         form[formIds.target][i].checked = false;
@@ -606,11 +611,26 @@ function changeSettings(settings) {
         }
     }
 
+    updateSourceInterface();
+
     logger.verboseLogging = settings.logging;
     logger.addLog("Settings successfully updated.", Logger.LOG_LEVELS.info);
-    // } catch {
-    //     logger.addLog("Failed to update settings.", Logger.LOG_LEVELS.error);
-    // }
+}
+
+/**
+ * Reflect current status of source selection.
+ * This is to reduce visual clutter in the panel and only show appropriate settings.
+ */
+function updateSourceInterface() {
+    const file = $('.file-only'),
+        metadata = $('.metadata-only');
+    if (document.forms[0][formIds.source][TIMECODE_SOURCE.file].checked) {
+        file.removeClass('hidden');
+        metadata.addClass('hidden');
+    } else {
+        file.addClass('hidden');
+        metadata.removeClass('hidden');
+    }
 }
 
 /**

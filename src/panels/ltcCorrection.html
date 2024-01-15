@@ -37,28 +37,43 @@
 			<form id="atc" name="atc" onsubmit="return 0" method="post">
 				<p id="explainer">Select .csv file to start.</p>
 				<p id="errorDisplay"></p>
+				<section class="bridge-only" id="updateTypeRadio">
+					<span>
+						<input type="radio" id="fromFile" name="source" value="file" checked>
+						<label for="fromFile">Timecode from file</label>
+					</span>
+					<span>
+						<input type="radio" id="fromSource" name="source" value="creation">
+						<label for="fromSource">Creation time as timecode</label>
+					</span>
+					<span>
+						<input type="radio" id="fromChange" name="source" value="changed">
+						<label for="fromChange">Last changed as timecode</label>
+					</span>
+				</section>
 				<section>
-					<label id="file" class="file">
+					<label id="file" class="file file-only">
 						<input type="file" id="source">
 					</label>
+					<span class="metadata-only">
+						<select name="framerate" id="framerate">
+							<option value="23976">23.976</option>
+							<option value="24">24.00</option>
+							<option value="25" selected>25.00</option>
+							<option value="2997">29.97</option>
+							<option value="30">30.00</option>
+							<option value="48">48.00</option>
+							<option value="50">50.00</option>
+							<option value="5994">59.94</option>
+							<option value="60">60.00</option>
+						</select>
+						<label for="framerate">Framerate per second</label>
+					</span>
 				</section>
 				<section class="atc-from-content--settings">
-					<div class="bridge-only" id="updateTypeRadio">
-						<span>
-							<input type="radio" id="fromFile" name="source" value="file" checked>
-							<label for="fromFile">Timecode from file</label>
-						</span>
-						<span>
-							<input type="radio" id="fromSource" name="source" value="creation">
-							<label for="fromSource">Creation time as timecode</label>
-						</span>
-						<span>
-							<input type="radio" id="fromChange" name="source" value="changed">
-							<label for="fromChange">Last changed as timecode</label>
-						</span>
-					</div>
+
 					<div>
-						<span>
+						<span class="file-only">
 							<input type="checkbox" id="mediaStart" name="mediaStart">
 							<label for="mediaStart">Disable media start comparison</label>
 						</span>
@@ -85,7 +100,7 @@
 					</div>
 				</section>
 				<section class="buttons-interface" id="processButtons">
-					<input type="submit" id="start" value="Start">	
+					<input type="submit" id="start" value="Start">
 					<button class="bridge-only" id="revert">Revert</button>
 					<button class="bridge-only" id="csv">Save CSV</button>
 					<button id="reset">Reset panel</button>
