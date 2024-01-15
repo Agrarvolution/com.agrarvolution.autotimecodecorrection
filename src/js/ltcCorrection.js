@@ -24,6 +24,16 @@ const defaultSettings = {
     source: TIMECODE_SOURCE.file,
     ignoreMediaStart: true,
 }
+const csvColumnNumbers = {
+    fileName: 0,
+    duration: 1,
+    fileTimecode: 2,
+    audioTimecode: 3,
+    framerate: 4
+};
+const csvColumnNames = [
+    "File Name", "Duration", "File TC", "Audio TC", "Framerate"
+]
 let settings = defaultSettings;
 
 
@@ -307,9 +317,11 @@ function checkCSV(csv, version) {
 
     if (version === csvVersion.ttc116) {
         //check first row
-        if (!(csv[0][0] !== undefined && csv[0][0] === 'File Name' && csv[0][1] !== undefined && csv[0][1] === 'Duration' &&
-            csv[0][2] !== undefined && csv[0][2] === 'File TC' && csv[0][3] !== undefined &&
-            csv[0][3] === 'Audio TC' && csv[0][4] !== undefined && csv[0][4] === 'Framerate')) {
+        if (!(csv[0][csvColumnNumbers.fileName] !== undefined && csv[0][csvColumnNumbers.fileName] === csvColumnNames[csvColumnNumbers.fileName] &&
+            csv[0][csvColumnNumbers.duration] !== undefined && csv[0][csvColumnNumbers.duration] === csvColumnNames[csvColumnNumbers.duration] &&
+            csv[0][csvColumnNumbers.fileTimecode] !== undefined && csv[0][csvColumnNumbers.fileTimecode] === csvColumnNames[csvColumnNumbers.fileTimecode] &&
+            csv[0][csvColumnNumbers.audioTimecode] !== undefined && csv[0][csvColumnNumbers.audioTimecode] === csvColumnNames[csvColumnNumbers.audioTimecode] &&
+            csv[0][csvColumnNumbers.framerate] !== undefined && csv[0][csvColumnNumbers.framerate] === csvColumnNames[csvColumnNumbers.framerate])) {
             logger.addLog("CSV Headers don't match [TTCT_1.16]", Logger.LOG_LEVELS.status);
             throw new Error("No valid csv. Check csv headers!");
         }
@@ -343,19 +355,19 @@ function checkCSVrow(row, version, rowNumber) {
     if (version === csvVersion.ttc116) {
         for (let i = 0; i < row.length; i++) {
             if (row[i] === undefined) {
-                logger.addLog("CSV row " + rowNumber + (row[0] !== undefined ? " (" + row[0] + ")" : '') + " is incomplete.", Logger.LOG_LEVELS.error);
+                logger.addLog("CSV row " + rowNumber + (row[csvColumnNumbers.fileName] !== undefined ? " (" + row[csvColumnNumbers.fileName] + ")" : '') + " is incomplete.", Logger.LOG_LEVELS.error);
                 return false;
             }
         }
 
-        tcMediaElement.filename = row[0];
+        tcMediaElement.filename = row[csvColumnNumbers.fileName];
 
         //@todo check if no match - check if values are valid in new function
 
         tcMediaElement.framerate = Number(row[4]) * 100;
         if (Number.isNaN(tcMediaElement.framerate)) {
             logger.addLog(tcMediaElement.filename + " at row " + rowNumber + " - Framerate (" +
-                row[4] + ") is invalid.", Logger.LOG_LEVELS.error);
+                row[csvColumnNumbers.framerate] + ") is invalid.", Logger.LOG_LEVELS.error);
             return false;
         }
         switch (tcMediaElement.framerate) {
@@ -370,39 +382,82 @@ function checkCSVrow(row, version, rowNumber) {
                 break;
             default:
                 logger.addLog(tcMediaElement.filename + " at row " + rowNumber + " - Framerate (" +
-                    row[4] + ") is unexpected.", Logger.LOG_LEVELS.info);
+                    row[csvColumnNumbers.framerate] + ") is unexpected.", Logger.LOG_LEVELS.info);
+                return false;
         }
         tcMediaElement.framerate /= 100;
 
-        let hmsfPattern = /^(?<hours>[\d]{1,2})[:;](?<minutes>[\d]{1,2})[:;](?<seconds>[\d]{1,2})([:;](?<frames>[\d]{1,}))?$/g;
+        tcMediaElement.duration = validateTimeCode(
+            row[csvColumnNames.duration], 
+            tcMediaElement.framerate, 
+            tcMediaElement.filename,
+            rowNumber, csvColumnNames.duration);
 
-        tcMediaElement.duration = hmsfPattern.exec(row[1]);
-        if (!validateTime(tcMediaElement.duration, tcMediaElement.framerate)) {
-            logger.addLog(tcMediaElement.filename + " at row " + rowNumber + " - duration (" +
-                row[1] + ") is invalid.", Logger.LOG_LEVELS.error);
-            return false;
-        }
-        tcMediaElement.duration = compressMatch(tcMediaElement.duration);
-        hmsfPattern.lastIndex = 0;
+        tcMediaElement.fileTC = validateTimeCode(
+            row[csvColumnNames.fileTimecode], 
+            tcMediaElement.framerate, 
+            tcMediaElement.filename,
+            rowNumber, csvColumnNames.fileTimecode);
 
-        tcMediaElement.fileTC = hmsfPattern.exec(row[2]);
-        if (!validateTime(tcMediaElement.fileTC, tcMediaElement.framerate, true)) {
-            logger.addLog(tcMediaElement.filename + " at row " + rowNumber + " - File TC (" +
-                row[2] + ") is invalid.", Logger.LOG_LEVELS.error);
-            return false;
-        }
-        tcMediaElement.fileTC = compressMatch(tcMediaElement.fileTC);
-        hmsfPattern.lastIndex = 0;
-
-        tcMediaElement.audioTC = hmsfPattern.exec(row[3]);
-        if (!validateTime(tcMediaElement.audioTC, tcMediaElement.framerate)) {
-            logger.addLog(tcMediaElement.filename + " at row " + rowNumber + " - Audio TC (" +
-                row[3] + ") is invalid.", Logger.LOG_LEVELS.error);
-            return false;
-        }
-        tcMediaElement.audioTC = compressMatch(tcMediaElement.audioTC);
+        tcMediaElement.audioTC = validateTimeCode(
+            row[csvColumnNames.audioTimecode], 
+            tcMediaElement.framerate, 
+            tcMediaElement.filename,
+            rowNumber, csvColumnNames.audioTimecode);
 
         return tcMediaElement;
+    }
+}
+/**
+ * Validates string values for being a timecode and returns a timecode object as a result.
+ * @param {string} value 
+ * @param {number} framerate 
+ * @param {string} fileName used for logging only
+ * @param {number} rowNumber used for logging only
+ * @param {number} column 
+ * @returns 
+ */
+function validateTimeCode(value, framerate, fileName, rowNumber, column) {
+    const hmsfPattern = /^(?<hours>[\d]{1,2})[:;](?<minutes>[\d]{1,2})[:;](?<seconds>[\d]{1,2})([:;](?<frames>[\d]{1,}))?$/g;
+
+    let timeCode = hmsfPattern.exec(value);
+
+    if (!validateTime(timeCode, framerate, true)) {
+        logger.addLog(`${fileName} at row ${rowNumber} - ${csvColumnNames[csvColumnNumbers.framerate]} (" ${value} ") is invalid. Added empty timecode instead."`,
+            Logger.LOG_LEVELS.info);
+        timeCode = createZeroTimeCode(column !== csvColumnNumbers.duration, framerate);
+    } else {
+        timeCode = compressMatch(timeCode);
+    }
+    hmsfPattern.lastIndex = 0; //maybe not needed anymore?
+    return timeCode;
+}
+
+
+/**
+ * Creates a new timecode with the value of 0.
+ * @param {boolean} addFrames 
+ * @param {number} framerate 
+ * @returns {text: string, groups: {hours: number, minutes: number, seconds: number, frames: number}} timecode
+ */
+function createZeroTimeCode(addFrames, framerate) {
+
+    let text = "00:00:00";
+    if (addFrames) {
+        text = "00:00:00:00";
+    }
+    if (addFrames && framerate === 2397 || framerate === 2997 || framerate === 5994) {
+        text = "00:00:00;00";
+    }
+
+    return {
+        text: text,
+        groups: {
+            hours: 0,
+            minutes: 0,
+            seconds: 0,
+            frames: 0
+        }
     }
 }
 /**
@@ -448,6 +503,7 @@ function validateTime(time, framerate, blockFrameCheck) {
 
     return true;
 }
+
 /**
  * This will parse a delimited string into an array of arrays. The default delimiter is the comma, but this can be overriden in the second argument.
  * @source https://www.bennadel.com/blog/1504-ask-ben-parsing-csv-strings-with-javascript-exec-regular-expression-command.htm
