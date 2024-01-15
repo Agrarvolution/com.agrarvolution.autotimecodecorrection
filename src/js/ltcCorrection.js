@@ -164,24 +164,20 @@ function exportCSV() {
             try {
                 e = JSON.parse(e);
                 if (e.csv === undefined || e.path === undefined) {
-                    e === 'false';
-                }
-
-                if (e === 'false') {
                     logger.addLog("Fail to retrieve any timecodes.", Logger.LOG_LEVELS.status);
-                } else {
-
-
-                    let writeResult = window.cep.fs.writeFile(e.path + "\\timecode.csv", e.csv)
-                    if (writeResult.err === 0) {
-                        logger.addLog("Saving metadata is finished.", Logger.LOG_LEVELS.status);
-
-                    } else {
-                        console.log(writeResult);
-                        logger.addLog("Failed to save timecode csv.", Logger.LOG_LEVELS.status);
-                    }
-
+                    return false;
                 }
+
+                const writeResult = window.cep.fs.writeFile(e.path + "\\timecode.csv", e.csv)
+                if (writeResult.err === 0) {
+                    logger.addLog("Saving metadata is finished.", Logger.LOG_LEVELS.status);
+
+                } else {
+                    console.log(writeResult);
+                    logger.addLog("Failed to save timecode csv.", Logger.LOG_LEVELS.status);
+                }
+
+
             } catch (e) {
                 logger.addLog("Error parsing file metadata.", Logger.LOG_LEVELS.status);
             }
@@ -388,20 +384,20 @@ function checkCSVrow(row, version, rowNumber) {
         tcMediaElement.framerate /= 100;
 
         tcMediaElement.duration = validateTimeCode(
-            row[csvColumnNames.duration], 
-            tcMediaElement.framerate, 
+            row[csvColumnNames.duration],
+            tcMediaElement.framerate,
             tcMediaElement.filename,
             rowNumber, csvColumnNames.duration);
 
         tcMediaElement.fileTC = validateTimeCode(
-            row[csvColumnNames.fileTimecode], 
-            tcMediaElement.framerate, 
+            row[csvColumnNames.fileTimecode],
+            tcMediaElement.framerate,
             tcMediaElement.filename,
             rowNumber, csvColumnNames.fileTimecode);
 
         tcMediaElement.audioTC = validateTimeCode(
-            row[csvColumnNames.audioTimecode], 
-            tcMediaElement.framerate, 
+            row[csvColumnNames.audioTimecode],
+            tcMediaElement.framerate,
             tcMediaElement.filename,
             rowNumber, csvColumnNames.audioTimecode);
 
