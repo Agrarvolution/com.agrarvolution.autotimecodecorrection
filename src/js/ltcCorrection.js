@@ -45,10 +45,7 @@ const csvVersion = {
     ttc116: 'tentacletimecodetool_1.16'
 };
 
-let lockForm = false,
-    lockFormFix = false;
-
-
+let lockForm = false;
 
 $(function () {
     onLoaded();
@@ -355,18 +352,14 @@ function checkCSVrow(row, version, rowNumber) {
     let tcMediaElement = {};
 
     if (version === csvVersion.ttc116) {
-        for (let i = 0; i < row.length; i++) {
-            if (row[i] === undefined) {
-                logger.addLog("CSV row " + rowNumber + (row[csvColumnNumbers.fileName] !== undefined ? " (" + row[csvColumnNumbers.fileName] + ")" : '') + " is incomplete.", Logger.LOG_LEVELS.error);
-                return false;
-            }
+        if (row[csvColumnNumbers.framerate] === undefined) {
+            logger.addLog("CSV row " + rowNumber + (row[csvColumnNumbers.fileName] !== undefined ? " (" + row[csvColumnNumbers.fileName] + ")" : '') + " is incomplete.", Logger.LOG_LEVELS.error);
+            return false;
         }
 
         tcMediaElement.filename = row[csvColumnNumbers.fileName];
 
-        //@todo check if no match - check if values are valid in new function
-
-        tcMediaElement.framerate = Number(row[4]) * 100;
+        tcMediaElement.framerate = Number(row[csvColumnNumbers.framerate]) * 100;
         if (Number.isNaN(tcMediaElement.framerate)) {
             logger.addLog(tcMediaElement.filename + " at row " + rowNumber + " - Framerate (" +
                 row[csvColumnNumbers.framerate] + ") is invalid.", Logger.LOG_LEVELS.error);
