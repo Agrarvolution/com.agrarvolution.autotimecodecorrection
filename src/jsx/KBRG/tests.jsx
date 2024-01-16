@@ -26,6 +26,9 @@ timeCorrection.processInput({
     logging: true
 });*/
 
+// var tcObject = JSON.parse('{"timeCodes":[{"filename":"GX010004.MP4","framerate":23.98,"duration":{"text":"00:00:00:00","groups":{"hours":0,"minutes":0,"seconds":0,"frames":0}},"fileTC":{"text":"00:00:00:00","groups":{"hours":0,"minutes":0,"seconds":0,"frames":0}},"audioTC":{"text":"00:00:00:00","groups":{"hours":0,"minutes":0,"seconds":0,"frames":0}}},{"filename":"GX010005.MP4","framerate":23.98,"duration":{"text":"00:00:00:00","groups":{"hours":0,"minutes":0,"seconds":0,"frames":0}},"fileTC":{"text":"00:00:00:00","groups":{"hours":0,"minutes":0,"seconds":0,"frames":0}},"audioTC":{"text":"00:00:00:00","groups":{"hours":0,"minutes":0,"seconds":0,"frames":0}}}],"searchRecursive":true,"searchTarget":0,"ignoreMediaStart":true,"overrideFramerate":false,"logging":true}');
+// var tcObject = JSON.parse('{"timeCodes":[{"filename":"GX010004.MP4","framerate":23.98,"duration":{"text":"00:00:10","groups":{"hours":0,"minutes":0,"seconds":10,"frames":null}},"fileTC":{"text":"22:46:08:18","groups":{"hours":22,"minutes":46,"seconds":8,"frames":18}},"audioTC":{"text":"21:49:13:08","groups":{"hours":21,"minutes":49,"seconds":13,"frames":8}}},{"filename":"GX010005.MP4","framerate":23.98,"duration":{"text":"00:00:06","groups":{"hours":0,"minutes":0,"seconds":6,"frames":null}},"fileTC":{"text":"21:49:29:21","groups":{"hours":21,"minutes":49,"seconds":29,"frames":21}},"audioTC":{"text":"21:49:29:20","groups":{"hours":21,"minutes":49,"seconds":29,"frames":20}}}],"searchRecursive":true,"searchTarget":0,"ignoreMediaStart":true,"overrideFramerate":true,"logging":true}');
+// timeCorrection.processInput(tcObject);
 /*
 timeCorrection.revertChanges({
     searchTarget: 2,
