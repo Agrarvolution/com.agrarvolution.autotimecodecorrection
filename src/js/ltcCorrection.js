@@ -264,7 +264,7 @@ function handleFileLoad(file) {
     }
 
 
-    let tcObject = {
+    const tcObject = {
         timeCodes: timeCodes,
         searchRecursive: settings.searchRecursive,
         searchTarget: settings.searchTarget,
@@ -376,11 +376,12 @@ function checkCSVrow(row, version, rowNumber) {
             case 2400:
             case 2500:
             case 5000:
-            case 2397:
             case 2997:
             case 3000:
             case 5994:
             case 6000:
+            case 2397:
+            case 2398:
                 break;
             default:
                 logger.addLog(tcMediaElement.filename + " at row " + rowNumber + " - Framerate (" +
@@ -390,22 +391,22 @@ function checkCSVrow(row, version, rowNumber) {
         tcMediaElement.framerate /= 100;
 
         tcMediaElement.duration = validateTimeCode(
-            row[csvColumnNames.duration],
+            row[csvColumnNumbers.duration],
             tcMediaElement.framerate,
             tcMediaElement.filename,
-            rowNumber, csvColumnNames.duration);
+            rowNumber, csvColumnNumbers.duration);
 
         tcMediaElement.fileTC = validateTimeCode(
-            row[csvColumnNames.fileTimecode],
+            row[csvColumnNumbers.fileTimecode],
             tcMediaElement.framerate,
             tcMediaElement.filename,
-            rowNumber, csvColumnNames.fileTimecode);
+            rowNumber, csvColumnNumbers.fileTimecode);
 
         tcMediaElement.audioTC = validateTimeCode(
-            row[csvColumnNames.audioTimecode],
+            row[csvColumnNumbers.audioTimecode],
             tcMediaElement.framerate,
             tcMediaElement.filename,
-            rowNumber, csvColumnNames.audioTimecode);
+            rowNumber, csvColumnNumbers.audioTimecode);
 
         return tcMediaElement;
     }
@@ -468,7 +469,6 @@ function createZeroTimeCode(addFrames, framerate) {
  * @returns {{text: string, groups: object}}
  */
 function compressMatch(timeMatched) {
-    a
     return {
         text: timeMatched?.[0],
         groups: timeMatched?.groups
