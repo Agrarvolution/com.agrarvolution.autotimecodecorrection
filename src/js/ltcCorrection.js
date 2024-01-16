@@ -8,6 +8,7 @@ const formIds = {
     mediaStart: 'mediaStart',
     source: 'source',
     framerate: 'framerate',
+    overrideFramerate: 'overrideFramerate'
 }
 
 let host = '';
@@ -24,7 +25,8 @@ const defaultSettings = {
     searchTarget: SELECTION.all,
     source: TIMECODE_SOURCE.file,
     ignoreMediaStart: true,
-    framerate: 25
+    framerate: 25,
+    overrideFramerate: false
 }
 const csvColumnNumbers = {
     fileName: 0,
@@ -231,7 +233,9 @@ function timecodeFromMetadata() {
     let csObject = {
         searchTarget: settings.searchTarget,
         source: settings.source,
-        logging: logger.verboseLogging
+        logging: logger.verboseLogging,
+        framerate: settings.framerate,
+        overrideFramerate: settings.overrideFramerate
     };
 
     let csInterface = new CSInterface();
@@ -570,6 +574,7 @@ function readSettings() {
 
     settings.ignoreMediaStart = form[formIds.mediaStart].checked;
     settings.framerate = form[formIds.framerate].value;
+    settings.overrideFramerate = form[formIds.overrideFramerate].checked
 
     for (let i = 0; i < form[formIds.target].length; i++) {
         if (form[formIds.target][i].checked) {
@@ -596,6 +601,7 @@ function changeSettings(settings) {
     form[formIds.recursion].checked = settings.searchRecursive || false;
     form[formIds.mediaStart].checked = settings.ignoreMediaStart || false;
     form[formIds.framerate].value = settings?.framerate || 25;
+    form[formIds.overrideFramerate].checked = settings.overrideFramerate || false;
 
     for (let i = 0; i < form[formIds.target].length; i++) {
         form[formIds.target][i].checked = false;
@@ -624,12 +630,15 @@ function changeSettings(settings) {
 function updateSourceInterface() {
     const file = $('.file-only'),
         metadata = $('.metadata-only');
+
     if (document.forms[0][formIds.source][TIMECODE_SOURCE.file].checked) {
         file.removeClass('hidden');
         metadata.addClass('hidden');
+        logger.addLog("Select .csv file to start.", Logger.LOG_LEVELS.status);
     } else {
         file.addClass('hidden');
         metadata.removeClass('hidden');
+        logger.addLog("Press start to update timecodes form metadata.", Logger.LOG_LEVELS.status);
     }
 }
 
