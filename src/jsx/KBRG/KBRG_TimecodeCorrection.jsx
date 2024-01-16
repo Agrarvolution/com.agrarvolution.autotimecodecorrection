@@ -540,6 +540,8 @@ $.agrarvolution.timecodeCorrection = {
                 } else {
                     item.framerate = 0;
                 }
+            } else { // fix empty wavs
+                item.framerate = 0;
             }
 
             item.isDropFrame = this.isDropFrame(item.framerate);
@@ -672,7 +674,7 @@ $.agrarvolution.timecodeCorrection = {
         // @Todo -> set flag if conversion should be by total frames or last frames only (premiere one works last frame only)
     */
     changeStartTime: function(update, mediaItem) {
-        if (this.overrideFramerate || this.media[i].framerate === 0) {
+        if (this.overrideFramerate || mediaItem.framerate === 0) {
             mediaItem.framerate = update.framerate;
             mediaItem.isDropFrame = update.isDropFrame;
         }
@@ -719,7 +721,7 @@ $.agrarvolution.timecodeCorrection = {
      */
     setEmptyStartTimeProperty: function(mediaItem) {
         if (mediaItem.tcStruct === '') {
-            return false;
+            mediaItem.tcStruct = "altTimecode";
         }
         var framerate = mediaItem.framerate || 25; //default safety
 
@@ -746,7 +748,7 @@ $.agrarvolution.timecodeCorrection = {
             var timeFormat = this.timeFormats.nonDrop;
         }
         mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat", framerate + timeFormat);
-        mediaItem.tcStruct = "altTimecode";
+        
         mediaItem.framerate = framerate;
     },
     /**
