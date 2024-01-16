@@ -74,6 +74,7 @@ $.agrarvolution.timecodeCorrection = {
     targetFramerate: 25,
     targetFramerateisDropFrame: false,
     overrideFramerate: false,
+    zeroTimecode: "00:00:00:00",
 
     metaDataOfSelected: function() {
         if (app.document.selectionLength !== 0) {
@@ -98,7 +99,7 @@ $.agrarvolution.timecodeCorrection = {
      *@return {boolean} true on success
      */
     fixXmpTimeFormat: function(parameters) {
-        if (this.checkFixXmpParameter(parameters) && this.cacheMediaObjects(parameters.errorOnly) && this.fixTimeFormat(parameters.framerate)) {
+        if (this.checkFixXmpParameters(parameters) && this.cacheMediaObjects(parameters.errorOnly) && this.fixTimeFormat(parameters.errorOnly)) {
             this.logToCEP("Time formats for " + this.processedMedia + " media thumbnails have been updated.", this.logLevels.status);
             return true;
         } else {
@@ -110,16 +111,21 @@ $.agrarvolution.timecodeCorrection = {
      * @param {number} framerate
      * @return {boolean} true on success
      */
-    fixTimeFormat: function(framerate) {
+    fixTimeFormat: function(errorOnly) {
         this.processedMedia = 0;
         for (var i = 0; i < this.media.length; i++) {
-            var text = "Timecode";
-            if (this.DropFrameTimecodes[framerate]) {
-                text = "Drop" + text;
-            }
-            text = framerate + text;
+            this.media[i].framerate = this.media[i].framerate === 0 ? this.targetFramerate : this.media[i].framerate;
 
-            this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat", text);
+            if (!errorOnly) {
+                var updatedGroups = this.convertFramesToNewFramerate(this.media[i].startTime.groups, this.media[i].framerate, this.targetFramerate);
+                var updatedTimecode = this.createTimecodeFromObj(updatedGroups, this.media[i].isDropFrame, this.targetFramerate);
+
+                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", updatedTimecode);
+                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, this.previousTimeValue, this.media[i].startTime.text || this.zeroTimecode);
+                this.media[i].framerate = this.targetFramerate;
+            }
+
+            this.setEmptyStartTimeProperty(this.media[i]);
 
             try {
                 var newMetadata = new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
@@ -129,6 +135,7 @@ $.agrarvolution.timecodeCorrection = {
             } catch (e) {
                 this.logToCEP(this.media[i].filename + " - failed to fix time format.", this.logLevels.error);
                 this.logToCEP(JSON.stringify(e), this.logLevels.error);
+                return false;
             }
         }
         return true;
@@ -137,15 +144,19 @@ $.agrarvolution.timecodeCorrection = {
      * Check parameters for fixing xmp timeFormat.
      * @return {boolean} true on success
      */
-    checkFixXmpParameter: function(parameter) {
-        if (!isNaN(Number(parameter.searchTarget)) && !isNaN(Number(parameter.framerate))) {
-            this.searchTarget = parameter.searchTarget;
-            this.searchRecursive = parameter.recurse;
-            this.logging = parameter.logging;
-        } else {
-            this.logToCEP("Error in parameters before fixing xmp timeFormat.", this.logLevels.error);
+    checkFixXmpParameters: function(parameter) {
+        parameter.framerate = Number(parameter.framerate);
+
+        if (isNaN(Number(parameter.searchTarget)) && isNaN(parameter.framerate)) {
+            this.logToCEP("Parameters are not numbers (framerate / search target). - XMP time format repair", this.logLevels.error);
             return false;
         }
+
+        this.targetFramerate = parameter.framerate;
+        this.searchTarget = parameter.searchTarget;
+        this.searchRecursive = parameter.recurse;
+        this.logging = parameter.logging;
+
         return true;
     },
     /**
@@ -397,22 +408,23 @@ $.agrarvolution.timecodeCorrection = {
      *@returns {boolean} true - on success | false if group did not exist
      */
     timeValuesToInt: function(group) {
-        if (group) {
-            if (group.hours) {
-                group.hours = Number(group.hours);
-            }
-            if (group.minutes) {
-                group.minutes = Number(group.minutes);
-            }
-            if (group.seconds) {
-                group.seconds = Number(group.seconds);
-            }
-            if (group.frames) {
-                group.frames = Number(group.frames);
-            }
-            return true;
+        if (group === undefined || group == null) {
+            return false;
         }
-        return false;
+
+        if (group.hours) {
+            group.hours = Number(group.hours);
+        }
+        if (group.minutes) {
+            group.minutes = Number(group.minutes);
+        }
+        if (group.seconds) {
+            group.seconds = Number(group.seconds);
+        }
+        if (group.frames) {
+            group.frames = Number(group.frames);
+        }
+        return true;
     },
 
     /**
@@ -535,7 +547,7 @@ $.agrarvolution.timecodeCorrection = {
             if (item.startTime === undefined && item.timeReference !== undefined && item.sampleFrequency !== undefined) {
                 item.startTime = this.samplesToTime(item.timeReference, item.sampleFrequency, 25, false);
             } else if (item.startTime === undefined) {
-                item.startTime = "00:00:00:00";
+                item.startTime = this.zeroTimecode;
             }
 
             if (addItem !== addInvalidOnly) {
@@ -711,11 +723,23 @@ $.agrarvolution.timecodeCorrection = {
         }
         var framerate = mediaItem.framerate || 25; //default safety
 
-        if (framerate === 2397 || framerate === 2398) { //catch short framerates
-            framerate = 23976;
+        switch (framerate) { //fixes wrong timeformat values
+            case 2397:
+            case 2398:
+            case 23.98:
+            case 23.97:
+                framerate = 23976;
+                break;
+            case 29.97:
+                framerate = 2997;
+                break;
+            case 59.94:
+                framerate = 5994;
+                break;
+            default:
+                break;
         }
-        // mediaItem.xmp.setProperty(XMPConst.NS_DM, "startTimeScale", "12800"); //#Todo determine whether this is needed or not
-        // mediaItem.xmp.setProperty(XMPConst.NS_DM, "startTimeSampleSize", "512");
+
         if (this.DropFrameTimecodesKeys[framerate]) {
             var timeFormat = this.timeFormats.drop;
         } else {
@@ -732,26 +756,33 @@ $.agrarvolution.timecodeCorrection = {
      * @returns {hours: number, minutes: number, seconds: number, frames: number} always with positive values
      */
     convertFramesToNewFramerate: function(time, prevFramerate, newFramerate) {
-        if (!isNaN(Number(prevFramerate)) && !isNaN(Number(newFramerate))) {
-            time.frames = Math.round(time.frames / prevFramerate * newFramerate);
-
-            if (time.frames === Math.round(newFramerate)) {
-                time.seconds++;
-                time.frames = 0;
-            }
-
-            if (time.seconds === 60) {
-                time.minutes++;
-                time.seconds = 0;
-            }
-
-            if (time.minutes === 60) {
-                time.hours = time.hours < 23 ? time.hours++ : time.hours;
-                time.minutes = 0;
-            }
+        if (isNaN(Number(prevFramerate)) || isNaN(Number(newFramerate))) {
+            return time;
         }
+
+        prevFramerate = this.normalizeFramerate(prevFramerate);
+        newFramerate = this.normalizeFramerate(newFramerate);
+
+        time.frames = Math.round(time.frames / prevFramerate * newFramerate);
+
+        if (time.frames === Math.round(newFramerate)) {
+            time.seconds++;
+            time.frames = 0;
+        }
+
+        if (time.seconds === 60) {
+            time.minutes++;
+            time.seconds = 0;
+        }
+
+        if (time.minutes === 60) {
+            time.hours = time.hours < 23 ? time.hours++ : time.hours;
+            time.minutes = 0;
+        }
+
         return time;
     },
+
     /**
      * Creates a timestring from a given time object. 
      * 00:00:00:00
@@ -760,6 +791,7 @@ $.agrarvolution.timecodeCorrection = {
      * @param {boolean} isDropFrame determines delimiter
      */
     createTimecodeFromObj: function(time, isDropFrame, framerate) {
+        framerate = this.normalizeFramerate(framerate);
         var timecode = [
             this.padZero(time.hours, 2),
             this.padZero(time.minutes, 2),
@@ -890,7 +922,24 @@ $.agrarvolution.timecodeCorrection = {
         }
         return 1;
     },
-
+    /**
+     * Convert framesrates from integer values to floats.
+     * This fixes an issues where these framerates could be mixed in code.
+     * @param {number} framerate
+     * @param {number}
+     */
+    normalizeFramerate: function(framerate) {
+        if (framerate === 23976) {
+            return 23.976;
+        }
+        if (framerate > 1000) {
+            return framerate / 100;
+        }
+        if (framerate > 10000) {
+            return framerate / 1000;
+        }
+        return framerate;
+    },
     /**
      *CSXSEvent wrapping function to send log messages to the gui.
      *@param {string} text - text that should be sent to gui

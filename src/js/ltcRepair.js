@@ -15,9 +15,6 @@ let host = '';
 
 const logger = new Logger();
 
-let fileEl = null;
-let csvLink = null;
-
 const settingsKey = "autoTimecodeRepair.settings";
 const defaultSettings = {
     logging: false,
@@ -32,26 +29,21 @@ const csvVersion = {
     ttc116: 'tentacletimecodetool_1.16'
 };
 
-let lockForm = false,
-    lockFormFix = false;
+let lockForm = false;
 
 $(function () {
     onLoaded();
     logger.init($('#log'), $('#loggingArea')[0], $('#explainer'), $('#errorDisplay'));
 
-    fileEl = $('#file');
-    csvLink = $('#csvDownload');
-
     host = setHostinDOM();
     onAppThemeColorChanged();
 
-    let csInterface = new CSInterface();
+    const csInterface = new CSInterface();
     csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, onAppThemeColorChanged);
     csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
         logger.addLog(e.data.text, e.data.logLevel);
     });
     csInterface.requestOpenExtension("com.agrarvolution.autoTimecodeCorrection.server", "");
-    //localServer = cep_node.require(__dirname + '/server/main.js')();
 
     //restore settings
     settings = loadSettings();
@@ -83,22 +75,22 @@ $(function () {
             logger.addLog("Settings successfully stored.", Logger.LOG_LEVELS.info);
         };
     }
-    $('#update-xmp-timevalue').on('click', function (e) {
+    $('#rebase-xmp-timevalue').on('click', function (e) {
         e.preventDefault();
-        if (lockFormFix) {
+        if (lockForm) {
             return false;
         }
-        lockFormFix = true;
+        lockForm = true;
 
         fixXMP(false);
     });
 
     $('#cleanup-xmp').on('click', function (e) {
         e.preventDefault();
-        if (lockFormFix) {
+        if (lockForm) {
             return false;
         }
-        lockFormFix = true;
+        lockForm = true;
 
         fixXMP(true);
     });
@@ -125,42 +117,6 @@ function fixXMP(type) {
     csInterface.evalScript(`$.agrarvolution.timecodeCorrection.fixXmpTimeFormat(${JSON.stringify(csObject)});`, function (e) {
         if (e === 'true') {
             logger.addLog("Time format was repaired.", Logger.LOG_LEVELS.status);
-        } else if (e === 'false') {
-            logger.addLog("Media hasn't been updated. Process stopped.", Logger.LOG_LEVELS.status);
-        }
-        lockForm = false;
-    });
-}
-
-/**
- * Alternative way of changing timecode.
- */
-function timecodeFromMetadata() {
-    let logMessage = '';
-    switch (settings.source) {
-        case TIMECODE_SOURCE.created:
-            logMessage = "Creating timecode from creation time.";
-            break;
-        case TIMECODE_SOURCE.lastChanged:
-            logMessage = "Creating timecode from time last changed.";
-            break;
-        default:
-            logger.addLog('Code took wrong path - erroneously in metadata path.', Logger.LOG_LEVELS.error);
-            lockForm = false;
-            return false;
-    }
-    logger.addLog(logMessage, Logger.LOG_LEVELS.status);
-
-    let csObject = {
-        searchTarget: settings.searchTarget,
-        source: settings.source,
-        logging: logger.verboseLogging
-    };
-
-    let csInterface = new CSInterface();
-    csInterface.evalScript('$.agrarvolution.timecodeCorrection.timecodesFromMetadata(' + JSON.stringify(csObject) + ');', function (e) {
-        if (e === 'true') {
-            logger.addLog("Media has been updated. Process finished. Select the next file to be processed.", Logger.LOG_LEVELS.status);
         } else if (e === 'false') {
             logger.addLog("Media hasn't been updated. Process stopped.", Logger.LOG_LEVELS.status);
         }
