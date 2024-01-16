@@ -9,8 +9,10 @@ var timeCorrection = $.agrarvolution.timecodeCorrection;
 //timeCorrection.metaDataOfSelected();
 
 // timeCorrection.timecodesFromMetadata({
-//     searchTarget: 2,
-//     source: $.agrarvolution.timecodeCorrection.TIMECODE_SOURCE.created,
+//     searchTarget: 0,
+//     source: $.agrarvolution.timecodeCorrection.TIMECODE_SOURCE.lastChanged,
+//     framerate: "5994",
+//     overrideFramerate: true,
 //     logging: true
 // });
 
