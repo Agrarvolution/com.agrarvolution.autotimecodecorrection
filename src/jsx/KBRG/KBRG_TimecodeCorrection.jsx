@@ -705,11 +705,10 @@ $.agrarvolution.timecodeCorrection = {
     /**
      * Helper function to add default framerate information to an empty file.
      */
-    setEmptyStartTimeProperty: function(mediaItem, framerate) {
+    setEmptyStartTimeProperty: function(mediaItem, framerate = 25) {
         if (mediaItem.tcStruct === '') {
             return false;
         }
-        framerate = framerate || 25; //default safety
         // mediaItem.xmp.setProperty(XMPConst.NS_DM, "startTimeScale", "12800"); //#Todo determine whether this is needed or not
         // mediaItem.xmp.setProperty(XMPConst.NS_DM, "startTimeSampleSize", "512");
         if (this.DropFrameTimecodesKeys[framerate]) {
