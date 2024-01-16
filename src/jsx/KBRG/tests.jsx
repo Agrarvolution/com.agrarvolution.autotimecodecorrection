@@ -37,11 +37,11 @@ timeCorrection.revertChanges({
 });*/
 
 // timeCorrection.fixXmpTimeFormat({
-//     framerate: 25,
+//     framerate: 50,
 //     searchTarget: $.agrarvolution.timecodeCorrection.SCAN_TARGET.selection,
 //     recursive: 1,
 //     logging: true,
-//     errorOnly: true
+//     errorOnly: false
 // });
 
 
