@@ -359,6 +359,7 @@ $.agrarvolution.timecodeCorrection = {
             this.searchRecursive = tcObject.searchRecursive;
             this.searchTarget = tcObject.searchTarget;
             this.ignoreMediaStart = tcObject.ignoreMediaStart;
+            this.overrideFramerate = tcObject.overrideFramerate || false;
             this.logging = tcObject.logging
             this.logToCEP("Values have successfully arrived in host.", this.logLevels.status);
 
@@ -659,6 +660,11 @@ $.agrarvolution.timecodeCorrection = {
         // @Todo -> set flag if conversion should be by total frames or last frames only (premiere one works last frame only)
     */
     changeStartTime: function(update, mediaItem) {
+        if (this.overrideFramerate || this.media[i].framerate === 0) {
+            mediaItem.framerate = update.framerate;
+            mediaItem.isDropFrame = update.isDropFrame;
+        }
+
         this.setEmptyStartTimeProperty(mediaItem);
 
         var startTime = {};

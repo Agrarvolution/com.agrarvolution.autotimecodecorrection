@@ -269,6 +269,7 @@ function handleFileLoad(file) {
         searchRecursive: settings.searchRecursive,
         searchTarget: settings.searchTarget,
         ignoreMediaStart: settings.ignoreMediaStart,
+        overrideFramerate: settings.overrideFramerate,
         logging: logger.verboseLogging
     };
 
