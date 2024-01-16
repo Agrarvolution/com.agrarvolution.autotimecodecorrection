@@ -118,7 +118,7 @@ $(function () {
         let form = document.forms['atc'];
 
         if (host !== 'kbrg' || settings.source === TIMECODE_SOURCE.file) {
-            let validation = validateForm(form);
+            let validation = validateFile();
 
             if (!validation) {
                 logger.addLog('Process canceled. Inputs are invalid.', Logger.LOG_LEVELS.status);
@@ -645,17 +645,18 @@ function updateSourceInterface() {
 
 /**
  * Validates the source file path.
- * @param {*} form 
+ * 
  */
-function validateForm(form) {
-    if (form[0].files.length === 0) {
+function validateFile() {
+    const fileElement = $('#source')[0];
+    if (fileElement.files.length === 0) {
         logger.addLog('No file has been selected.', Logger.LOG_LEVELS.status);
         return false;
-    } else if (form[0].files[0].size === 0) {
+    } else if (fileElement.files[0].size === 0) {
         logger.addLog('Selection is not a file.', Logger.LOG_LEVELS.status);
         return false;
-    } else if (!(form[0].files[0].type === 'text/csv' || form[0].files[0].type === 'application/vnd.ms-excel')) {
+    } else if (!(fileElement.files[0].type === 'text/csv' || fileElement.files[0].type === 'application/vnd.ms-excel')) {
         logger.addLog('File type does not match.', Logger.LOG_LEVELS.info);
     }
-    return form[0].files[0];
+    return fileElement.files[0];
 }
