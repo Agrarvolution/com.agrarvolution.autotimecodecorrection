@@ -295,7 +295,7 @@ $.agrarvolution.timecodeCorrection = {
                 this.media[i].isDropFrame = this.targetFramerateisDropFrame;
 
             }
-            this.setEmptyStartTimeProperty(this.media[i], this.media[i].framerate);
+            this.setEmptyStartTimeProperty(this.media[i]);
 
             var time = Date.now();
 
@@ -705,11 +705,15 @@ $.agrarvolution.timecodeCorrection = {
     /**
      * Helper function to add default framerate information to an empty file.
      */
-    setEmptyStartTimeProperty: function(mediaItem, framerate) {
+    setEmptyStartTimeProperty: function(mediaItem) {
         if (mediaItem.tcStruct === '') {
             return false;
         }
-        framerate = framerate || 25; //default safety
+        var framerate = mediaItem.framerate || 25; //default safety
+
+        if (framerate === 2397 || framerate === 2398) { //catch short framerates
+            framerate = 23976;
+        }
         // mediaItem.xmp.setProperty(XMPConst.NS_DM, "startTimeScale", "12800"); //#Todo determine whether this is needed or not
         // mediaItem.xmp.setProperty(XMPConst.NS_DM, "startTimeSampleSize", "512");
         if (this.DropFrameTimecodesKeys[framerate]) {
