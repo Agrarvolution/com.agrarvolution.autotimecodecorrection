@@ -112,7 +112,6 @@ $(function () {
             return false;
         }
         lockForm = true;
-        let form = document.forms['atc'];
 
         if (host !== 'kbrg' || settings.source === TIMECODE_SOURCE.file) {
             let validation = validateFile();
@@ -130,7 +129,7 @@ $(function () {
 
     $('#revert').on('click', function (e) {
         e.preventDefault();
-        if (lockFormFix || host !== 'kbrg') {
+        if (lockForm || host !== 'kbrg') {
             return false;
         }
         lockForm = true;
@@ -141,7 +140,7 @@ $(function () {
 
     $('#csv').on('click', function (e) {
         e.preventDefault();
-        if (lockFormFix || host !== 'kbrg') {
+        if (lockForm || host !== 'kbrg') {
             return false;
         }
         logger.addLog("Exporting timecodes stored in metadata.", Logger.LOG_LEVELS.status);
