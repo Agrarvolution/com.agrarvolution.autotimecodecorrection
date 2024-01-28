@@ -1,6 +1,6 @@
 #include 'KBRG_TimecodeCorrection.jsx';
 
-var timeCorrection = $.agrarvolution.timecodeCorrection;
+var timeCorrection = Agrarvolution.timecodeCorrection;
 
 //timeCorrection.cacheMediaObjects();
 //timeCorrection.processInput(tcObject);
@@ -10,7 +10,7 @@ var timeCorrection = $.agrarvolution.timecodeCorrection;
 
 // timeCorrection.timecodesFromMetadata({
 //     searchTarget: 0,
-//     source: $.agrarvolution.timecodeCorrection.TIMECODE_SOURCE.lastChanged,
+//     source: Agrarvolution.timecodeCorrection.TIMECODE_SOURCE.lastChanged,
 //     framerate: "5994",
 //     overrideFramerate: true,
 //     logging: true
@@ -41,7 +41,7 @@ timeCorrection.revertChanges({
 
 // timeCorrection.fixXmpTimeFormat({
 //     framerate: 50,
-//     searchTarget: $.agrarvolution.timecodeCorrection.SCAN_TARGET.selection,
+//     searchTarget: Agrarvolution.timecodeCorrection.SCAN_TARGET.selection,
 //     recursive: 1,
 //     logging: true,
 //     errorOnly: false

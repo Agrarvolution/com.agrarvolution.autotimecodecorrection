@@ -14,9 +14,9 @@ try {
 XMPConst.NS_BWF = "http://ns.adobe.com/bwf/bext/1.0/";
 
 //define namespace
-$.agrarvolution = $.agrarvolution || {};
+var Agrarvolution = Agrarvolution || {};
 
-$.agrarvolution.timecodeCorrection = {
+Agrarvolution.timecodeCorrection = {
     AllowedMediaTypes: [
         'mp4', 'av1', 'mov', 'ogg', 'ogv', 'mkv', 'webm',
         'wav', 'bwf', 'rf64', 'amb', 'acc', 'aif', 'aiff', 'aifc', 'mp2', 'mp3', '3gp', 'wma', 'flac', 'ape'

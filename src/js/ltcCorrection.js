@@ -159,7 +159,7 @@ function exportCSV() {
     };
 
     const csInterface = new CSInterface();
-    csInterface.evalScript('$.agrarvolution.timecodeCorrection.gatherTimecodes(' +
+    csInterface.evalScript('Agrarvolution.timecodeCorrection.gatherTimecodes(' +
         JSON.stringify(csObject) + ');', async function (e) {
             logger.addLog("Timecodes arrived in frontend.", Logger.LOG_LEVELS.status);
             try {
@@ -197,7 +197,7 @@ function revertTimecodechanges() {
     };
 
     const csInterface = new CSInterface();
-    csInterface.evalScript('$.agrarvolution.timecodeCorrection.revertChanges(' +
+    csInterface.evalScript('Agrarvolution.timecodeCorrection.revertChanges(' +
         JSON.stringify(csObject) + ');', function (e) {
             if (e === 'true') {
                 logger.addLog("Timecode changes have been reverted. Old values were stored.", Logger.LOG_LEVELS.status);
@@ -235,7 +235,7 @@ function timecodeFromMetadata() {
     };
 
     let csInterface = new CSInterface();
-    csInterface.evalScript('$.agrarvolution.timecodeCorrection.timecodesFromMetadata(' + JSON.stringify(csObject) + ');', function (e) {
+    csInterface.evalScript('Agrarvolution.timecodeCorrection.timecodesFromMetadata(' + JSON.stringify(csObject) + ');', function (e) {
         if (e === 'true') {
             logger.addLog("Media has been updated. Process finished. Select the next file to be processed.", Logger.LOG_LEVELS.status);
         } else if (e === 'false') {
@@ -276,7 +276,7 @@ function handleFileLoad(file) {
         logger.addLog(result, Logger.LOG_LEVELS.info);
     });
 
-    csInterface.evalScript('$.agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function (e) {
+    csInterface.evalScript('Agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function (e) {
         if (e === 'true') {
             logger.addLog("Media has been updated. Process finished. Select the next file to be processed.", Logger.LOG_LEVELS.status);
             $('#source')[0].value = "";
