@@ -1,3 +1,4 @@
+
 function CacheThumbnails(parameters) {
 
 }
@@ -8,7 +9,7 @@ function CacheThumbnails(parameters) {
  *@param {boolean} toggleInvalid either caches every thumbnail or only thumbnails with invalid timecodes
  *@returns {boolean} false - not processed times, thus useless for comparisons, true - everything worked
  */
-CacheThumbnails.prototype.cacheMediaObjects = function(parameters, toggleInvalid) {
+CacheThumbnails.prototype.cacheMediaObjects = function (parameters, toggleInvalid) {
     var i = 0;
     var mediaCache = [];
 
@@ -63,7 +64,7 @@ CacheThumbnails.prototype.cacheMediaObjects = function(parameters, toggleInvalid
  *@param {Object} thumb Bridge folder element, see CEP reference
  *@param {object} parameters 
  */
-CacheThumbnails.prototype.processThumbnail = function(thumb, parameters) {
+CacheThumbnails.prototype.processThumbnail = function (thumb, parameters) {
     if (thumb.type === this.ThumbnailTypes.file && thumb.hasMetadata) {
         var timecodeMetadataStruct = thumb.mimeType.match('audio') ? 'startTimecode' : 'altTimecode';
 
