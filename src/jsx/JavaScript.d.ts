@@ -2709,25 +2709,3 @@ type Pick<T, K extends keyof T> = { [P in K]: T[P] }
  */
 type Record<K extends string, T> = { [P in K]: T }
 
-//relates to Bridge Thumbnail objects
-declare class Thumbnail {
-    type: string
-    name: string
-    mimeType: string
-    hasMetadata: boolean
-    synchronousMetadata: any
-
-}
-declare class ThumbnailMetadata {
-
-}
-declare class Timecode {
-  framerate: number
-  hours: number
-  minutes: number
-  seconds: number
-  frames: number
-}
-declare class CacheThumbnails {
-
-}
