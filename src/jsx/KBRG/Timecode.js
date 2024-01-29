@@ -89,20 +89,33 @@ Timecode.prototype.validateTime = function () {
     // accounts for time tickover
     if (this.framerate <= 0) {
         this.frames = 0;
-    } else if (this.frames > this.framerate) {
+    } else {
         this.seconds += Math.floor(this.frames / this.framerate);
-        this.frames = Math.floor(this.frames % this.framerate);
+        this.frames = Math.floor(this.frames % this.framerate); //clamp
     }
-    if (this.seconds > 60) {
-        this.minutes += Math.floor(this.seconds / 60);
-        this.seconds = this.seconds % 60;
+
+    if (this.frames < 0) { //negative rollover
+        this.frames = this.framerate + this.frames;
     }
-    if (this.minutes > 60) {
-        this.hours += Math.floor(this.minutes / 60);
-        this.minutes = this.minutes % 60;
+
+    this.minutes += Math.floor(this.seconds / 60);
+    this.seconds = this.seconds % 60; //clamp
+
+    if (this.seconds < 0) { //negative rollover
+        this.seconds = 60 + this.seconds;
     }
-    if (this.hours > 24) {
-        this.hours = this.hours % 24;
+
+    this.hours += Math.floor(this.minutes / 60);
+    this.minutes = this.minutes % 60; //clamp
+
+    if (this.minutes < 0) { //negative rollover
+        this.minutes = 60 + this.minutes;
+    }
+
+    this.hours = this.hours % 24; //clamp
+
+    if (this.hours < 0) { //negative rollover
+        this.hours = 24 + this.hours;
     }
 }
 
