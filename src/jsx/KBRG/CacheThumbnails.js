@@ -6,7 +6,6 @@ CacheThumbnails.THUMBNAIL_TYPES = {
     app: 'application',
     other: 'other'
 };
-
 /**
  * Constructer for a thumbnail cache.
  * @param {object} parameters has to contain a search target, folder search and whether only erroneous thumbnails should be added 
@@ -22,6 +21,8 @@ function CacheThumbnails(parameters, logCallback) {
     this.searchTarget = parameters.searchTarget || Agrarvolution.timecodeCorrection.folder;
     this.searchRecursive = parameters.searchRecursive || false;
     this.errorOnly = parameters.errorOnly || false;
+    this.logTarget = parameters.logTarget || 0;
+    this.logging = parameters.logging || false;
     this.mediaCache = [];
 }
 
@@ -45,16 +46,16 @@ CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function () {
         this.extractTimecodeFromThumbnail(app.document.selections[i]);
     }
 
-    if (hasNoSelection || this.searchTarget === this.SCAN_TARGET.folder) { // remove selection if there was none before
+    if (hasNoSelection || this.searchTarget === Agrarvolution.timecodeCorrection.SCAN_TARGET.folder) { // remove selection if there was none before
         app.document.deselectAll()
     }
 
-    if (this.splitTimesToNumbers()) {
-        this.logging("Processing time strings was successfull.", Agrarvolution.logLevel.status);
-    } else {
-        this.logging("Processing time strings was unsuccessfull.", Agrarvolution.logLevel.critical);
-        return false;
-    }
+    // if (this.splitTimesToNumbers()) {
+    //     this.logging("Processing time strings was successfull.", Agrarvolution.logLevel.status);
+    // } else {
+    //     this.logging("Processing time strings was unsuccessfull.", Agrarvolution.logLevel.critical);
+    //     return false;
+    // }
 
     // //extended log
     // if (parameters.logging) {
@@ -77,6 +78,12 @@ CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function () {
     // }
     return true;
 }
+
+
+CacheThumbnails.prototype.toString = function() {
+
+}
+
 /**
  *Processes a single project item. 
  *If it is a folder, it will call this method for all its children (depending on the settings.)
@@ -90,30 +97,17 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb) {
         }
         return;
     }
-    if (thumb.type === CacheThumbnails.THUMBNAIL_TYPES.file && thumb.hasMetadata) {
-        var metaThumb = new ThumbnailMetadata(thumb);
-
-        if (metaThumb.extractMetadata() !== this.errorOnly) {
-            this.mediaCache.push(metaThumb);
-        }
+    if (thumb.type !== CacheThumbnails.THUMBNAIL_TYPES.file || !thumb.hasMetadata) {
+        return;
     }
-}
 
+    var metaThumb = new ThumbnailMetadata(thumb);
+    var metaDataExtractionSuccessful = metaThumb.extractMetadata();
 
-/**
- *Calls splitTimeToNumber for duration and startTime for every object in the media array.
- *@returns {boolean} false on any error | true on success
- */
-CacheThumbnails.prototype.splitTimesToNumbers = function () {
-    for (var i = 0; i < this.media.length; i++) {
-        var startTimeMatch = CacheThumbnails.splitTimeToNumber(this.media[i].startTime, this.media[i].framerate);
-        if (!startTimeMatch) {
-            this.logToCEP(this.media[i].name + " - Couldn't process start time. (" + this.media[i].startTime + ")", Agrarvolution.logLevels.status);
-        }
-        this.media[i].startTime = startTimeMatch;
-
-        var prevTimeMatch = CacheThumbnails.splitTimeToNumber(this.media[i].prevStartTime, this.media[i].framerate);
-        this.media[i].prevStartTime = prevTimeMatch;
+    if (!metaDataExtractionSuccessful) {
+        this.logging(`Metadata extraction of ${metaThumb} was unsuccessful.`, Agrarvolution.logLevel.info, this.logTarget, this.logging);
     }
-    return true;
+    if (metaDataExtractionSuccessful !== this.errorOnly) {
+        this.mediaCache.push(metaThumb);
+    }
 }
