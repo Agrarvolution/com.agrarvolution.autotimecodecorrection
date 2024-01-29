@@ -23,9 +23,13 @@ function Timecode(text, framerate) {
     // doesn't use total frame to avoid dropframe issues
 }
 
+/**
+ * Overrides standard toString() method of objects.
+ * @returns {string} timecode as hh:mm:ss:ff* (or ; on dropframe)
+ */
 Timecode.prototype.toString = function () {
     var delimiter = this.isDropframe ? ';' : ':';
-    var framerateDigits = Number.parseInt(this.framerate).toString().length;
+    var framerateDigits = Math.floor(this.framerate).toString().length;
 
     return Timecode.padZero(this.hours, 2) + delimiter +
         Timecode.padZero(this.minutes, 2) + delimiter +
@@ -39,7 +43,7 @@ Timecode.prototype.toString = function () {
  * @return {number} samples
  */
 Timecode.prototype.toSamples = function (sampleFrequency) {
-    if (Number.isNaN(Number(sampleFrequency))) {
+    if (isNaN(Number(sampleFrequency))) {
         return 0;
     }
     return ((((this.hours * 60) + this.minutes) * 60) + this.seconds + this.frames / this.framerate) * sampleFrequency;
@@ -53,7 +57,7 @@ Timecode.prototype.toSamples = function (sampleFrequency) {
  *@return {boolean} 
  */
 Timecode.prototype.updateFromSamples = function (samples, sampleFrequency, framerate) {
-    if (Number.isNaN(Number(samples)) || Number.isNaN(Number(sampleFrequency))) {
+    if (isNaN(Number(samples)) || isNaN(Number(sampleFrequency))) {
         return false;
     }
 
@@ -128,7 +132,7 @@ Timecode.validateFramerate = function (framerate) {
 *@returns {boolean|object} false on failure | matched group on success
 */
 Timecode.validateTime = function (time, framerate) {
-    if (time == null || !time.length || time.length !== 4 || Number.isNaN(Number(framerate))) {
+    if (time == null || !time.length || time.length !== 4 || isNaN(Number(framerate))) {
         return false;
     }
     var groups = {};
@@ -137,30 +141,30 @@ Timecode.validateTime = function (time, framerate) {
     groups.seconds = Number(time[2]);
     groups.frames = Number(time[3]);
 
-    if (Number.isNaN(groups.hours)) {
+    if (isNaN(groups.hours)) {
         groups.hours = 0;
     }
-    if (Number.isNaN(groups.minutes)) {
+    if (isNaN(groups.minutes)) {
         groups.minutes = 0;
     }
-    if (Number.isNaN(groups.seconds)) {
+    if (isNaN(groups.seconds)) {
         groups.seconds = 0;
     }
-    if (Number.isNaN(groups.frames)) {
+    if (isNaN(groups.frames)) {
         groups.frames = 0;
     }
 
     // accounts for time tickover
     if (groups.frames > framerate) {
-        groups.seconds += Number.parseInt(groups.frames / framerate);
-        groups.frames = Number.parseInt(groups.frames % framerate);
+        groups.seconds += Math.floor(groups.frames / framerate);
+        groups.frames = Math.floor(groups.frames % framerate);
     }
     if (groups.seconds > 60) {
-        groups.minutes += Number.parseInt(groups.seconds / 60);
+        groups.minutes += Math.floor(groups.seconds / 60);
         groups.seconds = groups.seconds % 60;
     }
     if (groups.minutes > 60) {
-        groups.hours += Number.parseInt(groups.minutes / 60);
+        groups.hours += Math.floor(groups.minutes / 60);
         groups.minutes = groups.minutes % 60;
     }
     if (groups.hours > 24) {
