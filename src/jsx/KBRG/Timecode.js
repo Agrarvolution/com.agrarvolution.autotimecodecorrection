@@ -91,11 +91,11 @@ Timecode.prototype.validateTime = function () {
         this.frames = 0;
     } else {
         this.seconds += Math.floor(this.frames / this.framerate);
-        this.frames = Math.floor(this.frames % this.framerate); //clamp
+        this.frames = Math.round(this.frames % this.framerate); //clamp
     }
 
     if (this.frames < 0) { //negative rollover
-        this.frames = this.framerate + this.frames;
+        this.frames = Math.round(this.framerate + this.frames);
     }
 
     this.minutes += Math.floor(this.seconds / 60);
