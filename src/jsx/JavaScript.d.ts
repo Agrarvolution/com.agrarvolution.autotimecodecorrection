@@ -190,7 +190,7 @@ interface ObjectConstructor {
    * Creates and returns a new object of a given type.
    * @param what The object type.
    */
-  new (what: any): Object
+  new(what: any): Object
   (): any
   (what: any): any
 
@@ -206,6 +206,7 @@ declare const Object: ObjectConstructor
  * The base class of all JavaScript objects.
  */
 interface Object {
+  
   /**
    * Points to the constructor function that created this object.
    * Note that this property is treated as an XML element in the XML class.
@@ -280,6 +281,7 @@ interface Object {
   watch(name: string, func: Function): void
 }
 
+
 interface ArrayConstructor {
   readonly prototype: Array<any>
 
@@ -289,7 +291,7 @@ interface ArrayConstructor {
    * @param arrayLength If no other parameters are passed, the initial length of the empty array. Otherwise, the first element.
    * @param values If there is more than one parameter, the array is initialized with the given parameters.
    */
-  new (arrayLength?: number): any[]
+  new(arrayLength?: number): any[]
   new <T>(arrayLength: number): T[]
   new <T>(...values: T[]): T[]
   (arrayLength?: number): any[]
@@ -563,10 +565,10 @@ interface DateConstructor {
    * @param sec An Integer value from 0 to 59. If this argument is not supplied, its value is set to 0.
    * @param ms An integer value from 0 to 999. If this argument is not supplied, its value is set to 0.
    */
-  new (): Date
-  new (value: number): Date
-  new (value: string): Date
-  new (
+  new(): Date
+  new(value: number): Date
+  new(value: string): Date
+  new(
     year: number,
     month: number,
     day?: number,
@@ -876,7 +878,7 @@ interface FunctionConstructor {
    * @param arguments The list of formal arguments, separated by commas. The formal arguments can also be supplied one by one; in this case, the last argument to the Function constructor is considered to be the function body.
    * @param body The body of the function to create.
    */
-  new (arguments: string, body: string): Function
+  new(arguments: string, body: string): Function
   (arguments: string, body: string): Function
 }
 declare const Function: FunctionConstructor
@@ -941,7 +943,7 @@ interface StringConstructor {
    * Returns a string representation of the value given as an argument.
    * @param value A number, variable, or object to convert to a string.
    */
-  new (value?: any): String
+  new(value?: any): String
   (value: any): string
 
   /**
@@ -1173,7 +1175,7 @@ interface NumberConstructor {
    * Returns a new Number object set to the value of the argument converted to a number.
    * @param value The value of the object being created.
    */
-  new (value?: any): Number
+  new(value?: any): Number
   (value: any): number
 
   /**
@@ -1254,7 +1256,7 @@ interface BooleanConstructor {
    * Creates and returns a new Boolean object set to the value of the argument converted to a boolean.
    * @param value The value to be converted to a Boolean.
    */
-  new (value?: any): Boolean
+  new(value?: any): Boolean
   (value: any): boolean
 }
 declare const Boolean: BooleanConstructor
@@ -1289,7 +1291,7 @@ interface RegExpConstructor {
    * @param pattern The pattern to convert.
    * @param flags Flags that control how the conversion is performed. A string containing any combination of the letters i, m, g: "i" -- ignore case in pattern matching "m" -- treat the string as multiple lines "g" -- do global pattern matching
    */
-  new (pattern: string | RegExp, flags?: string): RegExp
+  new(pattern: string | RegExp, flags?: string): RegExp
   (pattern: string | RegExp, flags?: string): RegExp
 
   /**
@@ -1427,7 +1429,7 @@ interface ErrorConstructor {
    * @param file The name of the file.
    * @param line The line number.
    */
-  new (msg: string, file?: string, line?: number): Error
+  new(msg: string, file?: string, line?: number): Error
   (msg: string, file?: string, line?: number): Error
 }
 declare const Error: ErrorConstructor
@@ -1459,7 +1461,7 @@ interface FileConstructor {
    * Creates and returns a new File object referring to a given file system location.
    * @param path The full or partial path name of the file,in platform-specific or URI format. The value stored in the object is the absolute path. The file that the path refers to does not need to exist.If the path refers to an existing folder: The File function returns a Folder object instead of a File object. The new operator returns a File object for a nonexisting file with the same name.
    */
-  new (path?: string): File
+  new(path?: string): File
   (path?: string): File
 
   /**
@@ -1788,7 +1790,7 @@ interface FolderConstructor {
    * If the path name refers to an already existing disk file, a File object is returned instead.Returns the new Folder object.
    * @param path The absolute or relative path to the folder associated with this object, specified in URI format. The value stored in the object is the absolute path.The path need not refer to an existing folder. If the path refers to an existing file, rather than a folder: The Folder() function returns a File object instead of a Folder object. The new operator returns a Folder object for a nonexisting folder with the same name.
    */
-  new (path?: string): Folder
+  new(path?: string): Folder
   (path?: string): Folder
 
   /**
@@ -2048,7 +2050,7 @@ interface SocketConstructor {
   /**
    * Creates a new Socket object.
    */
-  new (): Socket
+  new(): Socket
   (): Socket
 }
 declare const Socket: SocketConstructor
@@ -2286,7 +2288,7 @@ interface QNameConstructor {
    * @param uri The URI, specified as a Namespace object, an existing QName object, or string. If this is a Namespace object, the URI is set to the namespace URI, and there is no local name. If this is a QName object, the URI and localName is set to those of that object. If this is a string, the URI is set to that string.
    * @param name The local name. Used only if URI is given as a string.
    */
-  new (uri: any, name?: string): QName
+  new(uri: any, name?: string): QName
   (uri: any, name?: string): QName
 }
 declare const QName: QNameConstructor
@@ -2314,7 +2316,7 @@ interface NamespaceConstructor {
    * @param prefix The URIprefix, specified as an existing Namespace object, QName object, or string. If this is a Namespace or a QName object, the URI and prefix are set to that of the object. If this is a string, the prefix is set to that string, and the URI must be specified.
    * @param uri The URI if the prefix is specified as a string.
    */
-  new (prefix: any, uri?: string): Namespace
+  new(prefix: any, uri?: string): Namespace
   (prefix: any, uri?: string): Namespace
 }
 declare const Namespace: NamespaceConstructor
@@ -2341,7 +2343,7 @@ interface XMLConstructor {
    * Parses an XML string. Throws an error if the XML is incorrect.
    * @param text The text to parse.
    */
-  new (text: string): XML
+  new(text: string): XML
   (text: string): XML
 
   /**
@@ -2618,7 +2620,7 @@ interface XML {
  * An XML list object.
  * In this implementation, an XMLList object is synonymous to the XML object. The constructor accepts an XML list, but everything else works like theXML object.
  */
-interface XMLList {}
+interface XMLList { }
 declare const XMLList: XMLList
 
 interface UnitValueConstructor {
@@ -2627,7 +2629,7 @@ interface UnitValueConstructor {
   /**
    * Creates a new UnitValue object.
    */
-  new (value: string | UnitValue): UnitValue
+  new(value: string | UnitValue): UnitValue
   (value: string | UnitValue): UnitValue
 
   /**
@@ -2706,3 +2708,11 @@ type Pick<T, K extends keyof T> = { [P in K]: T[P] }
  * Construct a type with a set of properties K of type T
  */
 type Record<K extends string, T> = { [P in K]: T }
+
+declare class Timecode {
+  framerate: number
+  hours: number
+  minutes: number
+  seconds: number
+  frames: number
+}
