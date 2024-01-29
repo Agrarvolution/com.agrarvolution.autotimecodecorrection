@@ -1,10 +1,5 @@
 Timecode.ZERO_TIMECODE = "00:00:00:00";
-Timecode.DROP_FRAME_TIMECODES = {
-    //"23976": 23.976,
-    "2997": 29.97,
-    "5994": 59.94,
-    "11988": 119.88
-};
+
 Timecode.DROP_FRAME_TIMECODE_KEYS = [
     /*23976,*/
     29.97, 59.94, 119.88
@@ -41,7 +36,7 @@ function Timecode(timecode, framerate) {
     } else if (typeof timecode === 'number') {
         this.frames = timecode;
     } else if (typeof timecode === 'string') {
-        this.setFromArray(Timecode.splitTimecodeTextToNumber(timecode, framerate));
+        this.setFromArray(Timecode.splitTimecodeTextToNumber(timecode));
     }
 
     this.validateTime();
@@ -294,10 +289,9 @@ Timecode.prototype.toValue = function () {
 /**
  *Processes a time string into separate values and call validateTime to convert the separate values into numbers.
  *@param {string} timeText "hh:mm:ss:ff*"
- *@param {number} framerate
  *@returns {array} array containing time time values 0..hours to 3..frames, empty array on failure
  */
-Timecode.splitTimecodeTextToNumber = function (timeText, framerate) {
+Timecode.splitTimecodeTextToNumber = function (timeText) {
     if (timeText === undefined) {
         return [];
     }
@@ -339,15 +333,26 @@ Timecode.createTimecodeFromSamples = function (samples, sampleFrequency, framera
 
 /**
  * Validate framerate replaces invalid inputs with 0.
- * @param {number} framerate 
- * @returns 
+ * @important The logic assumes that values given with string originate from XMP metadata and thus are 100x too large. This is a possible sideeffect.
+ * @param {number|string} framerate 
+ * @returns {number}
  */
 Timecode.validateFramerate = function (framerate) {
-    framerate = Number(framerate);
-    if (isNaN(framerate)) {
-        framerate = 0;
+    var correctedframerate = Number(framerate);
+
+    if (typeof framerate === 'string' && correctedframerate >= 1000) { //correct for timecode extraction from XMP.timeFormat
+        correctedframerate /= 100;
     }
-    return framerate;
+
+    if (//correctedframerate === 2397 || correctedframerate === 2398 ||
+        correctedframerate === 23.98 || correctedframerate === 23.97) {
+        correctedframerate = 23.976; //correct for a rounding error
+    }
+
+    if (isNaN(correctedframerate)) {
+        correctedframerate = 0; //default 0
+    }
+    return correctedframerate;
 }
 
 /**
