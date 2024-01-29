@@ -2709,10 +2709,17 @@ type Pick<T, K extends keyof T> = { [P in K]: T[P] }
  */
 type Record<K extends string, T> = { [P in K]: T }
 
+//relates to Bridge Thumbnail objects
+declare class Thumbnail {
+
+}
 declare class Timecode {
   framerate: number
   hours: number
   minutes: number
   seconds: number
   frames: number
+}
+declare class CacheThumbnails {
+
 }
