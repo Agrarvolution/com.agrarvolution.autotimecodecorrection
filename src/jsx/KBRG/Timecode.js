@@ -1,5 +1,8 @@
 Timecode.ZERO_TIMECODE = "00:00:00:00";
-
+/** Possible values according to xmpDM spec.
+ * Non Drop timecodes variants are ignored.
+ * @see https://developer.adobe.com/xmp/docs/XMPNamespaces/XMPDataTypes/Timecode/
+ */
 Timecode.DROP_FRAME_TIMECODE_KEYS = [
     /*23976,*/
     29.97, 59.94, 119.88
@@ -389,13 +392,13 @@ Timecode.isDropFrame = function (framerate) {
  */
 Timecode.createTimeFormat = function (framerate) {
     framerate = this.validateFramerate(framerate);
-    var isDropFrame =  this.isDropFrame(framerate);
-    
+    var isDropFrame = this.isDropFrame(framerate);
+
     if (framerate % 1 !== 0) {
-        framerate = Math.floor(framerate*100);
+        framerate = Math.floor(framerate * 100);
     }
     return isDropFrame ?
-        framerate + this.TIMEFORMATS.drop:
+        framerate + this.TIMEFORMATS.drop :
         framerate + this.TIMEFORMATS.nonDrop;
 }
 /**
