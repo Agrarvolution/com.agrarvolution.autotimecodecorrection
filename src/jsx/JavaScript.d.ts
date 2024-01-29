@@ -2711,6 +2711,14 @@ type Record<K extends string, T> = { [P in K]: T }
 
 //relates to Bridge Thumbnail objects
 declare class Thumbnail {
+    type: string
+    name: string
+    mimeType: string
+    hasMetadata: boolean
+    synchronousMetadata: any
+
+}
+declare class ThumbnailMetadata {
 
 }
 declare class Timecode {

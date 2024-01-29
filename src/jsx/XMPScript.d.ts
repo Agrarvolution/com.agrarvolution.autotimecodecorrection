@@ -22,6 +22,7 @@ interface XMPMetaConstructor {
 }
 
 interface XMPMetaInstance {
+    getStructField(NS_DM: string, timecodeStruct: string, NS_DM1: string, arg3: string): any;
 	doesPropertyExist(namespace:String, value:String): Boolean
 	getProperty(namespace:String, property:String): XMPProperty
 	setProperty(namespace:String, property:String, value:String): Boolean
@@ -37,6 +38,7 @@ interface XMPMetaInstance {
 declare const XMPMeta: XMPMetaConstructor | undefined;
 
 interface XMPConstConstructor {
+    NS_BWF: String;
     new (): XMPConstInstance;
     NS_DM: string;
     NS_DC: string;

@@ -1,6 +1,6 @@
 XMPConst.NS_BWF = "http://ns.adobe.com/bwf/bext/1.0/";
-ThumbnailMetadata.previousTimeValue = 'previousTimeValue';
-
+ThumbnailMetadata.PREVIOUS_TIME_VALUE = 'previousTimeValue';
+ThumbnailMetadata.DEFAULT_FRAMERATE = 25;
 
 
 /**
@@ -29,16 +29,16 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
 
     this.timecodeMetadata = ThumbnailMetadata.extractTimecodeMetadata(this.xmp);
 
-    if (this.timecodeMetadata.startTime === undefined && this.audioMetadata) {
-        this.timecodeMetadata.startTime = ThumbnailMetadata.samplesToTime(
-            this.audioMetadata.samples,
-            this.audioMetadata.sampleFrequency,
-            25,
-            false
+    if (this.timecodeMetadata.startTime.toFrames() === 0 && this.audioMetadata) {
+        this.timecodeMetadata.startTime = new Timecode(
+            Timecode.createTimecodeFromSamples(
+                this.audioMetadata.samples,
+                this.audioMetadata.sampleFrequency,
+                ThumbnailMetadata.DEFAULT_FRAMERATE
+            ),
+            ThumbnailMetadata.DEFAULT_FRAMERATE
         );
-    }
-    if (this.timecodeMetadata.startTime === undefined) {
-        this.timecodeMetadata.startTime = ThumbnailMetadata.ZERO_TIMECODE;
+        this.timecodeMetadata.framerate = ThumbnailMetadata.DEFAULT_FRAMERATE;
     }
 
     if (this.timecodeMetadata.framerate === 0) {
@@ -47,6 +47,8 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
 
     return true;
 }
+
+
 /**
  * Extracts relevant audio metadata from a thumbnail's metadata.
  * @param {XMPMetaInstance} xmp XMP object - see XMP specification 
@@ -94,10 +96,6 @@ ThumbnailMetadata.extractTimecodeMetadata = function (xmp) {
     } else if (xmp.doesPropertyExist(XMPConst.NS_DM, "altTimecode")) {
         timecodeStruct = "altTimecode";
     }
-
-    var startTime = xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, "timeValue").value || '';
-    var prevStartTime = xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.previousTimeValue).value || '';
-
     var framerate = xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, "timeFormat").value || '';
     framerate = framerate.match(/\d+/g);
 
@@ -106,9 +104,10 @@ ThumbnailMetadata.extractTimecodeMetadata = function (xmp) {
     } else if (framerate.length) {
         framerate = Number(framerate[0]);
     }
-    var isDropFrame = this.isDropFrame(framerate);
 
-
+    var startTime = new Timecode(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, "timeValue").value, framerate);
+    var prevStartTime = new Timecode(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_VALUE).value, framerate);
+    var isDropFrame = Timecode.isDropFrame(framerate);
 
     return {
         startTime: startTime,
