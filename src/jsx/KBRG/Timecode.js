@@ -57,7 +57,13 @@ Timecode.prototype.toSamples = function (sampleFrequency) {
 Timecode.prototype.toFrames = function()  {
     return Math.floor(((((this.hours * 60) + this.minutes) * 60) + this.seconds) * this.framerate + this.frames);
 }
-
+/**
+ * Overrides the general to value function and return total frames
+ * @returns {number}
+ */
+Timecode.prototype.toValue = function()  {
+    return this.toFrames();
+}
 /**
  * Updates a timecode object from audio samples.
  *@param {number} samples
