@@ -1,9 +1,13 @@
 //relates to Bridge Thumbnail objects
 declare class Application {
-    document: Document
+    readonly document: Document
 }
 
 declare class Document {
+    selections: array<Thumbnail>
+    deselectAll() : void
+    selectAll() : void
+    readonly selectionLength: number
     
 }
 declare class Thumbnail {
