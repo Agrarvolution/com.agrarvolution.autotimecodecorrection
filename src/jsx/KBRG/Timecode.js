@@ -9,6 +9,11 @@ Timecode.DROP_FRAME_COUNT = {
     '59.94': 3,
     '119.88': 4
 }
+Timecode.TIMEFORMATS = {
+    "drop": "DropTimecode",
+    "nonDrop": "Timecode"
+
+}
 
 /**
  * Creates a timecode object from a timecode string.
@@ -377,6 +382,22 @@ Timecode.isDropFrame = function (framerate) {
     return false;
 }
 
+/**
+ * 
+ * @param {number} framerate 
+ * @returns {string} timeformat string - e.g. 25Timecode
+ */
+Timecode.createTimeFormat = function (framerate) {
+    framerate = this.validateFramerate(framerate);
+    var isDropFrame =  this.isDropFrame(framerate);
+    
+    if (framerate % 1 !== 0) {
+        framerate = Math.floor(framerate*100);
+    }
+    return isDropFrame ?
+        framerate + this.TIMEFORMATS.drop:
+        framerate + this.TIMEFORMATS.nonDrop;
+}
 /**
  * Convert frames from one framerate to another.
  * 0 Framerates are ignored. If the previous framerate is 0 and the new one isn't, only the framerate is updated.
