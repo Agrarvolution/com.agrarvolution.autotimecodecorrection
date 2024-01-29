@@ -9,6 +9,11 @@ Timecode.DROP_FRAME_TIMECODE_KEYS = [
     /*23976,*/
     29.97, 59.94, 119.88
 ];
+Timecode.DROP_FRAME_COUNT = {
+    '29.97': 2,
+    '59.94': 3,
+    '119.88': 4
+}
 
 /**
  * Creates a timecode object from a timecode string.
@@ -34,7 +39,6 @@ function Timecode(timecode, framerate) {
         this.setTimeArray(Timecode.splitTimecodeTextToNumber(timecode, framerate));
     }
 
-    this.isDropframe = Timecode.isDropFrame(framerate);
     this.validateTime();
 }
 
@@ -86,6 +90,9 @@ Timecode.prototype.validateTime = function () {
         this.frames = 0;
     }
 
+    //
+    this.isDropframe = Timecode.isDropFrame(this.framerate);
+
     // accounts for time tickover
     if (this.framerate <= 0) {
         this.frames = 0;
@@ -97,6 +104,7 @@ Timecode.prototype.validateTime = function () {
     if (this.frames < 0) { //negative rollover
         this.frames = Math.round(this.framerate + this.frames);
     }
+
 
     this.minutes += Math.floor(this.seconds / 60);
     this.seconds = this.seconds % 60; //clamp
@@ -116,6 +124,30 @@ Timecode.prototype.validateTime = function () {
 
     if (this.hours < 0) { //negative rollover
         this.hours = 24 + this.hours;
+    }
+
+    //correct for drop frame frame_drops
+    if (this.isDropframe) {
+        this.dropFrames();
+
+    }
+}
+/**
+ * Correction for drop frame timecodes. Otherwise invalid timecodes can be stored.
+ * @returns {void}
+ */
+Timecode.prototype.dropFrames = function () {
+    var droppedFrames = Timecode.DROP_FRAME_COUNT[this.framerate] || 0;
+    if (!(this.minutes % 10 && this.seconds === 0)) {
+        return;
+    }
+    if (this.frames === 0) {
+        this.frames = Math.round(this.framerate-1);
+        this.seconds = 59;
+        this.minutes -= 1;
+    }
+    if (this.frames <= droppedFrames) {
+        this.frames = 1 + droppedFrames;
     }
 }
 
@@ -298,6 +330,10 @@ Timecode.validateFramerate = function (framerate) {
 
 /**
 * Checks whether a given framerate is a known dropframe framerate.
+* @todo The script currently assumes any of the framerates listed under Timecode.DROP_FRAME_TIMECODE_KEYS are always using a dropframe timecode.
+* By the SMPTE spec they are not required to use a drop frame timecode. But this special case is currently neglected, because they seem to be pretty rare.
+* @see https://en.wikipedia.org/wiki/SMPTE_timecode
+* @see https://ieeexplore.ieee.org/document/7289820
 * @param {number} framerate
 * @returns {boolean}
 */
