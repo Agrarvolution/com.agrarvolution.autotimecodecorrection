@@ -281,7 +281,7 @@ Timecode.splitTimecodeTextToNumber = function (timeText, framerate) {
     }
 
     //var hmsfPattern = /^([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,})$/g; //strict matching
-    var hmsfPattern = /^([\d]+)[:;]([\d]+)[:;]([\d]+)[:;]([\d]+)$/g; // soft matching
+    var hmsfPattern = /^([\d]+)[:;.]([\d]+)[:;.]([\d]+)[:;.]([\d]+)$/g; // soft matching
     var match = hmsfPattern.exec(timeText);
 
     if (match != null) {
