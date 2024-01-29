@@ -46,7 +46,15 @@ Timecode.prototype.toSamples = function (sampleFrequency) {
     if (isNaN(Number(sampleFrequency))) {
         return 0;
     }
-    return ((((this.hours * 60) + this.minutes) * 60) + this.seconds + this.frames / this.framerate) * sampleFrequency;
+    return (this.toFrames() / this.framerate) * sampleFrequency;
+}
+
+/**
+ * Creates total frame count from timecode object.
+ * @returns {number} total frames
+ */
+Timecode.prototype.toFrames = function()  {
+    return Math.floor(((((this.hours * 60) + this.minutes) * 60) + this.seconds) * this.framerate + this.frames);
 }
 
 /**
