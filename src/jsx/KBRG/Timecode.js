@@ -12,15 +12,16 @@ Timecode.DROP_FRAME_TIMECODE_KEYS = [
 
 /**
  * Creates a timecode object from a timecode string.
- * @param {string} text 
+ * @param {string} text "hh:mm:ss:ff*"
  * @param {number} framerate 
  */
 function Timecode(text, framerate) {
     this.framerate = Timecode.validateFramerate(framerate);
     this.isDropframe = Timecode.isDropFrame(framerate);
-
-    this.setTimegroup(Timecode.splitTimecodeTextToNumber(text, framerate));
     // doesn't use total frame to avoid dropframe issues
+
+    this.setTimeArray(Timecode.splitTimecodeTextToNumber(text, framerate));
+    this.validateTime();
 }
 
 /**
@@ -81,7 +82,8 @@ Timecode.prototype.updateFromSamples = function (samples, sampleFrequency, frame
         Math.floor(sumSeconds % 60),
         Math.round(samples % sampleFrequency / sampleFrequency * framerate)
     ];
-    this.setTimegroup(Timecode.validateTime(times, framerate));
+    this.setTimeArray(times);
+    this.validateTime();
     return true;
 }
 
@@ -89,11 +91,61 @@ Timecode.prototype.updateFromSamples = function (samples, sampleFrequency, frame
  * Set time values for timecode object by a timegroup.
  * @param {object} timeGroup 
  */
-Timecode.prototype.setTimegroup = function (timeGroup) {
+Timecode.prototype.setTimeGroup = function (timeGroup) {
     this.hours = timeGroup.hours || 0;
     this.minutes = timeGroup.minutes || 0;
     this.seconds = timeGroup.seconds || 0;
     this.frames = timeGroup.frames || 0;
+}
+/**
+ * Sets time values from a 4 wide array.
+ * @param {array} timeArray 
+ * @returns {boolean} true on success
+ */
+Timecode.prototype.setTimeArray = function (timeArray) {
+    if (timeArray == null || !timeArray.length || timeArray.length !== 4) {
+        return false;
+    }
+    this.hours = Number(timeArray[0]);
+    this.minutes = Number(timeArray[1]);
+    this.seconds = Number(timeArray[2]);
+    this.frames = Number(timeArray[3]);
+
+    if (isNaN(this.hours)) {
+        this.hours = 0;
+    }
+    if (isNaN(this.minutes)) {
+        this.minutes = 0;
+    }
+    if (isNaN(this.seconds)) {
+        this.seconds = 0;
+    }
+    if (isNaN(this.frames)) {
+        this.frames = 0;
+    }
+    return true;
+}
+/**
+*Process the matched values into numbers and stores it into a new object containing the text and the capture group.
+*@returns {boolean|object} false on failure | matched group on success
+*/
+Timecode.prototype.validateTime = function () {
+    // accounts for time tickover
+    if (this.frames > this.framerate) {
+        this.seconds += Math.floor(this.frames / this.framerate);
+        this.frames = Math.floor(this.frames % this.framerate);
+    }
+    if (this.seconds > 60) {
+        this.minutes += Math.floor(this.seconds / 60);
+        this.seconds = this.seconds % 60;
+    }
+    if (this.minutes > 60) {
+        this.hours += Math.floor(this.minutes / 60);
+        this.minutes = this.minutes % 60;
+    }
+    if (this.hours > 24) {
+        this.hours = this.hours % 24;
+    }
 }
 /**
  *Processes a time string into separate values and call validateTime to convert the separate values into numbers.
@@ -113,8 +165,8 @@ Timecode.splitTimecodeTextToNumber = function (timeText, framerate) {
     if (match != null) {
         match.shift();
     }
-    match = Timecode.validateTime(match, framerate);
-    if (!match) {
+    
+    if (match == null) {
         return false;
     }
     return match;
@@ -131,54 +183,6 @@ Timecode.validateFramerate = function (framerate) {
         framerate = 0;
     }
     return framerate;
-}
-
-/**
-*Process the matched values into numbers and stores it into a new object containing the text and the capture group.
-*@param {array} time "hh:mm:ss:ff*"
-*@param {number} framerate
-*@returns {boolean|object} false on failure | matched group on success
-*/
-Timecode.validateTime = function (time, framerate) {
-    if (time == null || !time.length || time.length !== 4 || isNaN(Number(framerate))) {
-        return false;
-    }
-    var groups = {};
-    groups.hours = Number(time[0]);
-    groups.minutes = Number(time[1]);
-    groups.seconds = Number(time[2]);
-    groups.frames = Number(time[3]);
-
-    if (isNaN(groups.hours)) {
-        groups.hours = 0;
-    }
-    if (isNaN(groups.minutes)) {
-        groups.minutes = 0;
-    }
-    if (isNaN(groups.seconds)) {
-        groups.seconds = 0;
-    }
-    if (isNaN(groups.frames)) {
-        groups.frames = 0;
-    }
-
-    // accounts for time tickover
-    if (groups.frames > framerate) {
-        groups.seconds += Math.floor(groups.frames / framerate);
-        groups.frames = Math.floor(groups.frames % framerate);
-    }
-    if (groups.seconds > 60) {
-        groups.minutes += Math.floor(groups.seconds / 60);
-        groups.seconds = groups.seconds % 60;
-    }
-    if (groups.minutes > 60) {
-        groups.hours += Math.floor(groups.minutes / 60);
-        groups.minutes = groups.minutes % 60;
-    }
-    if (groups.hours > 24) {
-        groups.hours = groups.hours % 24;
-    }
-    return groups;
 }
 
 /**
