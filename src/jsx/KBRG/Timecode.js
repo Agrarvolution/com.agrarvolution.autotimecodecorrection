@@ -7,7 +7,7 @@ Timecode.DROP_FRAME_TIMECODES = {
 };
 Timecode.DROP_FRAME_TIMECODE_KEYS = [
     /*23976,*/
-    2997, 5994, 11988
+    29.97, 59.94, 119.88
 ];
 
 /**
@@ -23,6 +23,28 @@ function Timecode(text, framerate) {
     // doesn't use total frame to avoid dropframe issues
 }
 
+Timecode.prototype.toString = function () {
+    var delimiter = this.isDropframe ? ';' : ':';
+    var framerateDigits = Number.parseInt(this.framerate).toString().length;
+
+    return Timecode.padZero(this.hours, 2) + delimiter +
+        Timecode.padZero(this.minutes, 2) + delimiter +
+        Timecode.padZero(this.seconds, 2) + delimiter +
+        Timecode.padZero(this.frames,framerateDigits)
+}
+
+/**
+ * Timecode is converted into samples.
+ * @param {number} sampleFrequency
+ * @return {number} samples
+ */
+Timecode.prototype.toSamples = function (sampleFrequency) {
+    if (Number.isNaN(Number(sampleFrequency))) {
+        return 0;
+    }
+    return ((((this.hours * 60) + this.minutes) * 60) + this.seconds + this.frames / this.framerate) * sampleFrequency;
+}
+
 /**
  * Updates a timecode object from audio samples.
  *@param {number} samples
@@ -30,12 +52,13 @@ function Timecode(text, framerate) {
  *@param {number} framerate
  *@return {boolean} 
  */
- Timecode.prototype.updateFromSamples = function (samples, sampleFrequency, framerate) {
+Timecode.prototype.updateFromSamples = function (samples, sampleFrequency, framerate) {
     if (Number.isNaN(Number(samples)) || Number.isNaN(Number(sampleFrequency))) {
         return false;
     }
 
     this.framerate = Timecode.validateFramerate(framerate);
+    this.isDropframe = Timecode.isDropFrame(framerate);
 
     var sumSeconds = Math.floor(samples / sampleFrequency);
     var sumMinutes = Math.floor(sumSeconds / 60);
@@ -54,7 +77,7 @@ function Timecode(text, framerate) {
  * Set time values for timecode object by a timegroup.
  * @param {object} timeGroup 
  */
-Timecode.prototype.setTimegroup = function(timeGroup) {
+Timecode.prototype.setTimegroup = function (timeGroup) {
     this.hours = timeGroup.hours || 0;
     this.minutes = timeGroup.minutes || 0;
     this.seconds = timeGroup.seconds || 0;
@@ -83,8 +106,6 @@ Timecode.splitTimecodeTextToNumber = function (timeText, framerate) {
         return false;
     }
     return match;
-
-
 }
 
 /**
@@ -132,7 +153,7 @@ Timecode.validateTime = function (time, framerate) {
     // accounts for time tickover
     if (groups.frames > framerate) {
         groups.seconds += Number.parseInt(groups.frames / framerate);
-        groups.frames = groups.frames % framerate;
+        groups.frames = Number.parseInt(groups.frames % framerate);
     }
     if (groups.seconds > 60) {
         groups.minutes += Number.parseInt(groups.seconds / 60);
@@ -164,4 +185,18 @@ Timecode.isDropFrame = function (framerate) {
         }
     }
     return false;
+}
+
+/**
+ * Pad numbers with leading zeros.
+ * @param {number} number
+ * @param {number} size
+ * @return {string} number with padded zeros
+ */
+Timecode.padZero = function (number, size) {
+    var stringNumber = number.toString();
+    while (stringNumber.length < size) {
+        stringNumber = '0' + stringNumber;
+    }
+    return stringNumber;
 }
