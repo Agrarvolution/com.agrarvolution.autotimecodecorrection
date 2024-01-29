@@ -48,6 +48,18 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
     return true;
 }
 
+/**
+ * Generates a shortened version of the Thumbnail metadata. For this use case only this.timecodeMetadata.startTime is really relevant.
+ * @returns {string}
+ */
+ThumbnailMetadata.prototype.toString = function() {
+    var text = this.filename + " ";
+    if (this.timecodeMetadata) {
+        text += `[${this.timecodeMetadata.startTime}@${this.timecodeMetadata.framerate}fps]`
+    }
+    return text;
+}
+
 
 /**
  * Extracts relevant audio metadata from a thumbnail's metadata.
