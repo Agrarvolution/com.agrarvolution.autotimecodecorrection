@@ -107,21 +107,68 @@ Timecode.prototype.validateTime = function () {
 }
 
 /**
- * Converts framerate of a timecode object and returns a new timecode object. 
+ * Converts framerate of a timecode object.
+ * Returns a new timecode object so original object is not mutated. 
  * @param {number} newFramerate 
  * @returns {Timecode}
  */
 Timecode.prototype.convertByFramerate = function (newFramerate) {
     return new Timecode(this, newFramerate);
 }
-// Timecode.prototype['+'] = function (timecode) {
-//     if (timecode instanceof Timecode) {
-//         return new Timecode()
-//     }
-// }
+/**
+ * Overrides default addition function for Timecodes.
+ * Calls add function to add up the values.
+ * Returns a new timecode object so original object is not mutated. 
+ * @param {string|number|object|Timecode} timecode
+ * @returns {Timecode}
+ */
+Timecode.prototype['+'] = function (timecode) {
+    return this.add(timecode);
+}
+/**
+ * Adds timecode values. Creates a new Timecode object with the input.
+ * This reuses the tests and vlaidation in the constructor.
+ * @param {string|number|object|Timecode} timecode
+ * @returns {Timecode}
+ */
+Timecode.prototype.add = function (timecode) {
+    var add = new Timecode(timecode, this.framerate);
+    return new Timecode([
+        this.hours + add.hours,
+        this.minutes + add.minutes,
+        this.seconds + add.seconds,
+        this.frames + add.frames
+    ], this.framerate);
+}
+/**
+ * Overrides default substraction function for Timecodes.
+ * Calls add function to add up the values.
+ * Returns a new timecode object so original object is not mutated. 
+ * @param {string|number|object|Timecode} timecode
+ * @returns {Timecode}
+ */
+Timecode.prototype['-'] = function (timecode) {
+    return this.substract(timecode);
+}
+/**
+ * Substracts timecode values. Creates a new Timecode object with the input.
+ * This reuses the tests and vlaidation in the constructor.
+ * @param {string|number|object|Timecode} timecode
+ * @returns {Timecode}
+ */
+Timecode.prototype.substract = function (timecode) {
+    var add = new Timecode(timecode, this.framerate);
+    return new Timecode([
+        this.hours - add.hours,
+        this.minutes - add.minutes,
+        this.seconds - add.seconds,
+        this.frames - add.frames
+    ], this.framerate);
+}
 
 /**
  * Exports an array from a timecode object.
+ * Returns a new timecode object so original object is not mutated.
  * @returns {array} [hh,mm,ss,ff*]
  */
 Timecode.prototype.toArray = function () {
