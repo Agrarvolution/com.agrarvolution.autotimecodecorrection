@@ -22,21 +22,26 @@ Timecode.DROP_FRAME_COUNT = {
  */
 function Timecode(timecode, framerate) {
     this.framerate = Timecode.validateFramerate(framerate);
-    // doesn't use total frame to avoid dropframe issues
+    this.hours = 0;
+    this.minutes = 0;
+    this.seconds = 0;
+    this.frames = 0;// doesn't use total frame to avoid dropframe issues
 
 
     if (timecode instanceof Timecode) {
-        this.setTimeGroup(timecode);
+        this.setFromGroup(timecode);
         this.frames = Timecode.convertFramesBetweenFramerate(timecode.frames, timecode.framerate, framerate);
         this.framerate = framerate;
     } else if (timecode instanceof Array) {
-        this.setTimeArray(timecode);
+        this.setFromArray(timecode);
+    } else if (timecode instanceof Date) {
+        this.setFromDate(timecode);
     } else if (timecode instanceof Object) {
-        this.setTimeGroup(timecode);
+        this.setFromGroup(timecode);
     } else if (typeof timecode === 'number') {
         this.frames = timecode;
     } else if (typeof timecode === 'string') {
-        this.setTimeArray(Timecode.splitTimecodeTextToNumber(timecode, framerate));
+        this.setFromArray(Timecode.splitTimecodeTextToNumber(timecode, framerate));
     }
 
     this.validateTime();
@@ -48,7 +53,7 @@ function Timecode(timecode, framerate) {
  * @param {object} timeGroup {hours: hh, minutes: mm, seconds: ss, frames: ff}
  * @returns {boolean} true on success
  */
-Timecode.prototype.setTimeGroup = function (timeGroup) {
+Timecode.prototype.setFromGroup = function (timeGroup) {
     if (timeGroup == null) {
         timeGroup = {};
     }
@@ -63,7 +68,7 @@ Timecode.prototype.setTimeGroup = function (timeGroup) {
  * @param {array} timeArray [hh,mm,ss,ff*]
  * @returns {boolean} true on success
  */
-Timecode.prototype.setTimeArray = function (timeArray) {
+Timecode.prototype.setFromArray = function (timeArray) {
     if (timeArray == null || !timeArray.length || timeArray.length !== 4) {
         return false;
     }
@@ -71,6 +76,23 @@ Timecode.prototype.setTimeArray = function (timeArray) {
     this.minutes = Number(timeArray[1]);
     this.seconds = Number(timeArray[2]);
     this.frames = Number(timeArray[3]);
+
+    return true;
+}
+/**
+ * Sets time values from a date object.
+ * @param {Date} date 
+ * @returns 
+ */
+Timecode.prototype.setFromDate = function (date) {
+    if (date == null) {
+        return false;
+    }
+    this.hours = date.getHours();
+    this.minutes = date.getMinutes();
+    this.seconds = date.getSeconds();
+    this.frames = Math.floor(date.getMilliseconds() / 1000 * this.framerate)
+
     return true;
 }
 /**
@@ -142,7 +164,7 @@ Timecode.prototype.dropFrames = function () {
         return;
     }
     if (this.frames === 0) {
-        this.frames = Math.round(this.framerate-1);
+        this.frames = Math.round(this.framerate - 1);
         this.seconds = 59;
         this.minutes -= 1;
     }
