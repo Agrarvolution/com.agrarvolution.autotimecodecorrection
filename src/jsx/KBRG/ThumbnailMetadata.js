@@ -1,7 +1,10 @@
 XMPConst.NS_BWF = "http://ns.adobe.com/bwf/bext/1.0/";
 ThumbnailMetadata.PREVIOUS_TIME_VALUE = 'previousTimeValue';
 ThumbnailMetadata.DEFAULT_FRAMERATE = 25;
-
+ThumbnailMetadata.ALLOWED_MEDIA_TYPES = [
+    'mp4', 'av1', 'mov', 'ogg', 'ogv', 'mkv', 'webm',
+    'wav', 'bwf', 'rf64', 'amb', 'acc', 'aif', 'aiff', 'aifc', 'mp2', 'mp3', '3gp', 'wma', 'flac', 'ape'
+],
 
 /**
  * Creates a new thumbnail metadata object.

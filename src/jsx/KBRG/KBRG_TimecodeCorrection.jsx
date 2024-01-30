@@ -27,11 +27,6 @@ Agrarvolution.CEP_PANEL = {
     repair: 1,
 };
 Agrarvolution.timecodeCorrection = {
-    AllowedMediaTypes: [
-        'mp4', 'av1', 'mov', 'ogg', 'ogv', 'mkv', 'webm',
-        'wav', 'bwf', 'rf64', 'amb', 'acc', 'aif', 'aiff', 'aifc', 'mp2', 'mp3', '3gp', 'wma', 'flac', 'ape'
-    ],
-
     TIMECODE_SOURCE: {
         file: 0,
         created: 1,
