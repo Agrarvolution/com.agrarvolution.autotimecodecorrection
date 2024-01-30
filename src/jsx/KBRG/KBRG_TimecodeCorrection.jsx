@@ -39,14 +39,8 @@ Agrarvolution.timecodeCorrection = {
 
     media: [],
     timeCodeUpdates: [],
-    searchRecursive: true,
-    searchTarget: 1, //0: root, 1: selection
-    ignoreMediaStart: true,
-    logging: true,
-    previousTimeValue: 'previousTimeValue',
     processedMedia: 0,
     targetFramerate: 25,
-    targetFramerateisDropFrame: false,
     overrideFramerate: false,
 
     /**
@@ -348,6 +342,8 @@ Agrarvolution.timecodeCorrection = {
         return false;
     },
     /**
+    *@Todo delete
+
      *Calls timeValuesToInt(group) to convert time strings into numbers.
      *Can only be called after the internal timeCodeUpdate array has been set. (setValues(tcObject))
      *@returns {boolean} true on success | false on failure 
@@ -372,6 +368,7 @@ Agrarvolution.timecodeCorrection = {
         return true;
     },
     /**
+    *@Todo delete
      *Converts strings into numbers, custom made for a group object. 
      *@param {Object} group - object created while looking for parts in a time string (e.g. hh:mm:ss:ff) -> groups.hour = hh, groups.minutes = mm, groups.seconds = ss, groups.frames = ff*
      *@returns {boolean} true - on success | false if group did not exist
@@ -551,25 +548,7 @@ Agrarvolution.timecodeCorrection = {
         return true;
     },
     /**
-     *Processes a time string into separate values and call validateTime to convert the separate values into numbers.
-     *@param {string} timeText "hh:mm:ss:ff*"
-     *@param {number} framerate
-     *@returns {boolean|object} false on failure | matched group on success
-     */
-    splitTimeToNumber: function(timeText, framerate) {
-        if (timeText === undefined) {
-            return false;
-        }
-
-        var hmsfPattern = /^([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,2})[:;]([\d]{1,})$/g;
-        var match = hmsfPattern.exec(timeText);
-        match = this.validateTime(match, framerate);
-        if (!match) {
-            return false;
-        }
-        return match;
-    },
-    /**
+    *@Todo remove
      *Process the matched values into numbers and stores it into a new object containing the text and the capture group.
      *@param {string} timeText "hh:mm:ss:ff*"
      *@param {number} framerate
@@ -686,74 +665,7 @@ Agrarvolution.timecodeCorrection = {
         }
         return true;
     },
-    /**
-     * Helper function to add default framerate information to an empty file.
-     */
-    setEmptyStartTimeProperty: function(mediaItem) {
-        if (mediaItem.tcStruct === '') {
-            mediaItem.tcStruct = "altTimecode";
-        }
-        var framerate = mediaItem.framerate || 25; //default safety
 
-        switch (framerate) { //fixes wrong timeformat values
-            case 2397:
-            case 2398:
-            case 23.98:
-            case 23.97:
-                framerate = 23976;
-                break;
-            case 29.97:
-                framerate = 2997;
-                break;
-            case 59.94:
-                framerate = 5994;
-                break;
-            default:
-                break;
-        }
-
-        if (this.DropFrameTimecodesKeys[framerate]) {
-            var timeFormat = this.timeFormats.drop;
-        } else {
-            var timeFormat = this.timeFormats.nonDrop;
-        }
-        mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat", framerate + timeFormat);
-
-        mediaItem.framerate = framerate;
-    },
-
-    /**
-     * Create a float value from 1/X strings as commonly seen in XMP Metadata.
-     * @param {string} scale in 1/X
-     * @returns {number} 1 if scale was invalid, float if matches were found
-     */
-    calcScale: function(scale) {
-        scale = scale.match(/\d+/g);
-        if (scale.length === 1) {
-            return scale[0];
-        } else if (scale.length >= 2) {
-            return scale[0] / scale[1];
-        }
-        return 1;
-    },
-    /**
-     * Convert framesrates from integer values to floats.
-     * This fixes an issues where these framerates could be mixed in code.
-     * @param {number} framerate
-     * @param {number}
-     */
-    normalizeFramerate: function(framerate) {
-        if (framerate === 23976) {
-            return 23.976;
-        }
-        if (framerate > 1000) {
-            return framerate / 100;
-        }
-        if (framerate > 10000) {
-            return framerate / 1000;
-        }
-        return framerate;
-    },
     /**
      *CSXSEvent wrapping function to send log messages to the gui.
      *@param {string} text - text that should be sent to gui
