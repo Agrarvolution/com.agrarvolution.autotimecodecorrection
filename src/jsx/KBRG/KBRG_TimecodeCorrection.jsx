@@ -16,44 +16,22 @@ XMPConst.NS_BWF = "http://ns.adobe.com/bwf/bext/1.0/";
 //define namespace
 var Agrarvolution = Agrarvolution || {};
 
+Agrarvolution.logLevels = {
+    critical: "CRIT",
+    status: "STAT",
+    info: "INFO",
+    error: "ERR "
+};
+Agrarvolution.CEP_PANEL = {
+    correction: 0,
+    repair: 1,
+};
 Agrarvolution.timecodeCorrection = {
     AllowedMediaTypes: [
         'mp4', 'av1', 'mov', 'ogg', 'ogv', 'mkv', 'webm',
         'wav', 'bwf', 'rf64', 'amb', 'acc', 'aif', 'aiff', 'aifc', 'mp2', 'mp3', '3gp', 'wma', 'flac', 'ape'
     ],
-    /** Possible values according to xmpDM spec.
-     * Non Drop timecodes variants are ignored.
-     * See https://developer.adobe.com/xmp/docs/XMPNamespaces/XMPDataTypes/Timecode/
-     */
-    DropFrameTimecodes: {
-        //"23976": 23.976,
-        "2997": 29.97,
-        "5994": 59.94,
-        "11988": 119.88
-    },
-    DropFrameTimecodesKeys: [
-        /*23976,*/
-        2997, 5994, 11988
-    ],
 
-    timeFormats: {
-        "drop": "DropTimecode",
-        "nonDrop": "Timecode"
-    },
-    ThumbnailTypes: {
-        file: 'file',
-        folder: 'folder',
-        alias: 'alias',
-        pkg: 'package',
-        app: 'application',
-        other: 'other'
-    },
-    logLevels: {
-        critical: "CRIT",
-        status: "STAT",
-        info: "INFO",
-        error: "ERR "
-    },
     TIMECODE_SOURCE: {
         file: 0,
         created: 1,
@@ -63,6 +41,7 @@ Agrarvolution.timecodeCorrection = {
         folder: 0,
         selection: 1
     },
+
     media: [],
     timeCodeUpdates: [],
     searchRecursive: true,
@@ -74,7 +53,6 @@ Agrarvolution.timecodeCorrection = {
     targetFramerate: 25,
     targetFramerateisDropFrame: false,
     overrideFramerate: false,
-    zeroTimecode: "00:00:00:00",
 
     metaDataOfSelected: function() {
         if (app.document.selectionLength !== 0) {
@@ -99,8 +77,21 @@ Agrarvolution.timecodeCorrection = {
      *@return {boolean} true on success
      */
     fixXmpTimeFormat: function(parameters) {
-        if (this.checkFixXmpParameters(parameters) && this.cacheMediaObjects(parameters.errorOnly) && this.fixTimeFormat(parameters.errorOnly)) {
-            this.logToCEP("Time formats for " + this.processedMedia + " media thumbnails have been updated.", this.logLevels.status);
+        parameters.logTarget = Agrarvolution.CEP_PANEL.repair;
+        parameters = this.checkFixXmpParameters(parameters);
+
+        if (parameters === undefined) {
+            this.logToCEP("Parameters invalid - fix xmp time format.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            return false;
+        }
+        var thumbnailCache = new CacheThumbnails(parameters, this.logToCEP);
+        if (thumbnailCache.mediaCache.length) {
+            return false;
+        }
+        var processMedia = this.fixTimeFormat(parameters.errorOnly);
+
+        if (true) {
+            this.logToCEP("Time formats for " + this.processedMedia + " media thumbnails have been updated.", Agrarvolution.logLevels.status, parameter.logTarget);
             return true;
         } else {
             return false;
@@ -130,11 +121,11 @@ Agrarvolution.timecodeCorrection = {
             try {
                 var newMetadata = new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
                 this.media[i].thumb.synchronousMetadata = newMetadata;
-                this.logToCEP(this.media[i].filename + " - Time format fixed.", this.logLevels.info);
+                this.logToCEP(this.media[i].filename + " - Time format fixed.", Agrarvolution.logLevels.info);
                 this.processedMedia++;
             } catch (e) {
-                this.logToCEP(this.media[i].filename + " - failed to fix time format.", this.logLevels.error);
-                this.logToCEP(JSON.stringify(e), this.logLevels.error);
+                this.logToCEP(this.media[i].filename + " - failed to fix time format.", Agrarvolution.logLevels.error);
+                this.logToCEP(JSON.stringify(e), Agrarvolution.logLevels.error);
                 return false;
             }
         }
@@ -142,22 +133,23 @@ Agrarvolution.timecodeCorrection = {
     },
     /**
      * Check parameters for fixing xmp timeFormat.
-     * @return {boolean} true on success
+     * @param {object} parameters
+     * @return {object} parameters on success, undefined on failure
      */
-    checkFixXmpParameters: function(parameter) {
-        parameter.framerate = Number(parameter.framerate);
+    checkFixXmpParameters: function(parameters) {
+        parameters.framerate = Number(parameters.framerate);
 
-        if (isNaN(Number(parameter.searchTarget)) && isNaN(parameter.framerate)) {
-            this.logToCEP("Parameters are not numbers (framerate / search target). - XMP time format repair", this.logLevels.error);
-            return false;
+        if (isNaN(Number(parameters.searchTarget)) && isNaN(parameters.framerate)) {
+            this.logToCEP("Parameters are not numbers (framerate / search target). - XMP time format repair", Agrarvolution.logLevels.error);
+            return undefined;
         }
+        if (!(parameters.searchTarget && parameters.searchRecursive && parameters.framerate && parameters.logging && parameters.errorOnly)) {
+            this.logToCEP("Parameters are not complete. - XMP time format repair", Agrarvolution.logLevels.error);
+            return undefined;
+        }
+        this.logging = parameters.logging;
 
-        this.targetFramerate = parameter.framerate;
-        this.searchTarget = parameter.searchTarget;
-        this.searchRecursive = parameter.recurse;
-        this.logging = parameter.logging;
-
-        return true;
+        return parameters;
     },
     /**
      * Calls to cache media objects and then reverts timecodes of selected elements.
@@ -165,7 +157,7 @@ Agrarvolution.timecodeCorrection = {
      */
     revertChanges: function(parameter) {
         if (this.checkRevertParameter(parameter) && this.cacheMediaObjects(false) && this.revertTimecodeChanges()) {
-            this.logToCEP("Reverted the timecode for " + this.processedMedia + " media thumbnails.", this.logLevels.status);
+            this.logToCEP("Reverted the timecode for " + this.processedMedia + " media thumbnails.", Agrarvolution.logLevels.status);
             return true;
         } else {
             return false;
@@ -178,10 +170,10 @@ Agrarvolution.timecodeCorrection = {
     checkRevertParameter: function(parameter) {
         if (Number(parameter.searchTarget) !== NaN) {
             this.searchTarget = parameter.searchTarget;
-            this.searchRecursive = parameter.recurse;
+            this.searchRecursive = parameter.searchRecursive;
             this.logging = parameter.logging;
         } else {
-            this.logToCEP("Error in parameters before reverting timecode changes.", this.logLevels.error);
+            this.logToCEP("Error in parameters before reverting timecode changes.", Agrarvolution.logLevels.error);
             return false;
         }
         return true;
@@ -204,16 +196,16 @@ Agrarvolution.timecodeCorrection = {
                     this.media[i].thumb.synchronousMetadata =
                         new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
                     this.logToCEP(this.media[i].filename + " - start time / timecode has been updated. (" + this.media[i].startTime.text + " -> " +
-                        this.media[i].prevStartTime.text + ")", this.logLevels.info);
+                        this.media[i].prevStartTime.text + ")", Agrarvolution.logLevels.info);
                 } catch (e) {
                     this.logToCEP(this.media[i].filename + " - failed to update start time / timecode. (" + this.media[i].startTime.text + " -> " +
-                        this.media[i].prevStartTime.text + ")", this.logLevels.error);
-                    this.logToCEP(e, this.logLevels.error);
+                        this.media[i].prevStartTime.text + ")", Agrarvolution.logLevels.error);
+                    this.logToCEP(e, Agrarvolution.logLevels.error);
                 }
                 this.processedMedia++;
             } else {
                 this.logToCEP(this.media[i].filename + " - Timecodes are invalid. (" + this.media[i].prevStartTime + " -> " +
-                    this.media[i].prevStartTime + ")", this.logLevels.error);
+                    this.media[i].prevStartTime + ")", Agrarvolution.logLevels.error);
             }
         }
         return true;
@@ -226,7 +218,7 @@ Agrarvolution.timecodeCorrection = {
     gatherTimecodes: function(parameter) {
         if (this.checkRevertParameter(parameter) && this.cacheMediaObjects(false)) {
             var csvData = this.timecodeFromCache();
-            this.logToCEP("Gathered timecodes from " + this.processedMedia + " media thumbnails.", this.logLevels.status);
+            this.logToCEP("Gathered timecodes from " + this.processedMedia + " media thumbnails.", Agrarvolution.logLevels.status);
 
             $.writeln(csvData);
             return JSON.stringify({
@@ -282,7 +274,7 @@ Agrarvolution.timecodeCorrection = {
         if (isNaN(Number(parameter.searchTarget)) ||
             isNaN(Number(parameter.source)) ||
             isNaN(this.targetFramerate)) {
-            this.logToCEP("Error in parameters - Update from metadata.", this.logLevels.error);
+            this.logToCEP("Error in parameters - Update from metadata.", Agrarvolution.logLevels.error);
             return false;
         }
 
@@ -290,7 +282,7 @@ Agrarvolution.timecodeCorrection = {
         this.searchTarget = parameter.searchTarget;
         this.logging = parameter.logging || false;
         this.overrideFramerate = parameter.overrideFramerate || false;
-        this.logToCEP("Metadata parameter have been set.", this.logLevels.info);
+        this.logToCEP("Metadata parameter have been set.", Agrarvolution.logLevels.info);
 
         return true;
     },
@@ -334,11 +326,11 @@ Agrarvolution.timecodeCorrection = {
                 this.media[i].thumb.synchronousMetadata =
                     new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
                 this.logToCEP(this.media[i].filename + " - start time / timecode has been updated. (" + this.media[i].startTime.text + " -> " +
-                    newTimecode + ")", this.logLevels.info);
+                    newTimecode + ")", Agrarvolution.logLevels.info);
             } catch (e) {
                 this.logToCEP(this.media[i].filename + " - failed to update start time / timecode. (" + this.media[i].startTime.text + " -> " +
-                    newTimecode + ")", this.logLevels.error);
-                this.logToCEP(e, this.logLevels.error);
+                    newTimecode + ")", Agrarvolution.logLevels.error);
+                this.logToCEP(e, Agrarvolution.logLevels.error);
             }
         }
         return true;
@@ -349,7 +341,7 @@ Agrarvolution.timecodeCorrection = {
      *@returns {boolean} true on success | false on failure  
      */
     processInput: function(tcObject) {
-        this.logToCEP("Starting host script.", this.logLevels.info);
+        this.logToCEP("Starting host script.", Agrarvolution.logLevels.info);
         this.processedMedia = 0;
         if (this.setValues(tcObject) && this.cacheMediaObjects(false) && this.updateTimeCodes()) {
             return true;
@@ -372,7 +364,7 @@ Agrarvolution.timecodeCorrection = {
             this.ignoreMediaStart = tcObject.ignoreMediaStart;
             this.overrideFramerate = tcObject.overrideFramerate || false;
             this.logging = tcObject.logging
-            this.logToCEP("Values have successfully arrived in host.", this.logLevels.status);
+            this.logToCEP("Values have successfully arrived in host.", Agrarvolution.logLevels.status);
 
             return this.parseTimeGroups();
         }
@@ -387,19 +379,19 @@ Agrarvolution.timecodeCorrection = {
         var i = 0;
         for (i = 0; i < this.timeCodeUpdates.length; i++) {
             if (!this.timeValuesToInt(this.timeCodeUpdates[i].duration.groups)) {
-                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse duration. (" + this.timeCodeUpdates[i].duration.text + ")", this.logLevels.status);
+                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse duration. (" + this.timeCodeUpdates[i].duration.text + ")", Agrarvolution.logLevels.status);
                 return false;
             }
             if (!this.timeValuesToInt(this.timeCodeUpdates[i].fileTC.groups)) {
-                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse file timecode. (" + this.timeCodeUpdates[i].fileTC.text + ")", this.logLevels.status);
+                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse file timecode. (" + this.timeCodeUpdates[i].fileTC.text + ")", Agrarvolution.logLevels.status);
                 return false;
             }
             if (!this.timeValuesToInt(this.timeCodeUpdates[i].audioTC.groups)) {
-                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse audio timecode. (" + this.timeCodeUpdates[i].audioTC.text + ")", this.logLevels.status);
+                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse audio timecode. (" + this.timeCodeUpdates[i].audioTC.text + ")", Agrarvolution.logLevels.status);
                 return false;
             }
         }
-        this.logToCEP("Input times have been converted to numbers.", this.logLevels.status);
+        this.logToCEP("Input times have been converted to numbers.", Agrarvolution.logLevels.status);
         return true;
     },
     /**
@@ -429,41 +421,41 @@ Agrarvolution.timecodeCorrection = {
 
     /**
      *Loads media file / clips into a semipermanent cache. This avoids scraping through the app DOM everytime a match has to be found later.
+     *@param {object} parameters
      *@param {boolean} toggleInvalid either caches every thumbnail or only thumbnails with invalid timecodes
      *@returns {boolean} false - not processed times, thus useless for comparisons, true - everything worked
      */
-    cacheMediaObjects: function(toggleInvalid) {
+    cacheMediaObjects: function(parameters, toggleInvalid) {
         var i = 0;
-        this.media = [];
-
+        var mediaCache = [];
 
         var hasNoSelection = app.document.selectionLength === 0;
-        if (hasNoSelection || this.searchTarget === this.SCAN_TARGET.folder) { //process root - get all thumbnails if there is no selection
-            this.logToCEP("Start searching for all media items.", this.logLevels.status);
+        if (hasNoSelection || parameters.searchTarget === this.SCAN_TARGET.folder) { //process root - get all thumbnails if there is no selection
+            this.logToCEP("Start searching for all media items.", Agrarvolution.logLevels.status, parameters.logTarget, parameters.logging);
             app.document.selectAll();
         } else {
-            this.logToCEP("Start searching for selected media items.", this.logLevels.status);
+            this.logToCEP("Start searching for selected media items.", Agrarvolution.logLevels.status, parameters.logTarget, parameters.logging);
         }
 
         for (i = 0; i < app.document.selectionLength; i++) {
-            this.processThumbnail(app.document.selections[i], toggleInvalid);
+            mediaCache.push(this.processThumbnail(app.document.selections[i], parameters));
         }
 
-        if (hasNoSelection || this.searchTarget === this.SCAN_TARGET.folder) { // remove selection if there was none before
+        if (hasNoSelection || parameters.searchTarget === this.SCAN_TARGET.folder) { // remove selection if there was none before
             app.document.deselectAll()
         }
 
         if (this.splitTimesToNumbers()) {
-            this.logToCEP("Processing time strings was successfull.", this.logLevels.status);
+            this.logToCEP("Processing time strings was successfull.", Agrarvolution.logLevels.status, parameters.logTarget, parameters.logging);
         } else {
-            this.logToCEP("Processing time strings was unsuccessfull.", this.logLevels.critical);
+            this.logToCEP("Processing time strings was unsuccessfull.", Agrarvolution.logLevels.critical, parameters.logTarget, parameters.logging);
             return false;
         }
 
         //extended log
-        if (this.logging) {
+        if (parameters.logging) {
             var method = "";
-            switch (this.searchTarget) {
+            switch (parameters.searchTarget) {
                 case 0:
                     method = "project";
                     break;
@@ -476,8 +468,8 @@ Agrarvolution.timecodeCorrection = {
             for (var i = 0; i < mediaLog.length; i++) {
                 mediaLog[i].thumb = "[object ProjectItem]";
             }
-            this.logToCEP(this.media.length + " media files have been discovered in " + method + ": " +
-                JSON.stringify(mediaLog), this.logLevels.info);
+            this.logToCEP(mediaCache.length + " media files have been discovered in " + method + ": " +
+                JSON.stringify(mediaLog), Agrarvolution.logLevels.info, parameters.logTarget, parameters.logging);
         }
         return true;
     },
@@ -486,11 +478,12 @@ Agrarvolution.timecodeCorrection = {
      *If it is a folder, it will call this method for all its children (depending on the settings.)
      *If it is a clip it will store some informations about the thumbnail into this namespace's media array for quicker search later in the process.
      *@param {Object} thumb Bridge folder element, see CEP reference
-     *@param {boolean} addInvalidOnly only cache thumbnail with invalid time formats
+     *@param {object} parameters 
      */
-    processThumbnail: function(thumb, addInvalidOnly) {
+    processThumbnail: function(thumb, parameters) {
         if (thumb.type === this.ThumbnailTypes.file && thumb.hasMetadata) {
             var timecodeMetadataStruct = thumb.mimeType.match('audio') ? 'startTimecode' : 'altTimecode';
+
             var item = {};
             item.thumb = thumb;
             item.filename = thumb.name;
@@ -571,7 +564,7 @@ Agrarvolution.timecodeCorrection = {
         for (var i = 0; i < this.media.length; i++) {
             var startTimeMatch = this.splitTimeToNumber(this.media[i].startTime, this.media[i].framerate);
             if (!startTimeMatch) {
-                this.logToCEP(this.media[i].name + " - Couldn't process start time. (" + this.media[i].startTime + ")", this.logLevels.status);
+                this.logToCEP(this.media[i].name + " - Couldn't process start time. (" + this.media[i].startTime + ")", Agrarvolution.logLevels.status);
             }
             this.media[i].startTime = startTimeMatch;
 
@@ -634,7 +627,7 @@ Agrarvolution.timecodeCorrection = {
      * @returns {boolean} true on success
      */
     updateTimeCodes: function() {
-        this.logToCEP("Updating " + this.media.length + " discovered media items.", this.logLevels.status);
+        this.logToCEP("Updating " + this.media.length + " discovered media items.", Agrarvolution.logLevels.status);
         var i = 0,
             j = 0;
         if (!(this.timeCodeUpdates !== undefined && this.media !== undefined) || this.media.length === 0) {
@@ -650,7 +643,7 @@ Agrarvolution.timecodeCorrection = {
                 }
             }
         }
-        this.logToCEP("Updated " + this.processedMedia + " media thumbnails.", this.logLevels.status);
+        this.logToCEP("Updated " + this.processedMedia + " media thumbnails.", Agrarvolution.logLevels.status);
         return true;
     },
     /**
@@ -706,12 +699,12 @@ Agrarvolution.timecodeCorrection = {
             mediaItem.thumb.synchronousMetadata =
                 new Metadata(mediaItem.xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
             this.logToCEP(mediaItem.filename + " - start time / timecode has been updated. (" + mediaItem.startTime.text + " -> " +
-                startTime.text + ")", this.logLevels.info);
+                startTime.text + ")", Agrarvolution.logLevels.info);
             this.processedMedia++;
         } catch (e) {
             this.logToCEP(mediaItem.filename + " - failed to update start time / timecode. (" + mediaItem.startTime.text + " -> " +
-                startTime.text + ")", this.logLevels.error);
-            this.logToCEP(e, this.logLevels.error);
+                startTime.text + ")", Agrarvolution.logLevels.error);
+            this.logToCEP(e, Agrarvolution.logLevels.error);
             return false;
         }
         return true;
@@ -748,7 +741,7 @@ Agrarvolution.timecodeCorrection = {
             var timeFormat = this.timeFormats.nonDrop;
         }
         mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat", framerate + timeFormat);
-        
+
         mediaItem.framerate = framerate;
     },
     /**
@@ -786,81 +779,6 @@ Agrarvolution.timecodeCorrection = {
     },
 
     /**
-     * Creates a timestring from a given time object. 
-     * 00:00:00:00
-     * @param {hours: number, minutes: number, seconds: number, frames: number} time
-     * @param {number} framerate
-     * @param {boolean} isDropFrame determines delimiter
-     */
-    createTimecodeFromObj: function(time, isDropFrame, framerate) {
-        framerate = this.normalizeFramerate(framerate);
-        var timecode = [
-            this.padZero(time.hours, 2),
-            this.padZero(time.minutes, 2),
-            this.padZero(time.seconds, 2),
-            this.padZero(time.frames, Math.floor(framerate).toString().length),
-        ];
-        var delimiter = isDropFrame ? ';' : ':';
-
-        timecode = this.dropFrameTimecodeCorrection(timecode, framerate, isDropFrame);
-
-        return timecode.join(delimiter);
-    },
-    /**
-     * Create timecode from a date object.
-     * @param {Date} date
-     * @param {boolean} isDropFrame
-     * @returns {string} 00:00:00:00 or 00;00;00;00
-     */
-    createTimecodeFromDate: function(date, framerate, isDropFrame) {
-        var timecode = [
-            this.padZero(date.getHours(), 2),
-            this.padZero(date.getMinutes(), 2),
-            this.padZero(date.getSeconds(), 2),
-            this.padZero(Math.floor(date.getMilliseconds() / 1000 * framerate), 2),
-        ];
-        var delimiter = isDropFrame ? ';' : ':';
-
-        timecode = this.dropFrameTimecodeCorrection(timecode, framerate, isDropFrame);
-
-        return timecode.join(delimiter);
-    },
-    /**
-     * After naively assuming that every drop frame time code is legal, this function nudges the timecodes by a frame to be legal again.
-     * Otherwise the timecodes might by offset by a frame or so, since the editing programs compensate for that. (Usually you get a slightly too low framecount.)
-     * 23.976 FPS does not seem to be handled as drop frame in Premiere Pro and thus is ignored in this code.
-     * @param {array} timecode 
-     * @param {number} framerate 
-     * @param {boolean} isDropFrame 
-     * @return {array} corrected timecode
-     */
-    dropFrameTimecodeCorrection: function(timecode, framerate, isDropFrame) {
-        if (!isDropFrame && !(framerate === 2997 || framerate === 5994)) {
-            return timecode;
-        }
-
-        if (timecode[1] % 10 && timecode[3] === 0) {
-            timecode[3] = Math.round(framerate) - 1;
-            timecode[1] = timecode[1] - 1;
-        } else if (timecode[1] % 10 && timecode[3] === 1) {
-            timecode[3] = timecode[3] + 1;
-        }
-        return timecode;
-    },
-    /**
-     * Pad numbers with leading zeros.
-     * @param {number} number
-     * @param {number} size
-     * @return {string} number with padded zeros
-     */
-    padZero: function(number, size) {
-        number = number.toString();
-        while (number.length < size) {
-            number = '0' + number;
-        }
-        return number;
-    },
-    /**
      * Timecode is converted into samples.
      * @param {Object} time
      * @param {number} sampleFrequency
@@ -869,46 +787,9 @@ Agrarvolution.timecodeCorrection = {
     timeToSamples: function(time, framerate, sampleFrequency) {
         return ((((time.hours * 60) + time.minutes) * 60) + time.seconds + time.frames / framerate) * sampleFrequency;
     },
-    /**
-     *Convert samples into a timecode string.
-     *@param {number} samples
-     *@param {number} sampleFrequency
-     *@param {number} framerate
-     *@param {boolean} isDropFrame
-     *@return {string} 00:00:00:00 or 00;00;00;00
-     */
-    samplesToTime: function(samples, sampleFrequency, framerate, isDropFrame) {
-        var sumSeconds = Math.floor(samples / sampleFrequency);
-        var sumMinutes = Math.floor(sumSeconds / 60);
 
-        var timecode = [
-            this.padZero(Math.floor(sumMinutes / 60), 2),
-            this.padZero(Math.floor(sumMinutes % 60), 2),
-            this.padZero(Math.floor(sumSeconds % 60), 2),
-            this.padZero(Math.round(samples % sampleFrequency / sampleFrequency * framerate), 2)
-        ];
 
-        var delimiter = isDropFrame ? ';' : ':';
-        return timecode.join(delimiter);
-    },
 
-    /**
-     * Checks whether a given framerate is a known dropframe framerate.
-     * @param {number} framerate
-     * @returns {boolean}
-     */
-    isDropFrame: function(framerate) {
-        if (isNaN(Number(framerate))) {
-            return false;
-        }
-
-        for (var i = 0; i < this.DropFrameTimecodesKeys.length; i++) {
-            if (this.DropFrameTimecodesKeys[i] === framerate) {
-                return true;
-            }
-        }
-        return false;
-    },
 
     /**
      * Create a float value from 1/X strings as commonly seen in XMP Metadata.
@@ -946,16 +827,36 @@ Agrarvolution.timecodeCorrection = {
      *CSXSEvent wrapping function to send log messages to the gui.
      *@param {string} text - text that should be sent to gui
      *@param {string} logLevel - choose which log level to display in gui
+     *@param {number} parameters - selects which panel should receive the log messages
+     *@param {boolean} logging - enable logging
+     *@return {boolean}
      */
-    logToCEP: function(text, logLevel) {
-        if (xLib && this.logging) {
-            var eventObj = new CSXSEvent();
-            eventObj.type = "com.adobe.csxs.events.agrarvolution.cepLogging";
-            eventObj.data = JSON.stringify({
-                text: text,
-                logLevel: logLevel
-            });
-            eventObj.dispatch();
+    logToCEP: function(text, logLevel, targetPanel, logging) {
+        if (!xLib) {
+            return false;
         }
+        if (!logging) {
+            return false;
+        }
+
+        var eventObj = new CSXSEvent();
+
+        targetPanel = targetPanel || Agrarvolution.CEP_PANEL.correction; //temp default
+        switch (targetPanel) {
+            case Agrarvolution.CEP_PANEL.correction:
+            default:
+                eventObj.type = "com.adobe.csxs.events.agrarvolution.timecodeCorrectionLog";
+                break;
+            case Agrarvolution.CEP_PANEL.repair:
+                eventObj.type = "com.adobe.csxs.events.agrarvolution.timecodeRepairLog";
+                break;
+        }
+        eventObj.data = JSON.stringify({
+            text: text,
+            logLevel: logLevel
+        });
+        eventObj.dispatch();
+        return true;
     },
 };
+
