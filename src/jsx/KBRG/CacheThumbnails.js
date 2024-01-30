@@ -136,7 +136,7 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb) {
 /**
  * Fixes the xmp property timeFormat with a new value. (InvalidTimecode)
  * @param {number} targetFramerate 
- * @returns {number} count of processed media
+ * @returns {number} sum of processed media
  */
 CacheThumbnails.prototype.fixTimeFormat = function (targetFramerate) {
     this.processedMedia = 0;
@@ -156,7 +156,7 @@ CacheThumbnails.prototype.fixTimeFormat = function (targetFramerate) {
                 this.mediaCache[i].timecodeMetadata.framerate = targetFramerate;
             }
 
-            if (this.mediaCache[i].updateTimecodeMetadata(this.mediaCache[i].startTime.convertByFramerate(this.mediaCache[i].timecodeMetadata.framerate))) {
+            if (this.mediaCache[i].updateTimecodeMetadata(this.mediaCache[i].timecodeMetadata.startTime.convertByFramerate(this.mediaCache[i].timecodeMetadata.framerate))) {
                 this.logging(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
                     this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
                 this.logging(this.mediaCache[i].filename + " - Time format fixed.", Agrarvolution.logLevels.info, this.logTarget, this.logging);
@@ -170,6 +170,34 @@ CacheThumbnails.prototype.fixTimeFormat = function (targetFramerate) {
             }
         }
 
+    }
+    return this.processesMedia;
+}
+/**
+ * Reverts to the previously stored timecode.
+ * Only uses one history element.
+ * @return {number} sum of processed media
+ */
+CacheThumbnails.prototype.revertTimecodeChanges = function () {
+    this.processedMedia = 0;
+    for (var i = 0; i < this.mediaCache.length; i++) {
+        if (this.mediaCache[i].timecodeMetadata.prevStartTime.toValue() === 0 && this.mediaCache[i].timecodeMetadata.prevFramerate === 0) {
+            continue;
+        }
+
+        if (this.mediaCache[i].updateTimecodeMetadata(this.mediaCache[i].timecodeMetadata.prevStartTime)) {
+            this.logging(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
+                this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
+            this.logging("Timevalues have been reverted.", Agrarvolution.logLevels.info, this.logTarget, this.logging);
+            this.processedMedia++;
+        } else {
+            this.logging(this.mediaCache[i].filename + " - failed to fix time format.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
+            /**
+             * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
+             */
+            // this.logging(JSON.stringify(e), Agrarvolution.logLevels.error);
+        }
+        this.processedMedia++;
     }
     return this.processesMedia;
 }

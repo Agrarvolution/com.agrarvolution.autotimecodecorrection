@@ -57,6 +57,7 @@ Agrarvolution.timecodeCorrection = {
         }
         var thumbnailCache = new CacheThumbnails(parameters, this.logToCEP);
         if (thumbnailCache.mediaCache.length) {
+            this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
             return false;
         }
         var processMedia = thumbnailCache.fixTimeFormat(parameters.targetFramerate);
@@ -89,100 +90,31 @@ Agrarvolution.timecodeCorrection = {
      *@return {boolean} true on success
      */
     revertChanges: function(parameter) {
-        if (this.checkRevertParameter(parameter) && this.cacheMediaObjects(false) && this.revertTimecodeChanges()) {
-            this.logToCEP("Reverted the timecode for " + this.processedMedia + " media thumbnails.", Agrarvolution.logLevels.status);
-            return true;
-        } else {
+        parameters.logTarget = Agrarvolution.CEP_PANEL.correction;
+        if (this.checkRevertParameter(parameter)) {
             return false;
         }
+        var thumbnailCache = new CacheThumbnails(parameters, this.logToCEP);
+        if (thumbnailCache.mediaCache.length) {
+            this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            return false;
+        }
+        var processMedia = thumbnailCache.revertTimecodeChanges();
+        this.logToCEP("Time formats for " + this.processedMedia + " media thumbnails have been reverted.",
+            Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
+        return true;
     },
     /**
      * Check parameters for reverting timecode changes.
      * @return {boolean} true on success
      */
     checkRevertParameter: function(parameter) {
-        if (Number(parameter.searchTarget) !== NaN) {
-            this.searchTarget = parameter.searchTarget;
-            this.searchRecursive = parameter.searchRecursive;
-            this.logging = parameter.logging;
-        } else {
-            this.logToCEP("Error in parameters before reverting timecode changes.", Agrarvolution.logLevels.error);
-            return false;
+        if (!(parameter.searchTarget && parameter.searchRecursive && parameters.logging)) {
+            this.logToCEP("Parameters are not complete. - Reverting timecode changes", Agrarvolution.logLevels.error);
+            return undefined;
         }
-        return true;
-    },
 
-    /**
-     * Reverts to the previously stored timecode.
-     * Only uses one history element.
-     * @return {boolean} true on success
-     */
-    revertTimecodeChanges: function() {
-        this.processedMedia = 0;
-        for (var i = 0; i < this.media.length; i++) {
-            if (this.media[i].prevStartTime && this.media[i].startTime) {
-                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, this.previousTimeValue,
-                    this.media[i].startTime.text);
-                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", this.media[i].prevStartTime.text);
-
-                try {
-                    this.media[i].thumb.synchronousMetadata =
-                        new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
-                    this.logToCEP(this.media[i].filename + " - start time / timecode has been updated. (" + this.media[i].startTime.text + " -> " +
-                        this.media[i].prevStartTime.text + ")", Agrarvolution.logLevels.info);
-                } catch (e) {
-                    this.logToCEP(this.media[i].filename + " - failed to update start time / timecode. (" + this.media[i].startTime.text + " -> " +
-                        this.media[i].prevStartTime.text + ")", Agrarvolution.logLevels.error);
-                    this.logToCEP(e, Agrarvolution.logLevels.error);
-                }
-                this.processedMedia++;
-            } else {
-                this.logToCEP(this.media[i].filename + " - Timecodes are invalid. (" + this.media[i].prevStartTime + " -> " +
-                    this.media[i].prevStartTime + ")", Agrarvolution.logLevels.error);
-            }
-        }
-        return true;
-    },
-
-    /**
-     * Caches media objects and writes calls timecodeFromCache() to create a new .csv of selected metadata.
-     * @return {Object} 
-     */
-    gatherTimecodes: function(parameter) {
-        if (this.checkRevertParameter(parameter) && this.cacheMediaObjects(false)) {
-            var csvData = this.timecodeFromCache();
-            this.logToCEP("Gathered timecodes from " + this.processedMedia + " media thumbnails.", Agrarvolution.logLevels.status);
-
-            $.writeln(csvData);
-            return JSON.stringify({
-                csv: csvData,
-                path: app.document.presentationPath
-            });
-        } else {
-            return {};
-        }
-    },
-
-    /**
-     * Copies selected metadata from cached mediaItems.
-     * @return {array}
-     */
-    timecodeFromCache: function() {
-        this.processedMedia = 0;
-        var data = [
-            'File Name',
-            'File TC',
-            'Framerate'
-        ].join(',') + '\n';
-        for (var i = 0; i < this.media.length; i++) {
-            data += [
-                this.media[i].filename,
-                this.media[i].startTime.text,
-                this.media[i].framerate || 0
-            ].join(',') + '\n';
-            this.processedMedia++;
-        }
-        return data;
+        return parameter;
     },
 
     /**
