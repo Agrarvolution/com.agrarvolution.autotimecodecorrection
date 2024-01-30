@@ -721,52 +721,6 @@ Agrarvolution.timecodeCorrection = {
 
         mediaItem.framerate = framerate;
     },
-    /**
-     * @param {hours: number, minutes: number, seconds: number, frames: number} time
-     * @param {number} prevFramerate
-     * @param {number} newFramerate
-     * @returns {hours: number, minutes: number, seconds: number, frames: number} always with positive values
-     */
-    convertFramesToNewFramerate: function(time, prevFramerate, newFramerate) {
-        if (isNaN(Number(prevFramerate)) || isNaN(Number(newFramerate))) {
-            return time;
-        }
-
-        prevFramerate = this.normalizeFramerate(prevFramerate);
-        newFramerate = this.normalizeFramerate(newFramerate);
-
-        time.frames = Math.round(time.frames / prevFramerate * newFramerate);
-
-        if (time.frames === Math.round(newFramerate)) {
-            time.seconds++;
-            time.frames = 0;
-        }
-
-        if (time.seconds === 60) {
-            time.minutes++;
-            time.seconds = 0;
-        }
-
-        if (time.minutes === 60) {
-            time.hours = time.hours < 23 ? time.hours++ : time.hours;
-            time.minutes = 0;
-        }
-
-        return time;
-    },
-
-    /**
-     * Timecode is converted into samples.
-     * @param {Object} time
-     * @param {number} sampleFrequency
-     * @return {number} samples
-     */
-    timeToSamples: function(time, framerate, sampleFrequency) {
-        return ((((time.hours * 60) + time.minutes) * 60) + time.seconds + time.frames / framerate) * sampleFrequency;
-    },
-
-
-
 
     /**
      * Create a float value from 1/X strings as commonly seen in XMP Metadata.
