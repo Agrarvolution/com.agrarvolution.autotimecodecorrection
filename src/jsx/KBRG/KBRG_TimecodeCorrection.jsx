@@ -49,24 +49,6 @@ Agrarvolution.timecodeCorrection = {
     targetFramerateisDropFrame: false,
     overrideFramerate: false,
 
-    metaDataOfSelected: function() {
-        if (app.document.selectionLength !== 0) {
-            var thumb = app.document.selections[0];
-            if (thumb !== undefined && thumb != null && thumb.hasMetadata) {
-                // Get the metadata object - wait for  valid values
-                var md = thumb.metadata;
-                // Get the XMP packet as a string and create the XMPMeta object
-                var xmp = new XMPMeta(md.serialize());
-
-
-                var test = thumb.creationDate,
-                    test2 = thumb.lastModifiedDate;
-                var hours = test.getHours();
-            }
-            return true;
-        }
-        return false;
-    },
     /**
      * Caches media objects and fixes the xmp timeFormat - when invalid.
      *@return {boolean} true on success
