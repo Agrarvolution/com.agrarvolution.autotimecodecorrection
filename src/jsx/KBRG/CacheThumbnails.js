@@ -132,29 +132,44 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb) {
 // -----------------
 // Process methods
 // -----------------
+
+/**
+ * Fixes the xmp property timeFormat with a new value. (InvalidTimecode)
+ * @param {number} targetFramerate 
+ * @returns {number} count of processed media
+ */
 CacheThumbnails.prototype.fixTimeFormat = function (targetFramerate) {
     this.processedMedia = 0;
     for (var i = 0; i < this.mediaCache.length; i++) {
-        this.mediaCache[i].timecodeMetadata.framerate = this.mediaCache[i].timecodeMetadata.framerate === 0 ?
-            targetFramerate :
-            this.mediaCache[i].timecodeMetadata.framerate;
-
-        if (!this.errorOnly) {
+        var hasError = false;
+        if (this.mediaCache[i].timecodeMetadata.framerate === 0) {
             this.mediaCache[i].timecodeMetadata.framerate = targetFramerate;
+            hasError = true;
+
+        }
+        if (this.mediaCache[i].timecodeMetadata.timecodeStruct === '') {
+            hasError = true;
         }
 
-        if (this.mediaCache[i].updateTimecodeMetadata(this.mediaCache[i].startTime.convertByFramerate(this.mediaCache[i].timecodeMetadata.framerate))) {
-            this.logging(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
-                this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            this.logging(this.mediaCache[i].filename + " - Time format fixed.", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            this.processedMedia++;
-        } else {
-            this.logging(this.mediaCache[i].filename + " - failed to fix time format.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
-            /**
-             * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
-             */
-            // this.logging(JSON.stringify(e), Agrarvolution.logLevels.error);
+        if (!this.errorOnly || hasError) { //@Todo Find a better way to solved this instead of nested if - the whole structure might contain duplicated code.
+            if (!this.errorOnly) {
+                this.mediaCache[i].timecodeMetadata.framerate = targetFramerate;
+            }
+
+            if (this.mediaCache[i].updateTimecodeMetadata(this.mediaCache[i].startTime.convertByFramerate(this.mediaCache[i].timecodeMetadata.framerate))) {
+                this.logging(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
+                    this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
+                this.logging(this.mediaCache[i].filename + " - Time format fixed.", Agrarvolution.logLevels.info, this.logTarget, this.logging);
+                this.processedMedia++;
+            } else {
+                this.logging(this.mediaCache[i].filename + " - failed to fix time format.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
+                /**
+                 * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
+                 */
+                // this.logging(JSON.stringify(e), Agrarvolution.logLevels.error);
+            }
         }
 
     }
+    return this.processesMedia;
 }

@@ -59,47 +59,9 @@ Agrarvolution.timecodeCorrection = {
         if (thumbnailCache.mediaCache.length) {
             return false;
         }
-        var processMedia = this.fixTimeFormat(parameters.errorOnly);
-
-        if (true) {
-            this.logToCEP("Time formats for " + this.processedMedia + " media thumbnails have been updated.", Agrarvolution.logLevels.status, parameter.logTarget);
-            return true;
-        } else {
-            return false;
-        }
-    },
-    /**
-     * Fixes the xmp property timeFormat with a new value. (InvalidTimecode)
-     * @param {number} framerate
-     * @return {boolean} true on success
-     */
-    fixTimeFormat: function(errorOnly) {
-        this.processedMedia = 0;
-        for (var i = 0; i < this.media.length; i++) {
-            this.media[i].framerate = this.media[i].framerate === 0 ? this.targetFramerate : this.media[i].framerate;
-
-            if (!errorOnly) {
-                var updatedGroups = this.convertFramesToNewFramerate(this.media[i].startTime.groups, this.media[i].framerate, this.targetFramerate);
-                var updatedTimecode = this.createTimecodeFromObj(updatedGroups, this.media[i].isDropFrame, this.targetFramerate);
-
-                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", updatedTimecode);
-                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, this.previousTimeValue, this.media[i].startTime.text || this.zeroTimecode);
-                this.media[i].framerate = this.targetFramerate;
-            }
-
-            this.setEmptyStartTimeProperty(this.media[i]);
-
-            try {
-                var newMetadata = new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
-                this.media[i].thumb.synchronousMetadata = newMetadata;
-                this.logToCEP(this.media[i].filename + " - Time format fixed.", Agrarvolution.logLevels.info);
-                this.processedMedia++;
-            } catch (e) {
-                this.logToCEP(this.media[i].filename + " - failed to fix time format.", Agrarvolution.logLevels.error);
-                this.logToCEP(JSON.stringify(e), Agrarvolution.logLevels.error);
-                return false;
-            }
-        }
+        var processMedia = thumbnailCache.fixTimeFormat(parameters.targetFramerate);
+        this.logToCEP("Time formats for " + this.processedMedia + " media thumbnails have been updated.",
+            Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
         return true;
     },
     /**
@@ -368,7 +330,7 @@ Agrarvolution.timecodeCorrection = {
         return true;
     },
     /**
-    *@Todo delete
+     *@Todo delete
      *Converts strings into numbers, custom made for a group object. 
      *@param {Object} group - object created while looking for parts in a time string (e.g. hh:mm:ss:ff) -> groups.hour = hh, groups.minutes = mm, groups.seconds = ss, groups.frames = ff*
      *@returns {boolean} true - on success | false if group did not exist
@@ -548,7 +510,7 @@ Agrarvolution.timecodeCorrection = {
         return true;
     },
     /**
-    *@Todo remove
+     *@Todo remove
      *Process the matched values into numbers and stores it into a new object containing the text and the capture group.
      *@param {string} timeText "hh:mm:ss:ff*"
      *@param {number} framerate
@@ -702,4 +664,3 @@ Agrarvolution.timecodeCorrection = {
         return true;
     },
 };
-
