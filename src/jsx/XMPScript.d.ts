@@ -22,7 +22,7 @@ interface XMPMetaConstructor {
 }
 
 interface XMPMetaInstance {
-    getStructField(NS_DM: string, timecodeStruct: string, NS_DM1: string, arg3: string): any;
+    getStructField(NS_DM: string, timecodeStruct: string, NS_DM1: string, arg3: string): XMPProperty;
 	doesPropertyExist(namespace:String, value:String): Boolean
 	getProperty(namespace:String, property:String): XMPProperty
 	setProperty(namespace:String, property:String, value:String): Boolean
