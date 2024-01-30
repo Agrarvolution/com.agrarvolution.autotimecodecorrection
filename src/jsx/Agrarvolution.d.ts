@@ -1,6 +1,10 @@
 declare class ThumbnailMetadata {
+    thumb: Thumbnail
+    filename: string
 
+    constructor (thumb: Thumbnail)
 }
+
 declare class Timecode {
   framerate: number
   hours: number
@@ -8,6 +12,7 @@ declare class Timecode {
   seconds: number
   frames: number
 }
+
 declare class CacheThumbnails {
 
 }
