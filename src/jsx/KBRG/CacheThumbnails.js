@@ -13,6 +13,8 @@ CacheThumbnails.THUMBNAIL_TYPES = {
  * @returns 
  */
 function CacheThumbnails(parameters, logCallback) {
+    this.mediaCache = [];
+
     if (parameters == null || typeof logCallback !== 'function') {
         return {};
     }
@@ -23,7 +25,12 @@ function CacheThumbnails(parameters, logCallback) {
     this.errorOnly = parameters.errorOnly || false;
     this.logTarget = parameters.logTarget || 0;
     this.logging = parameters.logging || false;
-    this.mediaCache = [];
+    
+    if (this.cacheTimecodeOfThumbnails()) {
+        this.logging("Processing time strings was successfull.", Agrarvolution.logLevel.status, this.logTarget, this.logging);
+    } else {
+        this.logging("Processing time strings was unsuccessfull.", Agrarvolution.logLevel.error, this.logTarget, this.logging);
+    }
 }
 
 /**
@@ -50,12 +57,10 @@ CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function () {
         app.document.deselectAll()
     }
 
-    this.logging("Processing time strings was successfull.", Agrarvolution.logLevel.status, this.logTarget, this.logging);
-
     if (this.logging) {
         this.logging(this.toString(), Agrarvolution.logLevel.info, this.logTarget, this.logging);
     }
-    
+
     if (this.mediaCache.length === 0) {
         return false;
     }
