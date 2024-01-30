@@ -272,7 +272,7 @@ Timecode.prototype.toSamples = function (sampleFrequency) {
     if (isNaN(Number(sampleFrequency))) {
         return 0;
     }
-    return (this.toFrames() / this.framerate) * sampleFrequency;
+    return this.toValue() * 0.001 * sampleFrequency;
 }
 
 /**
