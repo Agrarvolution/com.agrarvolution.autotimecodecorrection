@@ -50,38 +50,48 @@ CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function () {
         app.document.deselectAll()
     }
 
-    // if (this.splitTimesToNumbers()) {
-    //     this.logging("Processing time strings was successfull.", Agrarvolution.logLevel.status);
-    // } else {
-    //     this.logging("Processing time strings was unsuccessfull.", Agrarvolution.logLevel.critical);
-    //     return false;
-    // }
+    this.logging("Processing time strings was successfull.", Agrarvolution.logLevel.status, this.logTarget, this.logging);
 
-    // //extended log
-    // if (parameters.logging) {
-    //     var method = "";
-    //     switch (parameters.searchTarget) {
-    //         case 0:
-    //             method = "project";
-    //             break;
-    //         case 1:
-    //             method = "selection";
-    //             break;
-    //     }
+    if (this.logging) {
+        this.logging(this.toString(), Agrarvolution.logLevel.info, this.logTarget, this.logging);
+    }
+    
+    if (this.mediaCache.length === 0) {
+        return false;
+    }
 
-    //     var mediaLog = JSON.parse(JSON.stringify(this.media));
-    //     for (var i = 0; i < mediaLog.length; i++) {
-    //         mediaLog[i].thumb = "[object ProjectItem]";
-    //     }
-    //     this.logToCEP(mediaCache.length + " media files have been discovered in " + method + ": " +
-    //         JSON.stringify(mediaLog), Agrarvolution.logLevel.info, parameters.logTarget, parameters.logging);
-    // }
     return true;
 }
 
+/**
+ * Overrides standard toString with a simple status output.
+ * @returns {string}
+ */
+CacheThumbnails.prototype.toString = function () {
+    var method = "";
+    switch (this.searchTarget) {
+        case Agrarvolution.timecodeCorrection.SCAN_TARGET.folder:
+            method = "folder";
+            break;
+        case Agrarvolution.timecodeCorrection.SCAN_TARGET.selection:
+            method = "selection";
+            break;
+    }
 
-CacheThumbnails.prototype.toString = function() {
+    return `${this.mediaCache.length} thumbnails have been cached in ${method}: ${this.toStringCache()}.`
+}
+/**
+ * Simple toString() function for the items in the media cache.
+ * @returns {string}
+ */
+CacheThumbnails.prototype.toStringCache = function () {
+    var output = '[';
+    for (var i = 0; i < this.mediaCache.length; i++) {
+        output += ` ${this.mediaCache[i]},`;
+    }
+    output.replace(/,$/, ' ]');
 
+    return output;
 }
 
 /**
