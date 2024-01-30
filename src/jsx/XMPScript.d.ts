@@ -1,4 +1,5 @@
-// A commonly used construct for loading XMPScript into
+// @see https://github.com/adobe/XMP-Toolkit-SDK/blob/main/docs/XMPSpecificationPart1.pdf 
+//A commonly used construct for loading XMPScript into
 // ExtendScript contexts.
 interface ExternalObjectConstructor {
     AdobeXMPScript: ExternalObject | undefined;
@@ -22,10 +23,12 @@ interface XMPMetaConstructor {
 }
 
 interface XMPMetaInstance {
+    setStructField(NS_DM: string, structName: string, NS_DM1: string, property: string, value: string): void;
 	getStructField(NS_DM: string, timecodeStruct: string, NS_DM1: string, arg3: string): XMPProperty
 	doesPropertyExist(namespace:string, value:string): boolean
 	getProperty(namespace:string, property:string): XMPProperty
 	setProperty(namespace:string, property:string, value:string): boolean
+	setProperty(namespace:string, property:string, value:string, flags: number): boolean
 	countArrayItems(namespace:string, property:string): Number
 	getArrayItem(namespace:string, property:string, itemIndex:Number): XMPProperty
 	deleteProperty(namespace:string, property:string): boolean
@@ -38,6 +41,7 @@ interface XMPMetaInstance {
 declare const XMPMeta: XMPMetaConstructor | undefined;
 
 interface XMPConstConstructor {
+    STRING: number;
     readonly SERIALIZE_USE_COMPACT_FORMAT: number;
     readonly SERIALIZE_OMIT_PACKET_WRAPPER: number;
 

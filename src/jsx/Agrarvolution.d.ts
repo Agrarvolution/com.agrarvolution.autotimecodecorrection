@@ -13,8 +13,10 @@ declare class ThumbnailMetadata {
     timecodeMetadata: {
       framerate: number
       startTime: Timecode
+      prevFramerate: number
       prevStartTime: Timecode
       isDropFrame: boolean
+      timecodeStruct: string
     }
 
     constructor (thumb: Thumbnail)
