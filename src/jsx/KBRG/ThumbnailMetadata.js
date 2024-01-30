@@ -63,6 +63,23 @@ ThumbnailMetadata.prototype.toString = function() {
     return text;
 }
 
+/**
+ * Update a ThumbnailMetadata startTime timecode with a new Timecode object.
+ * @param {Timecode} newStartTime
+ * @return {boolean} exits the function with false then the input is not a Timecode object
+ */
+ThumbnailMetadata.prototype.updateTimecodeMetadata = function (newStartTime) {
+    if (!(newStartTime instanceof Timecode)) {
+        return false;
+    }
+
+    this.timecodeMetadata.prevStartTime = this.timecodeMetadata.startTime
+    this.timecodeMetadata.startTime = newStartTime;
+    this.timecodeMetadata.framerate = newStartTime.framerate;
+
+    return true;
+}
+
 
 /**
  * Extracts relevant audio metadata from a thumbnail's metadata.
