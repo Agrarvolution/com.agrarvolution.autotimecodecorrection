@@ -32,5 +32,5 @@ declare class Timecode {
 
 declare class CacheThumbnails {
   mediaCache: array<ThumbnailMetadata>
-  
+  processesMedia: number
 }

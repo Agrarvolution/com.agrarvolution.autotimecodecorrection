@@ -25,7 +25,8 @@ function CacheThumbnails(parameters, logCallback) {
     this.errorOnly = parameters.errorOnly || false;
     this.logTarget = parameters.logTarget || 0;
     this.logging = parameters.logging || false;
-    
+    this.processedMedia = 0;
+
     if (this.cacheTimecodeOfThumbnails()) {
         this.logging("Processing time strings was successfull.", Agrarvolution.logLevel.status, this.logTarget, this.logging);
     } else {
@@ -124,5 +125,36 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb) {
     }
     if (metaDataExtractionSuccessful !== this.errorOnly) {
         this.mediaCache.push(metaThumb);
+    }
+}
+
+
+// -----------------
+// Process methods
+// -----------------
+CacheThumbnails.prototype.fixTimeFormat = function (targetFramerate) {
+    this.processedMedia = 0;
+    for (var i = 0; i < this.mediaCache.length; i++) {
+        this.mediaCache[i].timecodeMetadata.framerate = this.mediaCache[i].timecodeMetadata.framerate === 0 ?
+            targetFramerate :
+            this.mediaCache[i].timecodeMetadata.framerate;
+
+        if (!this.errorOnly) {
+            this.mediaCache[i].timecodeMetadata.framerate = targetFramerate;
+        }
+
+        if (this.mediaCache[i].updateTimecodeMetadata(this.mediaCache[i].startTime.convertByFramerate(this.mediaCache[i].timecodeMetadata.framerate))) {
+            this.logging(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
+                this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
+            this.logging(this.mediaCache[i].filename + " - Time format fixed.", Agrarvolution.logLevels.info, this.logTarget, this.logging);
+            this.processedMedia++;
+        } else {
+            this.logging(this.mediaCache[i].filename + " - failed to fix time format.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
+            /**
+             * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
+             */
+            // this.logging(JSON.stringify(e), Agrarvolution.logLevels.error);
+        }
+
     }
 }
