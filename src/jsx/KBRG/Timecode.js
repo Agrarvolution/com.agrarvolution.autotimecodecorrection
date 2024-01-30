@@ -283,11 +283,12 @@ Timecode.prototype.toFrames = function () {
     return Math.floor(((((this.hours * 60) + this.minutes) * 60) + this.seconds) * this.framerate + this.frames);
 }
 /**
- * Overrides the general to value function and return total frames
- * @returns {number}
+ * Overrides the general to toValue function and returns the time in milliseconds. 
+ * This makes comparisons trivial compared to using frame count.
+ * @returns {number} time in ms
  */
 Timecode.prototype.toValue = function () {
-    return this.toFrames();
+    return Math.floor(((((this.hours * 60) + this.minutes) * 60) + this.seconds + this.frames/this.framerate) * 1000);
 }
 
 
