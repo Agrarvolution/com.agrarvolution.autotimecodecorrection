@@ -18,4 +18,15 @@ declare class Thumbnail {
     synchronousMetadata: any
     children: array<Thumbnail>
 
+    metadata: Metadata
+    synchronousMetadata: Metadata
+
+}
+
+declare class Metadata extends XMPMeta {
+    namespace: string
+
+    constructor (metadata: string)
+
+    serialize(flags: number): string
 }

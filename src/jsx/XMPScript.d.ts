@@ -8,7 +8,7 @@ interface XMPMetaConstructor {
 	/** Creates an empty object. */
 	new (): XMPMetaInstance;
 	/**
-	 * @param packet A String containing an XML file or an XMP packet.
+	 * @param packet A string containing an XML file or an XMP packet.
 	 */
 	new (packet: string): XMPMetaInstance;
 	/**
@@ -22,23 +22,26 @@ interface XMPMetaConstructor {
 }
 
 interface XMPMetaInstance {
-    getStructField(NS_DM: string, timecodeStruct: string, NS_DM1: string, arg3: string): XMPProperty;
-	doesPropertyExist(namespace:String, value:String): Boolean
-	getProperty(namespace:String, property:String): XMPProperty
-	setProperty(namespace:String, property:String, value:String): Boolean
-	countArrayItems(namespace:String, property:String): Number
-	getArrayItem(namespace:String, property:String, itemIndex:Number): XMPProperty
-	deleteProperty(namespace:String, property:String): Boolean
-	appendArrayItem(namespace:String, property:String, arrayOptions:String, valueToAppend:String, valueOptions:String): Boolean
-	dumpObject():String
-	serialize(): String
+	getStructField(NS_DM: string, timecodeStruct: string, NS_DM1: string, arg3: string): XMPProperty
+	doesPropertyExist(namespace:string, value:string): boolean
+	getProperty(namespace:string, property:string): XMPProperty
+	setProperty(namespace:string, property:string, value:string): boolean
+	countArrayItems(namespace:string, property:string): Number
+	getArrayItem(namespace:string, property:string, itemIndex:Number): XMPProperty
+	deleteProperty(namespace:string, property:string): boolean
+	appendArrayItem(namespace:string, property:string, arrayOptions:string, valueToAppend:string, valueOptions:string): boolean
+	dumpObject():string
+	serialize(flags: any): string
     // Instance stuff.
 }
 
 declare const XMPMeta: XMPMetaConstructor | undefined;
 
 interface XMPConstConstructor {
-    NS_BWF: String;
+    readonly SERIALIZE_USE_COMPACT_FORMAT: number;
+    readonly SERIALIZE_OMIT_PACKET_WRAPPER: number;
+
+    NS_BWF: string;
     new (): XMPConstInstance;
     NS_DM: string;
     NS_DC: string;
