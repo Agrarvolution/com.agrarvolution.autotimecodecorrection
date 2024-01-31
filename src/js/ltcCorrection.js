@@ -446,37 +446,6 @@ function createZeroTimeCode(addFrames, framerate) {
 }
 
 /**
- * Validates a regex matched time string and converts its part into numbers.
- * @param {object} time 
- * @param {number} framerate 
- * @returns {boolean} true on success
- */
-function validateTime(time, framerate) {
-    return validateTime(time, framerate, false);
-}
-function validateTime(time, framerate, blockFrameCheck) {
-    if (time === undefined || time == null || time.groups === undefined || time.groups == null) {
-        return false;
-    }
-
-    time.groups.hours = Number(time.groups.hours);
-    time.groups.minutes = Number(time.groups.minutes);
-    time.groups.seconds = Number(time.groups.seconds);
-    time.groups.frames = Number(time.groups.frames);
-
-    if (time.length < 4 || time.length > 6) {
-        return false;
-    }
-
-    if (time.groups.hour > 24 || time.groups.minutes > 60 || time.groups.seconds > 60 || (!blockFrameCheck && time.groups.frames !== NaN &&
-        time.groups.frames >= framerate)) {
-        return false
-    }
-
-    return true;
-}
-
-/**
  * This will parse a delimited string into an array of arrays. The default delimiter is the comma, but this can be overriden in the second argument.
  * @source https://www.bennadel.com/blog/1504-ask-ben-parsing-csv-strings-with-javascript-exec-regular-expression-command.htm
  * @param {string} strData 
