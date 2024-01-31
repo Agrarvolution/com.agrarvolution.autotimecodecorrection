@@ -403,31 +403,29 @@ function checkCSVrow(row, version, rowNumber) {
         return tcMediaElement;
     }
 }
+
 /**
  * Validates string values for being a timecode and returns a timecode object as a result.
- * @param {string} value 
+ * @param {string} timeString
  * @param {number} framerate 
  * @param {string} fileName used for logging only
  * @param {number} rowNumber used for logging only
  * @param {number} column 
  * @returns 
  */
-function validateTimeCode(value, framerate, fileName, rowNumber, column) {
-    const hmsfPattern = /^(?<hours>[\d]{1,2})[:;](?<minutes>[\d]{1,2})[:;](?<seconds>[\d]{1,2})([:;](?<frames>[\d]{1,}))?$/g;
+function validateTimeCode(timeString, framerate, fileName, rowNumber, column) {
+    const hmsfPattern = /^(?<hours>[\d]{1,2})[:;.](?<minutes>[\d]{1,2})[:;.](?<seconds>[\d]{1,2})([:;.](?<frames>[\d]{1,}))?$/g;
 
-    let timeCode = hmsfPattern.exec(value);
+    let isTimecodeString = hmsfPattern.exec(timeString);
 
-    if (!validateTime(timeCode, framerate, true)) {
-        logger.addLog(`${fileName} at row ${rowNumber} - ${csvColumnNames[csvColumnNumbers.framerate]} (" ${value} ") is invalid. Added empty timecode instead."`,
+    if (!isTimecodeString) {
+        logger.addLog(`${fileName} at row ${rowNumber} - ${csvColumnNames[csvColumnNumbers.framerate]} (" ${timeString} ") is invalid. Added empty timecode instead."`,
             Logger.LOG_LEVELS.info);
-        timeCode = createZeroTimeCode(column !== csvColumnNumbers.duration, framerate);
+        return createZeroTimeCode(column !== csvColumnNumbers.duration, framerate);
     } else {
-        timeCode = compressMatch(timeCode);
+       return timeString; 
     }
-    hmsfPattern.lastIndex = 0; //maybe not needed anymore?
-    return timeCode;
 }
-
 
 /**
  * Creates a new timecode with the value of 0.
@@ -436,37 +434,17 @@ function validateTimeCode(value, framerate, fileName, rowNumber, column) {
  * @returns {text: string, groups: {hours: number, minutes: number, seconds: number, frames: number}} timecode
  */
 function createZeroTimeCode(addFrames, framerate) {
-
     let text = "00:00:00";
     if (addFrames) {
         text = "00:00:00:00";
     }
     if (addFrames && framerate === 2397 || framerate === 2997 || framerate === 5994) {
-        text = "00:00:00;00";
+        text = "00;00;00;00";
     }
 
-    return {
-        text: text,
-        groups: {
-            hours: 0,
-            minutes: 0,
-            seconds: 0,
-            frames: 0
-        }
-    }
+    return text;
 }
-/**
- * Discards unneeded references from a regex match.
- * @param {object} timeMatched 
- * @returns {{text: string, groups: object}}
- */
-function compressMatch(timeMatched) {
-    return {
-        text: timeMatched?.[0],
-        groups: timeMatched?.groups
-    }
 
-}
 /**
  * Validates a regex matched time string and converts its part into numbers.
  * @param {object} time 
