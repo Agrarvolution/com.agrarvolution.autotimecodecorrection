@@ -12,7 +12,10 @@ ThumbnailMetadata.ALLOWED_MEDIA_TYPES = [
     'mp4', 'av1', 'mov', 'ogg', 'ogv', 'mkv', 'webm',
     'wav', 'bwf', 'rf64', 'amb', 'acc', 'aif', 'aiff', 'aifc', 'mp2', 'mp3', '3gp', 'wma', 'flac', 'ape'
 ];
-
+ThumbnailMetadata.METADATA_DATE = {
+    'created': 0,
+    'lastChanged': 1
+};
 /**
  * Creates a new thumbnail metadata object.
  * @param {Thumbnail} thumbnail Bridge folder element, see CEP reference for Thumbnail object
@@ -85,7 +88,7 @@ ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerat
     }
 
     var hasError = false;
-    if (this.timecodeMetadata.framerate === 0) {
+    if (this.timecodeMetadata.framerate <= 0) {
         hasError = true;
 
     }
@@ -112,6 +115,39 @@ ThumbnailMetadata.prototype.revertTimecodeChange = function () {
     }
     return this.updateTimecodeMetadata(this.timecodeMetadata.prevStartTime);
 }
+
+/**
+ * Update start time of thumbnail by creation date or time of last modification. 
+ * @param {number} targetFramerate 
+ * @param {boolean} overrideFramerate
+ * @param {number} metadataSelector 
+ * @returns {boolean} true on success
+ */
+ThumbnailMetadata.prototype.updateFromMetadataDate = function (targetFramerate, overrideFramerate, metadataSelector) {
+    var dateUpdate = {};
+    targetFramerate = Number(targetFramerate || '');
+
+    if (isNaN(targetFramerate)) {
+        return false;
+    }
+    if (this.timecodeMetadata.framerate <= 0 || overrideFramerate) { //add for files with missing time values
+        this.timecodeMetadata.framerate = targetFramerate;
+    }
+
+    switch (metadataSelector) {
+        case ThumbnailMetadata.METADATA_DATE.created:
+            dateUpdate = this.thumb.bestCreationDate;
+            break;
+        case ThumbnailMetadata.METADATA_DATE.lastChanged:
+            dateUpdate = this.thumb.lastModifiedDate;
+            break;
+        default:
+            return false;
+    }
+
+    return this.updateTimecodeMetadata(new Timecode(dateUpdate, this.timecodeMetadata.framerate));
+}
+
 
 /**
  * Update a ThumbnailMetadata startTime timecode with a new Timecode object.

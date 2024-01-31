@@ -151,55 +151,7 @@ Agrarvolution.timecodeCorrection = {
 
         return true;
     },
-    /**
-     * Update timecode from thumbnail creation date or time of last modification.
-     * @return {boolean} true on success
-     */
-    updateTimecodesFromMetadata: function(source) {
-        for (var i = 0; i < this.media.length; i++) {
 
-            if (this.overrideFramerate || this.media[i].framerate === 0) {
-                this.media[i].framerate = this.targetFramerate;
-                this.media[i].isDropFrame = this.targetFramerateisDropFrame;
-
-            }
-            this.setEmptyStartTimeProperty(this.media[i]);
-
-            var time = Date.now();
-
-            switch (source) {
-                case this.TIMECODE_SOURCE.created:
-                    time = this.media[i].thumb.bestCreationDate;
-                    break;
-                case this.TIMECODE_SOURCE.lastChanged:
-                    time = this.media[i].thumb.lastModifiedDate;
-                    break;
-                default:
-                    return false;
-            }
-            this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, this.previousTimeValue, this.media[i].startTime.text);
-            var newTimecode = this.createTimecodeFromDate(time, this.media[i].framerate, this.media[i].isDropFrame);
-            this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM,
-                "timeValue", newTimecode);
-
-            if (this.media[i].tcStruct === 'startTimecode') {
-                this.media[i].xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat",
-                    this.media[i].xmp.getStructField(XMPConst.NS_DM, "startTimecode", XMPConst.NS_DM, "startTimecode").value);
-            }
-
-            try {
-                this.media[i].thumb.synchronousMetadata =
-                    new Metadata(this.media[i].xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
-                this.logToCEP(this.media[i].filename + " - start time / timecode has been updated. (" + this.media[i].startTime.text + " -> " +
-                    newTimecode + ")", Agrarvolution.logLevels.info);
-            } catch (e) {
-                this.logToCEP(this.media[i].filename + " - failed to update start time / timecode. (" + this.media[i].startTime.text + " -> " +
-                    newTimecode + ")", Agrarvolution.logLevels.error);
-                this.logToCEP(e, Agrarvolution.logLevels.error);
-            }
-        }
-        return true;
-    },
     /**
      *Function that start the timecode correction process. Usually called by the gui.
      *@param {Object} tcObject input object sent by the gui, contains settings and media references to be updated.

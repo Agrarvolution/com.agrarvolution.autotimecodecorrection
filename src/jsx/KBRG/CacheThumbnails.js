@@ -10,8 +10,9 @@ CacheThumbnails.PROCESS_METHODS = {
     fixXMP: 'fix',
     fixXMPErrorOnly: 'fixErrorOnly',
     revertTimeCode: 'revert',
-    fromDate: 'updateFromMetadata',
-    update: 'update'
+    fromCreated: 'updateFromCreated',
+    fromLastChange: 'updateFromLastChanged',
+    fromTimecode: 'updateFromTimecode'
 }
 /**
  * Constructer for a thumbnail cache.
@@ -227,17 +228,26 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
         switch (method) {
             case CacheThumbnails.PROCESS_METHODS.fixXMP:
                 processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.targetFramerate, false);
-                logMessage = processed ? 'Changed the framerate of every thumbnail.' : 'Error while changed framerates of thumbnails.'; // @Todo don't use these ifs in loop
+                logMessage = processed ? 'Changed the framerate of thumbnail.' : 'Error while changing the framerate of thumbnail.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fixXMPErrorOnly:
                 processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.targetFramerate, true);
-                logMessage = processed ? 'Corrected time formats of \'faulty}\' thumbnails.' : 'Error while correcting thumbnails.';
+                logMessage = processed ? 'Corrected time format of \'faulty}\' thumbnail.' : 'Error while correcting thumbnail.';
                 break;
-            case CacheThumbnails.PROCESS_METHODS.revertTimeCode: {
+            case CacheThumbnails.PROCESS_METHODS.revertTimeCode:
                 processed = this.mediaCache[i].revertTimecodeChanges();
-                logMessage = processed ? 'Reverted timecodes of every thumbnail.' : 'Error while reverting thumbnails.';
+                logMessage = processed ? 'Reverted start time from thumbnail.' : 'Error while reverting thumbnail.';
                 break;
-            }
+            case CacheThumbnails.PROCESS_METHODS.fromCreated: //override framerate?
+                processed = this.mediaCache[i].updateFromMetadataDate(input.targetFramerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.created);
+                logMessage = processed ? 'Changed start time to creation date.' : 'Error while updating thumbnail by creation date.';
+                break;
+            case CacheThumbnails.PROCESS_METHODS.fromLastChange:
+                processed = this.mediaCache[i].updateFromMetadataDate(input.targetFramerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.lastChanged);
+                logMessage = processed ? 'Changed start time to date of last change.' : 'Error while updating thumbnail by date of last change.';
+                break;
+
+
             default:
                 break;
         }
