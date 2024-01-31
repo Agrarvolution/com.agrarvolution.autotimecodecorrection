@@ -148,6 +148,22 @@ ThumbnailMetadata.prototype.updateFromMetadataDate = function (targetFramerate, 
     return this.updateTimecodeMetadata(new Timecode(dateUpdate, this.timecodeMetadata.framerate));
 }
 
+/**
+ * Updates / changes the starttime of a thumbnail.
+ * @param {Timecode} timecode 
+ * @param {boolean} overrideFramerate 
+ * @returns true on success
+ */
+ThumbnailMetadata.prototype.updateFromTimecode = function (timecode, overrideFramerate) {
+    if (!(timecode instanceof Timecode)) {
+        return false;
+    }
+
+    if (!overrideFramerate) {
+        timecode = timecode.convertByFramerate(this.timecodeMetadata.framerate);
+    }
+    return this.updateTimecodeMetadata(timecode);
+}
 
 /**
  * Update a ThumbnailMetadata startTime timecode with a new Timecode object.
