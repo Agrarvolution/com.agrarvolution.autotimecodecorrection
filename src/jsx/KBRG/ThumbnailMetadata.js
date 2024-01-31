@@ -71,6 +71,49 @@ ThumbnailMetadata.prototype.toString = function () {
 }
 
 /**
+ * Checks ThumbnailMetadata object is it contains any invalid framerate or timecode structure.
+ * It will than update the object with the targetFramerate.
+ * @param {number} targetFramerate check if input object contains targetFramerate 
+ * @param {boolean} errorOnly 
+ * @returns {boolean} true on success
+ */
+ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerate, errorOnly) {
+    targetFramerate = Number(targetFramerate || '');
+
+    if (isNaN(targetFramerate)) {
+        return false;
+    }
+
+    var hasError = false;
+    if (this.timecodeMetadata.framerate === 0) {
+        hasError = true;
+
+    }
+    if (this.timecodeMetadata.timecodeStruct === '') {
+        hasError = true;
+    }
+
+    if (hasError || !errorOnly) { // @Todo Check if this works as intended
+        return false;
+    }
+
+    this.timecodeMetadata.framerate = targetFramerate;
+
+    return this.updateTimecodeMetadata(this.timecodeMetadata.startTime.convertByFramerate(this.timecodeMetadata.framerate));
+}
+
+/**
+ * Reverts to the previously stored timecode.
+ * @returns {boolean} true on success
+ */
+ThumbnailMetadata.prototype.revertTimecodeChange = function () {
+    if (this.timecodeMetadata.prevStartTime.toValue() === 0 && this.timecodeMetadata.prevFramerate === 0) {
+        return false;
+    }
+    return this.updateTimecodeMetadata(this.timecodeMetadata.prevStartTime);
+}
+
+/**
  * Update a ThumbnailMetadata startTime timecode with a new Timecode object.
  * @param {Timecode} newStartTime
  * @return {boolean} exits the function with false then the input is not a Timecode object
