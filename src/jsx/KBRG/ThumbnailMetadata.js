@@ -215,6 +215,9 @@ ThumbnailMetadata.prototype.updateThumbnailMetadata = function () {
     }
 
     try {
+        if (this.thumb.locked) {
+            throw "Thumbnail is locked!";
+        }
         this.thumb.synchronousMetadata = new Metadata(this.xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
     } catch (e) {
         alert(e);

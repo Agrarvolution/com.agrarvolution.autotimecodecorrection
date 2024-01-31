@@ -19,9 +19,10 @@ declare class Thumbnail {
     children: array<Thumbnail>
     bestCreationDate: Date
     lastModifiedDate: Date
-    
+
     metadata: Metadata
     synchronousMetadata: Metadata
+    locked: boolean
 
 
 }
