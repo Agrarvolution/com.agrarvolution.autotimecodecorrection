@@ -20,7 +20,7 @@ Timecode.TIMEFORMATS = {
 
 /**
  * Creates a timecode object from a timecode string.
- * @param {string|array|object} timecode "hh:mm:ss:ff*"| [hh,mm,ss,ff] | {hours: hh, minutes: mm, seconds: ss, frames: ff}
+ * @param {Timecode|Date|object|array|number|string} timecode "hh:mm:ss:ff*"| [hh,mm,ss,ff] | {hours: hh, minutes: mm, seconds: ss, frames: ff}
  * @param {number} framerate 
  */
 function Timecode(timecode, framerate) {

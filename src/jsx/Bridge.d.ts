@@ -17,9 +17,12 @@ declare class Thumbnail {
     hasMetadata: boolean
     synchronousMetadata: any
     children: array<Thumbnail>
-
+    bestCreationDate: Date
+    lastModifiedDate: Date
+    
     metadata: Metadata
     synchronousMetadata: Metadata
+
 
 }
 
