@@ -246,8 +246,10 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
                 processed = this.mediaCache[i].updateFromMetadataDate(input.targetFramerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.lastChanged);
                 logMessage = processed ? 'Changed start time to date of last change.' : 'Error while updating thumbnail by date of last change.';
                 break;
-
-
+            case CacheThumbnails.PROCESS_METHODS.fromTimecode:
+                processed = this.mediaCache[i].updateFromTimecode(input, input.overrideFramerate); // @todo process inputs
+                logMessage = processed ? 'Changed start time by timecode input.' : 'Error while updating thumbnail by thumbnail input.';
+                break;
             default:
                 break;
         }
