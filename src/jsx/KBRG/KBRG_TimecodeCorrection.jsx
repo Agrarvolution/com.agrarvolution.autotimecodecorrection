@@ -268,7 +268,6 @@ Agrarvolution.timecodeCorrection = {
         };
     },
 
-
     /**
      * Compares all objects in media and timeCodeUpdates and calls changeStartTime if a match has been found.
      * Can't compare duration of files unlike the Premiere version.
@@ -306,56 +305,6 @@ Agrarvolution.timecodeCorrection = {
             return true
         }
         return false;
-    },
-    /**    
-        * Updates / changes the starttime of a given ProjectItem.
-        * @param {audioTC: {text: string, groups: object}} update
-        * @param {projectItem: object, filename: string, startTime: object} mediaItem
-        * @returns {boolean} true on success
-        // @Todo -> set flag if conversion should be by total frames or last frames only (premiere one works last frame only)
-    */
-    changeStartTime: function(update, mediaItem) {
-        if (this.overrideFramerate || mediaItem.framerate === 0) {
-            mediaItem.framerate = update.framerate;
-            mediaItem.isDropFrame = update.isDropFrame;
-        }
-
-        this.setEmptyStartTimeProperty(mediaItem);
-
-        var startTime = {};
-        startTime.groups = this.convertFramesToNewFramerate(update.audioTC.groups, update.framerate, mediaItem.framerate);
-
-        startTime.text = this.createTimecodeFromObj(startTime.groups, mediaItem.isDropFrame, mediaItem.framerate);
-
-        mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, this.previousTimeValue, mediaItem.startTime.text);
-        mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeValue", startTime.text);
-
-        if (mediaItem.tcStruct === 'startTimecode') {
-            mediaItem.xmp.setStructField(XMPConst.NS_DM, "altTimecode", XMPConst.NS_DM, "timeFormat",
-                mediaItem.xmp.getStructField(XMPConst.NS_DM, "startTimecode", XMPConst.NS_DM, "startTimecode").value);
-        }
-
-        if (mediaItem.sampleFrequency !== undefined) {
-            mediaItem.xmp.setProperty(XMPConst.NS_BWF, "timeReference",
-                this.timeToSamples(update.audioTC.groups, update.framerate, mediaItem.sampleFrequency).toString(), XMPConst.STRING);
-        }
-
-        try {
-            if (mediaItem.thumb.locked) {
-                throw "Thumbnail is locked!";
-            }
-            mediaItem.thumb.synchronousMetadata =
-                new Metadata(mediaItem.xmp.serialize(XMPConst.SERIALIZE_OMIT_PACKET_WRAPPER | XMPConst.SERIALIZE_USE_COMPACT_FORMAT));
-            this.logToCEP(mediaItem.filename + " - start time / timecode has been updated. (" + mediaItem.startTime.text + " -> " +
-                startTime.text + ")", Agrarvolution.logLevels.info);
-            this.processedMedia++;
-        } catch (e) {
-            this.logToCEP(mediaItem.filename + " - failed to update start time / timecode. (" + mediaItem.startTime.text + " -> " +
-                startTime.text + ")", Agrarvolution.logLevels.error);
-            this.logToCEP(e, Agrarvolution.logLevels.error);
-            return false;
-        }
-        return true;
     },
 
     /**
