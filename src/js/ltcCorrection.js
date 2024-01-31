@@ -59,7 +59,7 @@ $(function () {
 
     const csInterface = new CSInterface();
     csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, onAppThemeColorChanged);
-    csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
+    csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.timecodeCorrectionLog", function (e) {
         logger.addLog(e.data.text, e.data.logLevel);
     });
     csInterface.requestOpenExtension("com.agrarvolution.autoTimecodeCorrection.server", "");

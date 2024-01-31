@@ -223,25 +223,33 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
 
     for (var i = 0; i < this.mediaCache.length; i++) {
         var processed = false;
+        var logMessage = '';
         switch (method) {
             case CacheThumbnails.PROCESS_METHODS.fixXMP:
                 processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.targetFramerate, false);
+                logMessage = processed ? 'Changed the framerate of every thumbnail.' : 'Error while changed framerates of thumbnails.'; // @Todo don't use these ifs in loop
                 break;
             case CacheThumbnails.PROCESS_METHODS.fixXMPErrorOnly:
                 processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.targetFramerate, true);
+                logMessage = processed ? 'Corrected time formats of \'faulty}\' thumbnails.' : 'Error while correcting thumbnails.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.revertTimeCode: {
                 processed = this.mediaCache[i].revertTimecodeChanges();
+                logMessage = processed ? 'Reverted timecodes of every thumbnail.' : 'Error while reverting thumbnails.';
+                break;
             }
+            default:
+                break;
         }
 
         if (processed) {
             this.logCallback(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
                 this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            this.logCallback("Timevalues have been reverted.", Agrarvolution.logLevels.info, this.logTarget, this.logging);
+            this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
             this.processedMedia++;
         } else {
-            this.logCallback(this.mediaCache[i].filename + " - failed to fix time format.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
+            this.logCallback(this.mediaCache[i].toString() + " - Error during update.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
+            this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
             /**
              * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
              */

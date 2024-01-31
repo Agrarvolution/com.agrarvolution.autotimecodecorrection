@@ -40,7 +40,7 @@ $(function () {
 
     const csInterface = new CSInterface();
     csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, onAppThemeColorChanged);
-    csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.cepLogging", function (e) {
+    csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.timecodeRepairLog", function (e) {
         logger.addLog(e.data.text, e.data.logLevel);
     });
     csInterface.requestOpenExtension("com.agrarvolution.autoTimecodeCorrection.server", "");
@@ -108,7 +108,7 @@ function fixXMP(type) {
     let csObject = {
         framerate: settings.framerate,
         searchTarget: settings.searchTarget,
-        recursive: settings.searchRecursive,
+        searchRecursive: settings.searchRecursive,
         logging: settings.logging,
         errorOnly: type
     };
