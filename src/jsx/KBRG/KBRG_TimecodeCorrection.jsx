@@ -124,7 +124,7 @@ Agrarvolution.timecodeCorrection = {
             return false;
         }
 
-        var processedMedia = thumbnailCache.update(parameters, parameters.method);
+        var processedMedia = thumbnailCache.updateCache(parameters, parameters.method);
 
         if (processedMedia === 0) {
             Agrarvolution.logToCEP("No media was processed.",

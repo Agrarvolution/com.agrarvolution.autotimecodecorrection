@@ -87,7 +87,7 @@ ThumbnailMetadata.prototype.toTimecodeCSV = function () {
  * It will than update the object with the targetFramerate.
  * @param {number} targetFramerate check if input object contains targetFramerate 
  * @param {boolean} errorOnly 
- * @returns {boolean} true on success
+ * @returns {boolean|string} true on success
  */
 ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerate, errorOnly) {
     targetFramerate = Number(targetFramerate || '');
@@ -106,7 +106,7 @@ ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerat
     }
 
     if (errorOnly && !hasError) {
-        return false;
+        return 'skipped';
     }
 
     this.timecodeMetadata.framerate = targetFramerate;
@@ -249,7 +249,7 @@ ThumbnailMetadata.prototype.updateTimecodeMetadata = function (newStartTime) {
  * Basically a wrapper.
  * @returns {boolean} true on success
  */
-ThumbnailMetadata.prototype.updateThumbnailMetadata = function () {
+ThumbnailMetadata.prototype.updateThumbnailMetadata = function () { 
     if (!(this.xmp instanceof XMPMeta)) {
         return false;
     }

@@ -30,16 +30,21 @@ function tests() {
     $.writeln("Test revert time values stored in cache:\n" + cache);
 
     cache.updateCache({
-        framerate: 29.97
-    }, CacheThumbnails.PROCESS_METHODS.rebase);
-    $.writeln("Test rebase time values:\n" + cache);
-
-    cache.updateCache({
         framerate: 25
     }, CacheThumbnails.PROCESS_METHODS.fixXMP);
     $.writeln("Test fixing time values:\n" + cache);
 
+    cache.updateCache({
+        framerate: 50
+    }, CacheThumbnails.PROCESS_METHODS.rebase);
+    $.writeln("Test rebase time values:\n" + cache);
 
+
+    Agrarvolution.timecodeCorrection.processCEPInput({
+        framerate: 29.97,
+        method: CacheThumbnails.PROCESS_METHODS.rebase
+    });
+    $.writeln("Test process Input call:\n" + cache);
 }
 
 //Check WAV not saving metadata
