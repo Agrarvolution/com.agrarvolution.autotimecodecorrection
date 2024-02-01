@@ -237,7 +237,10 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
             default:
                 break;
         }
-
+        
+        if (processed.toString() === 'skipped') {
+            continue;
+        }
         if (processed) {
             this.logCallback(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
                 this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
