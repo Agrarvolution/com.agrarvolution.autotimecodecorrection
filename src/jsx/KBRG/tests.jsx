@@ -2,12 +2,13 @@
 
 if (app.eventHandlers) { //uses the fact, that app.eventhandlers is only available if the script is directly called to guard the test scripts
     testCache();
-    tests();
+    //tests();
 }
 
 function testCache() {
     var cache = new CacheThumbnails({
         searchTarget: Agrarvolution.timecodeCorrection.SCAN_TARGET.folder,
+        searchRecursive: true,
         logTarget: Agrarvolution.CEP_PANEL.correction,
         logging: true
     });

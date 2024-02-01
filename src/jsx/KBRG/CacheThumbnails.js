@@ -130,7 +130,7 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
     var metaDataExtractionSuccessful = metaThumb.extractMetadata();
 
     if (!metaDataExtractionSuccessful) {
-        this.logCallback('Metadata extraction of' + metaThumb + ' was unsuccessful.', Agrarvolution.logLevels.info, this.logTarget, this.logging);
+        this.logCallback('Metadata extraction of ' + metaThumb + ' was unsuccessful.', Agrarvolution.logLevels.info, this.logTarget, this.logging);
     }
 
     this.mediaCache.push(metaThumb);
@@ -237,18 +237,17 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
             default:
                 break;
         }
-        
+
         if (processed.toString() === 'skipped') {
             continue;
         }
         if (processed) {
             this.logCallback(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
                 this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            
+            processedMedia++;
         } else {
             this.logCallback(this.mediaCache[i].toString() + " - Error during update.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
         }
-        processedMedia++;
     }
 
     return processedMedia;
