@@ -43,6 +43,33 @@ Agrarvolution.timecodeCorrection = {
     targetFramerate: 25,
     overrideFramerate: false,
 
+
+    processCEPInput: function(parameters) { 
+        if (parameters === undefined) {
+            this.logToCEP("Called without parameters.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            return false;
+        }
+        this.logToCEP("Starting host script.", Agrarvolution.logLevels.info,parameter.logTarget, parameter.logging);
+
+        var thumbnailCache = new CacheThumbnails(parameters, this.logToCEP);
+        if (thumbnailCache.mediaCache.length === 0) {
+            this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            return false;
+        }
+        var processedMedia = thumbnailCache.update(parameters, parameters.method);
+
+        if (processedMedia === 0) {
+            this.logToCEP("No media was processed.",
+                Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
+            return false;
+        }
+
+        this.logToCEP("Time formats for " + processedMedia + " media thumbnails have been updated.",
+            Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
+        return true;
+    },
+
+
     /**
      * Caches media objects and fixes the xmp timeFormat - when invalid.
      *@return {boolean} true on success
@@ -187,66 +214,6 @@ Agrarvolution.timecodeCorrection = {
         }
         return false;
     },
-
-    /**
-     *Takes timecode inputs and validates every array item whether it contains valid timecode data.
-     *@returns {array} array containing parsed tiemcode updates 
-     */
-    parseTimecodeArray: function(timecodeUpdates, parameters) {
-        var i = 0;
-        var parsedUpdates = [];
-
-        for (i = 0; i < timeCodeUpdates.length; i++) {
-            var updateElement = this.validateTimecodeInput(timecodeUpdates[i]);
-
-            if (updateElement) {
-                parsedUpdates.push(updateElement);
-            }
-        }
-        this.logToCEP("Input times have been converted to numbers.", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
-        return parsedUpdates;
-    },
-    /**
-     * Checks whether timecode input contains any timecode data and returns false if there is an error.
-     * @param {object} timecodeInput 
-     * @param {object} parameter log parameters 
-     * @returns {boolean}
-     */
-    validateTimecodeInput(timecodeInput, parameters) {
-        var output = {};
-
-        if (!timecodeInput.name) {
-            this.logToCEP("The name of the input is missing.", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
-            return false;
-        }
-        output.name = timecodeInput.name;
-
-        output.framerate = Timecode.validateFramerate(timecodeInput.framerate);
-        if (output.framerate <= 0) {
-            this.logToCEP(timecodeInput.name + " - Framerate " + timecodeInput.framerate + " is invalid.", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
-            return false;
-        }
-
-        if (!timecodeInput.duration) {
-            this.logToCEP(timecodeInput.name + " - Data has no duration.", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
-            //return false; //This can't be easily used for processing in Bridge.
-        }
-        output.duration = new Timecode(timecodeInput.duration, output.framerate);
-
-        if (!timecodeInput.fileTC) {
-            this.logToCEP(timecodeInput.name + " - Couldn't parse file timecode. (" + timecodeInput.fileTC + ")", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
-            return false;
-        }
-        output.fileTC = new Timecode(timecodeInput.fileTC, output.framerate);
-
-        if (!timecodeInput.audioTC) {
-            this.logToCEP(timecodeInput.name + " - Couldn't parse audio timecode. (" + timecodeInput.audioTC + ")", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
-            return false;
-        }
-        output.audioTC = new Timecode(timecodeInput.audioTC, output.framerate);
-
-        return output;
-    }
 
     /**
      *CSXSEvent wrapping function to send log messages to the gui.

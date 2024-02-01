@@ -248,7 +248,8 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
                 logMessage = processed ? 'Changed start time to date of last change.' : 'Error while updating thumbnail by date of last change.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromTimecodes:
-                processed = this.mediaCache[i].updateFromTimecodes(input.timecodeUpdates, input.ignoreMediaStart, input.overrideFramerate);
+                var validatedInput = CacheThumbnails.validateTimecodeArray(input.timecodeUpdates, this.logCallback, this.logTarget, this.logging);
+                processed = this.mediaCache[i].updateFromTimecodes(validatedInput, input.ignoreMediaStart, input.overrideFramerate);
                 logMessage = processed ? 'Changed start time by timecode inputs.' : 'Error while updating thumbnail by thumbnail inputs.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromTimecode:
@@ -277,3 +278,71 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
     return processedMedia;
 }
 
+/**
+ * Takes timecode inputs and validates every array item whether it contains valid timecode data. 
+ * @param {array} timecodeUpdates 
+ * @param {function} logCallback 
+ * @param {boolean} logTarget 
+ * @param {boolean} logging 
+ * @returns {array} array containing parsed timecode updates 
+ */
+CacheThumbnails.validateTimecodeArray = function (timecodeUpdates, logCallback, logTarget, logging) {
+    if (!(timecodeUpdates instanceof Array)) {
+        return [];
+    }
+
+    var parsedUpdates = [];
+
+    for (var i = 0; i < timecodeUpdates.length; i++) {
+        var updateElement = this.validateTimecodeInput(timecodeUpdates[i], logCallback, logTarget, logging);
+
+        if (updateElement) {
+            parsedUpdates.push(updateElement);
+        }
+    }
+    logCallback("Input times have been converted to numbers.", Agrarvolution.logLevels.status, logTarget, logging);
+    return parsedUpdates;
+}
+/**
+ * Checks whether timecode input contains any timecode data and returns false if there is an error.
+ * @param {object} timecodeInput 
+ * @param {function} logCallback 
+ * @param {boolean} logTarget 
+ * @param {boolean} logging 
+ * @returns {object}
+ */
+CacheThumbnails.validateTimecodeInput = function (timecodeInput, logCallback, logTarget, logging) {
+    var output = {};
+
+    if (!timecodeInput.name) {
+        logCallback("The name of the input is missing.", Agrarvolution.logLevels.status, logTarget, logging);
+        return false;
+    }
+    output.name = timecodeInput.name;
+
+    output.framerate = Timecode.validateFramerate(timecodeInput.framerate);
+    if (output.framerate <= 0) {
+        logCallback(timecodeInput.name + " - Framerate " + timecodeInput.framerate + " is invalid.", Agrarvolution.logLevels.info, logTarget, logging);
+        return false;
+    }
+
+    if (!timecodeInput.duration) {
+        logCallback(timecodeInput.name + " - Data has no duration.", Agrarvolution.logLevels.info, logTarget, logging);
+        //return false; //This can't be easily used for processing in Bridge.
+    }
+    output.duration = new Timecode(timecodeInput.duration, output.framerate);
+
+    if (!timecodeInput.fileTC) {
+        logCallback(timecodeInput.name + " - Couldn't parse file timecode. (" + timecodeInput.fileTC + ")", Agrarvolution.logLevels.info, logTarget, logging);
+        return false;
+    }
+    output.fileTC = new Timecode(timecodeInput.fileTC, output.framerate);
+
+    if (!timecodeInput.audioTC) {
+        logCallback(timecodeInput.name + " - Couldn't parse audio timecode. (" + timecodeInput.audioTC + ")", Agrarvolution.logLevels.info, logTarget, logging);
+        return false;
+    }
+    output.audioTC = new Timecode(timecodeInput.audioTC, output.framerate);
+
+    return output;
+}
