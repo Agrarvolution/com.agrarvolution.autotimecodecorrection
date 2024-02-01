@@ -92,7 +92,8 @@ CacheThumbnails.prototype.toString = function (searchTarget) {
             break;
     }
 
-    return `${this.mediaCache.length} thumbnails have been cached ${method}: ${this.toStringCache()}.`
+    //return `${this.mediaCache.length} thumbnails have been cached ${method}: ${this.toStringCache()}.` //Literals not supported
+    return this.mediaCache.length + " thumbnails have been cached ${method}: " + this.toStringCache() + ".";
 }
 /**
  * Simple toString() function for the items in the media cache.
@@ -101,7 +102,7 @@ CacheThumbnails.prototype.toString = function (searchTarget) {
 CacheThumbnails.prototype.toStringCache = function () {
     var output = '[';
     for (var i = 0; i < this.mediaCache.length; i++) {
-        output += ` ${this.mediaCache[i]},`;
+        output += ' ' + this.mediaCache[i] + ',';
     }
     output.replace(/,$/, ' ]');
 
@@ -129,7 +130,7 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
     var metaDataExtractionSuccessful = metaThumb.extractMetadata();
 
     if (!metaDataExtractionSuccessful) {
-        this.logCallback(`Metadata extraction of ${metaThumb} was unsuccessful.`, Agrarvolution.logLevel.info, this.logTarget, this.logging);
+        this.logCallback('Metadata extraction of' + metaThumb + ' was unsuccessful.', Agrarvolution.logLevel.info, this.logTarget, this.logging);
     }
 
     this.mediaCache.push(metaThumb);
@@ -140,79 +141,6 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
 // -----------------
 // Process methods
 // -----------------
-
-/**
- * @Todo delete
- * Fixes the xmp property timeFormat with a new value. (InvalidTimecode)
- * @param {number} targetFramerate 
- * @returns {number} sum of processed media
- */
-CacheThumbnails.prototype.fixTimeFormat = function (targetFramerate, errorOnly) {
-    this.processedMedia = 0;
-    for (var i = 0; i < this.mediaCache.length; i++) {
-        var hasError = false;
-        if (this.mediaCache[i].timecodeMetadata.framerate === 0) {
-            this.mediaCache[i].timecodeMetadata.framerate = targetFramerate;
-            hasError = true;
-
-        }
-        if (this.mediaCache[i].timecodeMetadata.timecodeStruct === '') {
-            hasError = true;
-        }
-
-        if (!errorOnly || hasError) { //@Todo Find a better way to solved this instead of nested if - the whole structure might contain duplicated code.
-            if (!errorOnly) {
-                this.mediaCache[i].timecodeMetadata.framerate = targetFramerate;
-            }
-
-            if (this.mediaCache[i].updateTimecodeMetadata(this.mediaCache[i].timecodeMetadata.startTime.convertByFramerate(this.mediaCache[i].timecodeMetadata.framerate))) {
-                this.logCallback(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
-                    this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-                this.logCallback(this.mediaCache[i].filename + " - Time format fixed.", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-                this.processedMedia++;
-            } else {
-                this.logCallback(this.mediaCache[i].filename + " - failed to fix time format.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
-                /**
-                 * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
-                 */
-                // this.logCallback(JSON.stringify(e), Agrarvolution.logLevels.error);
-            }
-        }
-
-    }
-    return this.processesMedia;
-}
-
-
-/**
- *   @Todo delete
- * Reverts to the previously stored timecode.
- * Only uses one history element.
- * @return {number} sum of processed media
- */
-CacheThumbnails.prototype.revertTimecodeChanges = function () {
-    this.processedMedia = 0;
-    for (var i = 0; i < this.mediaCache.length; i++) {
-        if (this.mediaCache[i].timecodeMetadata.prevStartTime.toValue() === 0 && this.mediaCache[i].timecodeMetadata.prevFramerate === 0) {
-            continue;
-        }
-
-        if (this.mediaCache[i].updateTimecodeMetadata(this.mediaCache[i].timecodeMetadata.prevStartTime)) {
-            this.logCallback(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
-                this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            this.logCallback("Timevalues have been reverted.", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            this.processedMedia++;
-        } else {
-            this.logCallback(this.mediaCache[i].filename + " - failed to fix time format.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
-            /**
-             * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
-             */
-            // this.logCallback(JSON.stringify(e), Agrarvolution.logLevels.error);
-        }
-        this.processedMedia++;
-    }
-    return this.processesMedia;
-}
 
 CacheThumbnails.prototype.updateCache = function (input, method) {
     var processedMedia = 0;
@@ -264,7 +192,6 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
             this.logCallback(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
                 this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
             this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            this.processedMedia++;
         } else {
             this.logCallback(this.mediaCache[i].toString() + " - Error during update.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
             this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);

@@ -68,7 +68,7 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
 ThumbnailMetadata.prototype.toString = function () {
     var text = this.filename + " ";
     if (this.timecodeMetadata) {
-        text += `[${this.timecodeMetadata.startTime}@${this.timecodeMetadata.framerate}fps]`
+        text += '[' + this.timecodeMetadata.startTime + '@' + this.timecodeMetadata.framerate + 'fps]\n'
     }
     return text;
 }
@@ -96,7 +96,10 @@ ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerat
         hasError = true;
     }
 
-    if (hasError || !errorOnly) { // @Todo Check if this works as intended
+    /**
+     * @Todo Check if this works as intended
+     */
+    if (hasError || !errorOnly) {
         return false;
     }
 

@@ -1,4 +1,7 @@
 #include '../json2.js'
+#include 'CacheThumbnails.js'
+#include 'ThumbnailMetadata.js'
+#include 'Timecode.js'
 
 //add XMP context
 if (ExternalObject.AdobeXMPScript === undefined) {

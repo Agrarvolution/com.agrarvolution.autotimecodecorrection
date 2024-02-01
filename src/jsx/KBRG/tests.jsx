@@ -1,7 +1,7 @@
 #include 'KBRG_TimecodeCorrection.jsx';
 
 var timeCorrection = Agrarvolution.timecodeCorrection;
-
+timecodeCorrection;
 //timeCorrection.cacheMediaObjects();
 //timeCorrection.processInput(tcObject);
 //timeCorrection.updateTimeCodes();
