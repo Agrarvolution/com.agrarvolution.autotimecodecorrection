@@ -9,8 +9,8 @@ const TIMECODE_SOURCE = {
 };
 
 const PROCESS_METHODS = {
+    rebase: 'rebase',
     fixXMP: 'fix',
-    fixXMPErrorOnly: 'fixErrorOnly',
     revertTimeCode: 'revert',
     fromCreated: 'updateFromCreated',
     fromLastChange: 'updateFromLastChanged',

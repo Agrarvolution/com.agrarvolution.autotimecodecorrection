@@ -127,20 +127,20 @@ ThumbnailMetadata.prototype.revertTimecodeChange = function () {
 
 /**
  * Update start time of thumbnail by creation date or time of last modification. 
- * @param {number} targetFramerate 
+ * @param {number|string} targetFramerate 
  * @param {boolean} overrideFramerate
  * @param {number} metadataSelector 
  * @returns {boolean} true on success
  */
 ThumbnailMetadata.prototype.updateFromMetadataDate = function (targetFramerate, overrideFramerate, metadataSelector) {
     var dateUpdate = {};
-    targetFramerate = Number(targetFramerate || '');
+    targetFramerate = ThumbnailMetadata.checkMetadataFramerate(targetFramerate);
 
-    if (isNaN(targetFramerate)) {
+    if (targetFramerate === 0) {
         return false;
     }
-    if (this.timecodeMetadata.framerate <= 0 || overrideFramerate) { //add for files with missing time values
-        this.timecodeMetadata.framerate = targetFramerate;
+    if (this.timecodeMetadata.framerate > 0 && !overrideFramerate) { //add for files with missing time values
+        targetFramerate = this.timecodeMetadata.framerate;
     }
 
     switch (metadataSelector) {
@@ -153,7 +153,7 @@ ThumbnailMetadata.prototype.updateFromMetadataDate = function (targetFramerate, 
         default:
             return false;
     }
-
+    alert(dateUpdate.getHours());
     return this.updateTimecodeMetadata(new Timecode(dateUpdate, this.timecodeMetadata.framerate));
 }
 
@@ -249,7 +249,7 @@ ThumbnailMetadata.prototype.updateTimecodeMetadata = function (newStartTime) {
  * Basically a wrapper.
  * @returns {boolean} true on success
  */
-ThumbnailMetadata.prototype.updateThumbnailMetadata = function () { 
+ThumbnailMetadata.prototype.updateThumbnailMetadata = function () {
     if (!(this.xmp instanceof XMPMeta)) {
         return false;
     }
@@ -330,20 +330,22 @@ ThumbnailMetadata.extractTimecodeMetadata = function (xmp) {
 /**
  * Validates framerates read from metadata.
  * Returns 0 if the framerate was not a number.
- * @param {string} framerate 
+ * @param {number|string} framerate 
  * @returns {number} parsed framerate
  */
 ThumbnailMetadata.checkMetadataFramerate = function (framerate) {
-    var parsedFramerate = framerate.match(/\d+/g);
+    var parsedFramerate = framerate.toString().match(/\d+/g);
 
-    if (parsedFramerate && parsedFramerate.length) {
-        var newFramerate = Number(parsedFramerate[0]);
-
-        return newFramerate >= 1000 ?
-            newFramerate / 100 :
-            newFramerate === 23976 ?
-                23.976 :
-                newFramerate;
+    if (parsedFramerate == null || parsedFramerate.length < 1) {
+        return 0;
     }
-    return 0;
+    var newFramerate = Number(parsedFramerate[0]);
+
+    if (newFramerate === 23976) {
+        return 23.976;
+    }
+    if (newFramerate >= 1000) {
+        return newFramerate / 100;
+    }
+    return newFramerate;
 }

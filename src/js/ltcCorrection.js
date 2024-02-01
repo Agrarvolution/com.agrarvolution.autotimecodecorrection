@@ -269,7 +269,7 @@ function handleFileLoad(file) {
 
 
     const tcObject = {
-        timeCodes: timeCodes,
+        timecodes: timeCodes,
         searchRecursive: settings.searchRecursive,
         searchTarget: settings.searchTarget,
         ignoreMediaStart: settings.ignoreMediaStart,

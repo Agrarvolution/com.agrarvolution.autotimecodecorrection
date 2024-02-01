@@ -44,23 +44,40 @@ function tests() {
         framerate: 29.97,
         method: CacheThumbnails.PROCESS_METHODS.rebase
     });
-    $.writeln("Test process Input call:\n" + cache);
+    $.writeln("Test process input call:\n" + cache);
+
+    Agrarvolution.timecodeCorrection.processCEPInput({
+        timecodes: [{
+            filename: "GX010004.MP4",
+            framerate: 23.98,
+            duration: "00:00:10",
+            fileTC: "22:46:08:18",
+            audioTC: "21:49:13:08"
+        }, {
+            filename: "GX010005.MP4",
+            framerate: 23.98,
+            duration: "00:00:06",
+            fileTC: "21:49:29:21",
+            audioTC: "21:49:29:20"
+        }],
+        searchRecursive: true,
+        searchTarget: 0,
+        ignoreMediaStart: true,
+        overrideFramerate: true,
+        method: "updateFromTimecodes",
+        logTarget: 0,
+        logging: true
+    });
+    $.writeln("Test process timcecode updates from input call:\n" + cache);
+
+
+    Agrarvolution.timecodeCorrection.processCEPInput({
+        searchTarget: 0,
+        method: "updateFromLastChanged",
+        logging: true,
+        logTarget: 0,
+        framerate: "2997",
+        overrideFramerate: true
+    });
+    $.writeln("Test process input call:\n" + cache);
 }
-
-//Check WAV not saving metadata
-/*csvTimecodes = JSON.parse('[{"filename":"221111_001.WAV","framerate":25,"duration":{"text":"00:00:22","groups":{"hours":0,"minutes":0,"seconds":22,"frames":null}},"fileTC":{"text":"00:00:00:00","groups":{"hours":0,"minutes":0,"seconds":0,"frames":0}},"audioTC":{"text":"21:50:58:18","groups":{"hours":21,"minutes":50,"seconds":58,"frames":18}}},{"filename":"NZ6_3653.MOV","framerate":25,"duration":{"text":"00:00:14","groups":{"hours":0,"minutes":0,"seconds":14,"frames":null}},"fileTC":{"text":"20:47:36:10","groups":{"hours":20,"minutes":47,"seconds":36,"frames":10}},"audioTC":{"text":"21:50:03:08","groups":{"hours":21,"minutes":50,"seconds":3,"frames":8}}}]');
-timeCorrection.processInput({
-    timeCodes: csvTimecodes,
-    searchRecursive: true,
-    searchTarget: 2,
-    ignoreMediaStart: true,
-    logging: true
-});*/
-
-//get csv data
-/*
-timeCorrection.gatherTimecodes({
-    searchTarget: 2,
-    recursive: true,
-    logging: true
-});*/

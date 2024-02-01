@@ -202,8 +202,8 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
                 logMessage = processed ? 'Changed start time to date of last change.' : 'Error while updating thumbnail by date of last change.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromTimecodes:
-                var validatedInput = CacheThumbnails.validateTimecodeArray(input.timecodeUpdates, this.logCallback, this.logTarget, this.logging);
-                processed = this.mediaCache[i].updateFromTimecodes(validatedInput, input.ignoreMediaStart, input.overrideFramerate);
+                var validatedInput = CacheThumbnails.validateTimecodeArray(input.timecodes, this.logCallback, this.logTarget, this.logging);
+                processed = this.mediaCache[i].updateFromTimecodes(validatedInput, !input.ignoreMediaStart, input.overrideFramerate);
                 logMessage = processed ? 'Changed start time by timecode inputs.' : 'Error while updating thumbnail by thumbnail inputs.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromTimecode:
@@ -267,11 +267,11 @@ CacheThumbnails.validateTimecodeArray = function (timecodeUpdates, logCallback, 
 CacheThumbnails.validateTimecodeInput = function (timecodeInput, logCallback, logTarget, logging) {
     var output = {};
 
-    if (!timecodeInput.name) {
+    if (!timecodeInput.filename) {
         logCallback("The name of the input is missing.", Agrarvolution.logLevels.status, logTarget, logging);
         return false;
     }
-    output.name = timecodeInput.name;
+    output.name = timecodeInput.filename;
 
     output.framerate = Timecode.validateFramerate(timecodeInput.framerate);
     if (output.framerate <= 0) {

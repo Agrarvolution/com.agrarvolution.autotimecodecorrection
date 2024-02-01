@@ -37,7 +37,7 @@ function Timecode(timecode, framerate) {
         this.framerate = framerate;
     } else if (timecode instanceof Array) {
         this.setFromArray(timecode);
-    } else if (timecode instanceof Date) {
+    } else if (timecode instanceof Date || timecode.getHours) { //for some reason calling through CEP dates don't match Date
         this.setFromDate(timecode);
     } else if (timecode instanceof Object) {
         this.setFromGroup(timecode);
@@ -391,8 +391,10 @@ Timecode.createTimeFormat = function (framerate) {
     framerate = this.validateFramerate(framerate);
     var isDropFrame = this.isDropFrame(framerate);
 
-    if (framerate % 1 !== 0) {
-        framerate = Math.floor(framerate * 100);
+    if (framerate === 23.976) {
+        framerate = 23976;
+    } else if (framerate % 1 !== 0) {
+        framerate = Math.round(framerate * 100);
     }
     return isDropFrame ?
         framerate + this.TIMEFORMATS.drop :
