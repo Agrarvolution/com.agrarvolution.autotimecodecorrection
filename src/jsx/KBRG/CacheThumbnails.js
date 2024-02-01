@@ -110,16 +110,20 @@ CacheThumbnails.prototype.toStringCache = function () {
  *If it is a folder, it will call this method for all its children (depending on the settings.)
  *If it is a clip it will store some informations about the thumbnail into this namespace's media array for quicker search later in the process.
  *@param {Thumbnail} thumb Bridge folder element, see CEP reference
+ *@return {boolean} true on success
  */
 CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, searchRecursive) {
+    if (!(thumb instanceof Thumbnail)) {
+        return false;
+    }
     if (thumb.type === CacheThumbnails.THUMBNAIL_TYPES.folder && searchRecursive) {
         for (var i = 0; i < thumb.children.length; i++) {
             this.extractTimecodeFromThumbnail(thumb.children[i], searchRecursive);
         }
-        return;
+        return true;
     }
     if (thumb.type !== CacheThumbnails.THUMBNAIL_TYPES.file || !thumb.hasMetadata) {
-        return;
+        return false;
     }
 
     var metaThumb = new ThumbnailMetadata(thumb);
@@ -130,7 +134,7 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
     }
 
     this.mediaCache.push(metaThumb);
-
+    return true;
 }
 
 
