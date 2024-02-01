@@ -11,12 +11,16 @@ There is no guarantee every editing software is capable of interpreting Adobe XM
 
 ![Panel in Premiere Pro](payloads/panel_1.png)
 
-*Panel in Premiere Pro*
+*Premiere Pro - Correction panel*
 
-![Panel in Bridge](payloads/panel_3.png)
+![Correction panel with csv input in Bridge](payloads/bridge_panel_correction.png)
+![Correction panel with date mode in Bridge](payloads/bridge_panel_correction_date.png)
 
-*Panel in Bridge*
+*Bridge - correction panel in csv mode (left) and date mode (right).*
 
+![Repair panel in Bridge](payloads/bridge_panel_repair.png)
+
+*Bridge - repair panel used to rebase framerates or fix faulty values.*
 
 ## Why would you need that?
 
@@ -178,6 +182,11 @@ in progess
 - - -
 
 ### Changelist
+- 0.3.0 <-> 01.02.2024 (Focus on Bridge)
+    - Complete rework of the "backend" code
+    - Repair part moved into it's own panel
+    - Small bug fixes
+
 - 0.2.2 <-> 13.11.2022
     - Timecode metadata can now be exported to csv (Bridge only)
     - Timecode related metadata in audio files is handled better (Bridge only)
@@ -216,10 +225,7 @@ Running the plugin via the source code requires the setting up [Premiere Pro for
 
 Further informations for creating a package out of changed source code can be found under this link as well.
 
-The debugging port for the HTML of this panel is configured at port **7780**.
-```html
-http://localhost:7780/
-```
+The debugging ports of the panels are listed in ".debug".
 
 ## Future
 
