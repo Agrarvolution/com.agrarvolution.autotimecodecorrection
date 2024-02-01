@@ -187,7 +187,7 @@ Agrarvolution.timecodeCorrection = {
         }
         return false;
     },
-    
+
     /**
      *Takes timecode inputs and validates every array item whether it contains valid timecode data.
      *@returns {array} array containing parsed tiemcode updates 
@@ -231,60 +231,22 @@ Agrarvolution.timecodeCorrection = {
             this.logToCEP(timecodeInput.name + " - Data has no duration.", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
             //return false; //This can't be easily used for processing in Bridge.
         }
-        output.duration = new Timecode(timecodeInput.duration);
+        output.duration = new Timecode(timecodeInput.duration, output.framerate);
 
         if (!timecodeInput.fileTC) {
             this.logToCEP(timecodeInput.name + " - Couldn't parse file timecode. (" + timecodeInput.fileTC + ")", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
             return false;
         }
-        output.fileTC = new Timecode(timecodeInput.fileTC);
+        output.fileTC = new Timecode(timecodeInput.fileTC, output.framerate);
 
         if (!timecodeInput.audioTC) {
             this.logToCEP(timecodeInput.name + " - Couldn't parse audio timecode. (" + timecodeInput.audioTC + ")", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
             return false;
         }
-        output.audioTC = new Timecode(timecodeInput.audioTC);
+        output.audioTC = new Timecode(timecodeInput.audioTC, output.framerate);
 
         return output;
     }
-    /**
-     * Compares all objects in media and timeCodeUpdates and calls changeStartTime if a match has been found.
-     * Can't compare duration of files unlike the Premiere version.
-     * @returns {boolean} true on success
-     */
-    updateTimeCodes: function() {
-        this.logToCEP("Updating " + this.media.length + " discovered media items.", Agrarvolution.logLevels.status);
-        var i = 0,
-            j = 0;
-        if (!(this.timeCodeUpdates !== undefined && this.media !== undefined) || this.media.length === 0) {
-            return false;
-        }
-
-        for (i = 0; i < this.timeCodeUpdates.length; i++) {
-            for (j = 0; j < this.media.length; j++) {
-                if (this.timeCodeUpdates[i].filename.toUpperCase() === this.media[j].filename.toUpperCase() &&
-                    (this.ignoreMediaStart ? true : this.compareTimes(this.timeCodeUpdates[i].fileTC.groups, this.media[j].startTime.groups))
-                ) {
-                    this.changeStartTime(this.timeCodeUpdates[i], this.media[j]);
-                }
-            }
-        }
-        this.logToCEP("Updated " + this.processedMedia + " media thumbnails.", Agrarvolution.logLevels.status);
-        return true;
-    },
-    /**
-     *Compares two time groups.
-     *@param {{hour: number, minutes: number, seconds: number, frames: number}} timeObj1 
-     *@param {{hour: number, minutes: number, seconds: number, frames: number}} timeObj2
-     *@returns {boolean} true if values match 
-     */
-    compareTimes: function(timeObj1, timeObj2) {
-        if (timeObj1.hours === timeObj2.hours && timeObj1.minutes === timeObj2.minutes &&
-            timeObj1.seconds === timeObj2.seconds && (!isNaN(timeObj1.frames) || !isNaN(timeObj2.frames) ? true : timeObj1.frames === timeObj2.frames)) {
-            return true
-        }
-        return false;
-    },
 
     /**
      *CSXSEvent wrapping function to send log messages to the gui.

@@ -166,6 +166,37 @@ ThumbnailMetadata.prototype.updateFromTimecode = function (timecode, overrideFra
 }
 
 /**
+ * Loops through every update entitiy until a matching filename and or mediastart is found and then updates the object.
+ * @param {array} updates 
+ * @param {boolean} enableMediaStartComparison 
+ * @param {boolean} overrideFramerate 
+ * @returns true on success
+ */
+ThumbnailMetadata.prototype.updateFromtTimecodes = function (updates, enableMediaStartComparison, overrideFramerate) {
+    enableMediaStartComparison = enableMediaStartComparison || false; //default false
+
+    if (!(updates instanceof Array)) {
+        return false;
+    }
+
+    for (var i = 0; i < updates.length; i++) {
+        if (!updates[i].fileTC || !(updates[i].fileTC instanceof Timecode)) {
+            continue;
+        }
+
+        if (updates[i].name.toUpperCase() === this.filename.toUpperCase() &&
+            (enableMediaStartComparison ?
+                updates[i].fileTC === this.timecodeMetadata.startTime :
+                true) &&
+            updates[i].audioTC instanceof Timecode) {
+            return this.updateFromTimecode(updates[i].audioTC, overrideFramerate);
+        }
+    }
+
+    return false;
+}
+
+/**
  * Update a ThumbnailMetadata startTime timecode with a new Timecode object.
  * @param {Timecode} newStartTime
  * @return {boolean} exits the function with false then the input is not a Timecode object

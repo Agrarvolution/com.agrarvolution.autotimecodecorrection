@@ -12,7 +12,8 @@ CacheThumbnails.PROCESS_METHODS = {
     revertTimeCode: 'revert',
     fromCreated: 'updateFromCreated',
     fromLastChange: 'updateFromLastChanged',
-    fromTimecode: 'updateFromTimecode'
+    fromTimecode: 'updateFromTimecode',
+    fromTimecodes: 'updateFromTimecodes'
 }
 /**
  * Constructer for a thumbnail cache.
@@ -246,8 +247,12 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
                 processed = this.mediaCache[i].updateFromMetadataDate(input.targetFramerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.lastChanged);
                 logMessage = processed ? 'Changed start time to date of last change.' : 'Error while updating thumbnail by date of last change.';
                 break;
+            case CacheThumbnails.PROCESS_METHODS.fromTimecodes:
+                processed = this.mediaCache[i].updateFromTimecodes(input.timecodeUpdates, input.ignoreMediaStart, input.overrideFramerate);
+                logMessage = processed ? 'Changed start time by timecode inputs.' : 'Error while updating thumbnail by thumbnail inputs.';
+                break;
             case CacheThumbnails.PROCESS_METHODS.fromTimecode:
-                processed = this.mediaCache[i].updateFromTimecode(input, input.overrideFramerate); // @todo process inputs timecodes
+                processed = this.mediaCache[i].updateFromTimecode(input.timecode, input.overrideFramerate);
                 logMessage = processed ? 'Changed start time by timecode input.' : 'Error while updating thumbnail by thumbnail input.';
                 break;
             default:
