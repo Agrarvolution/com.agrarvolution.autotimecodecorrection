@@ -119,7 +119,7 @@ function fixXMP(type) {
     };
 
     let csInterface = new CSInterface();
-    csInterface.evalScript(`Agrarvolution.timecodeCorrection.fixXmpTimeFormat(${JSON.stringify(csObject)});`, function (e) {
+    csInterface.evalScript(`$.Agrarvolution.timecodeCorrection.fixXmpTimeFormat(${JSON.stringify(csObject)});`, function (e) {
         if (e === 'true') {
             logger.addLog("Time format was repaired.", Logger.LOG_LEVELS.status);
         } else if (e === 'false') {

@@ -22,6 +22,8 @@ XMPConst.NS_BWF = "http://ns.adobe.com/bwf/bext/1.0/";
 //define namespace
 var Agrarvolution = Agrarvolution || {};
 
+$.Agrarvolution = Agrarvolution;
+
 Agrarvolution.logLevels = {
     critical: "CRIT",
     status: "STAT",
@@ -87,18 +89,21 @@ Agrarvolution.timecodeCorrection = {
      */
     exportTimecodeData: function(parameters) {
         if (parameters === undefined) {
-            this.logToCEP("Called without parameters.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            Agrarvolution.logToCEP("Called without parameters.", Agrarvolution.logLevels.error, parameters.logTarget, parameters.logging);
             return '';
         }
-        this.logToCEP("Starting host script.", Agrarvolution.logLevels.info, parameter.logTarget, parameter.logging);
+        Agrarvolution.logToCEP("Starting host script.", Agrarvolution.logLevels.info, parameters.logTarget, parameters.logging);
 
         var thumbnailCache = new CacheThumbnails(parameters);
         if (thumbnailCache.mediaCache.length === 0) {
-            this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            Agrarvolution.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameters.logTarget, parameters.logging);
             return '';
         }
 
-        return thumbnailCache.toTimecodeCSV();
+        return JSON.stringify({
+            csv: thumbnailCache.toTimecodeCSV(),
+            path: app.document.presentationPath
+        });
     },
     /**
      * Handles input from CEP UI.
@@ -108,27 +113,27 @@ Agrarvolution.timecodeCorrection = {
      */
     processCEPInput: function(parameters) {
         if (parameters === undefined) {
-            this.logToCEP("Called without parameters.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            Agrarvolution.logToCEP("Called without parameters.", Agrarvolution.logLevels.error, parameters.logTarget, parameters.logging);
             return false;
         }
-        this.logToCEP("Starting host script.", Agrarvolution.logLevels.info, parameter.logTarget, parameter.logging);
+        Agrarvolution.logToCEP("Starting host script.", Agrarvolution.logLevels.info, parameters.logTarget, parameters.logging);
 
         var thumbnailCache = new CacheThumbnails(parameters);
         if (thumbnailCache.mediaCache.length === 0) {
-            this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            Agrarvolution.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameters.logTarget, parameters.logging);
             return false;
         }
 
         var processedMedia = thumbnailCache.update(parameters, parameters.method);
 
         if (processedMedia === 0) {
-            this.logToCEP("No media was processed.",
-                Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
+            Agrarvolution.logToCEP("No media was processed.",
+                Agrarvolution.logLevels.status, parameters.logTarget, parameters.logging);
             return false;
         }
 
-        this.logToCEP("Time formats for " + processedMedia + " media thumbnails have been updated.",
-            Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
+        Agrarvolution.logToCEP("Time formats for " + processedMedia + " media thumbnails have been updated.",
+            Agrarvolution.logLevels.status, parameters.logTarget, parameters.logging);
         return true;
     }
 };
