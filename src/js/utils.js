@@ -8,6 +8,21 @@ const TIMECODE_SOURCE = {
     lastChanged: 2
 };
 
+const PROCESS_METHODS = {
+    fixXMP: 'fix',
+    fixXMPErrorOnly: 'fixErrorOnly',
+    revertTimeCode: 'revert',
+    fromCreated: 'updateFromCreated',
+    fromLastChange: 'updateFromLastChanged',
+    fromTimecode: 'updateFromTimecode',
+    fromTimecodes: 'updateFromTimecodes'
+}
+
+const CEP_PANEL = {
+    correction: 0,
+    repair: 1,
+};
+
 class Logger {
     log; //log parent Node
     logArea; //logging textArea

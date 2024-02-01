@@ -99,9 +99,12 @@ $(function () {
  * Helper function to call host to fix the XMP value - timeFormat.
  */
 function fixXMP(type) {
+    let method = '';
     if (type) {
+        method = PROCESS_METHODS.fixXMPErrorOnly;
         logger.addLog("Fixing broken XMP timecode time format.", Logger.LOG_LEVELS.status);
     } else {
+        method = PROCESS_METHODS.fixXMP;
         logger.addLog("Update timecode time format.", Logger.LOG_LEVELS.status);
     }
 
@@ -110,6 +113,8 @@ function fixXMP(type) {
         searchTarget: settings.searchTarget,
         searchRecursive: settings.searchRecursive,
         logging: settings.logging,
+        method: method,
+        logTarget: CEP_PANEL.repair,
         errorOnly: type
     };
 

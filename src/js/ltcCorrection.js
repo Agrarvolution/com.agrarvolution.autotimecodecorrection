@@ -159,7 +159,7 @@ function exportCSV() {
     };
 
     const csInterface = new CSInterface();
-    csInterface.evalScript('Agrarvolution.timecodeCorrection.gatherTimecodes(' +
+    csInterface.evalScript('Agrarvolution.timecodeCorrection.gatherTimecodes(' + //accidentally deleted - needs incorporation
         JSON.stringify(csObject) + ');', async function (e) {
             logger.addLog("Timecodes arrived in frontend.", Logger.LOG_LEVELS.status);
             try {
@@ -193,11 +193,13 @@ function revertTimecodechanges() {
     const csObject = {
         searchTarget: settings.searchTarget,
         recursive: settings.searchRecursive,
+        method: PROCESS_METHODS.revertTimeCode,
+        logTarget: CEP_PANEL.correction,
         logging: settings.logging
     };
 
     const csInterface = new CSInterface();
-    csInterface.evalScript('Agrarvolution.timecodeCorrection.revertChanges(' +
+    csInterface.evalScript('Agrarvolution.timecodeCorrection.processCEPInput(' +
         JSON.stringify(csObject) + ');', function (e) {
             if (e === 'true') {
                 logger.addLog("Timecode changes have been reverted. Old values were stored.", Logger.LOG_LEVELS.status);
@@ -212,11 +214,15 @@ function revertTimecodechanges() {
  */
 function timecodeFromMetadata() {
     let logMessage = '';
+    let method = '';
+
     switch (settings.source) {
         case TIMECODE_SOURCE.created:
+            method = PROCESS_METHODS.fromCreated;
             logMessage = "Creating timecode from creation time.";
             break;
         case TIMECODE_SOURCE.lastChanged:
+            method = PROCESS_METHODS.fromLastChange;
             logMessage = "Creating timecode from time last changed.";
             break;
         default:
@@ -228,14 +234,15 @@ function timecodeFromMetadata() {
 
     let csObject = {
         searchTarget: settings.searchTarget,
-        source: settings.source,
+        method: method,
         logging: logger.verboseLogging,
+        logTarget: CEP_PANEL.correction,
         framerate: settings.framerate,
         overrideFramerate: settings.overrideFramerate
     };
 
     let csInterface = new CSInterface();
-    csInterface.evalScript('Agrarvolution.timecodeCorrection.timecodesFromMetadata(' + JSON.stringify(csObject) + ');', function (e) {
+    csInterface.evalScript('Agrarvolution.timecodeCorrection.processCEPInput(' + JSON.stringify(csObject) + ');', function (e) {
         if (e === 'true') {
             logger.addLog("Media has been updated. Process finished. Select the next file to be processed.", Logger.LOG_LEVELS.status);
         } else if (e === 'false') {
@@ -266,6 +273,8 @@ function handleFileLoad(file) {
         searchTarget: settings.searchTarget,
         ignoreMediaStart: settings.ignoreMediaStart,
         overrideFramerate: settings.overrideFramerate,
+        method: PROCESS_METHODS.fromTimecodes,
+        logTarget: CEP_PANEL.correction,
         logging: logger.verboseLogging
     };
 
@@ -276,7 +285,7 @@ function handleFileLoad(file) {
         logger.addLog(result, Logger.LOG_LEVELS.info);
     });
 
-    csInterface.evalScript('Agrarvolution.timecodeCorrection.processInput(' + JSON.stringify(tcObject) + ');', function (e) {
+    csInterface.evalScript('Agrarvolution.timecodeCorrection.processCEPInput(' + JSON.stringify(tcObject) + ');', function (e) {
         if (e === 'true') {
             logger.addLog("Media has been updated. Process finished. Select the next file to be processed.", Logger.LOG_LEVELS.status);
             $('#source')[0].value = "";
