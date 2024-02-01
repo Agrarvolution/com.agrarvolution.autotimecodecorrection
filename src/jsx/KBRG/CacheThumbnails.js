@@ -142,6 +142,14 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
 // Process methods
 // -----------------
 
+
+/**
+ * General process function for cache thumbnails.
+ * Previous system reused a lot of code in different places. Thus this is changed to a generic main function that branches into appropriate functions by method.
+ * @param {object} input generic input method - properties are tested before use 
+ * @param {string} method 
+ * @returns 
+ */
 CacheThumbnails.prototype.updateCache = function (input, method) {
     var processedMedia = 0;
     if (typeof method === 'number') {
