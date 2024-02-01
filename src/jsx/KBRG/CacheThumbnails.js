@@ -142,7 +142,25 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
 // Process methods
 // -----------------
 
+/**
+ * Gerates minimal csv string containing the media cache.
+ * @returns {string}
+ */
+CacheThumbnails.prototype.toTimecodeCSV = function () {
+    var csv = [[
+        'File Name',
+        'File TC',
+        'Framerate'
+    ].join(',')];
+    for (var i = 0; i < this.mediaCache.length; i++) {
+        var row = this.mediaCache[i].toCSV();
 
+        if (row !== '') {
+            csv.push(this.mediaCache[i].toCSV());
+        }
+    }
+    return csv.join('\n');
+}
 /**
  * General process function for cache thumbnails.
  * Previous system reused a lot of code in different places. Thus this is changed to a generic main function that branches into appropriate functions by method.

@@ -72,6 +72,16 @@ ThumbnailMetadata.prototype.toString = function () {
     }
     return text;
 }
+/**
+ * Generates a minimal csv row containing file name, start time and framerate.
+ * @returns {string}
+ */
+ThumbnailMetadata.prototype.toTimecodeCSV = function () {
+    if (this.timecodeMetadata == null) {
+        return '';
+    }
+    return [this.filename, this.timecodeMetadata.startTime, this.timecodeMetadata.framerate].join(',');
+}
 
 /**
  * Checks ThumbnailMetadata object is it contains any invalid framerate or timecode structure.
@@ -175,7 +185,7 @@ ThumbnailMetadata.prototype.updateFromTimecode = function (timecode, overrideFra
  * @param {boolean} overrideFramerate 
  * @returns true on success
  */
-ThumbnailMetadata.prototype.updateFromtTimecodes = function (updates, enableMediaStartComparison, overrideFramerate) {
+ThumbnailMetadata.prototype.updateFromTimecodes = function (updates, enableMediaStartComparison, overrideFramerate) {
     enableMediaStartComparison = enableMediaStartComparison || false; //default false
 
     if (!(updates instanceof Array)) {
