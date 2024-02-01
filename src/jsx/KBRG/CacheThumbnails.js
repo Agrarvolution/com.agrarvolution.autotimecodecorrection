@@ -7,8 +7,8 @@ CacheThumbnails.THUMBNAIL_TYPES = {
     other: 'other'
 };
 CacheThumbnails.PROCESS_METHODS = {
+    rebase: 'rebase',
     fixXMP: 'fix',
-    fixXMPErrorOnly: 'fixErrorOnly',
     revertTimeCode: 'revert',
     fromCreated: 'updateFromCreated',
     fromLastChange: 'updateFromLastChanged',
@@ -177,11 +177,11 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
         var processed = false;
         var logMessage = '';
         switch (method) {
-            case CacheThumbnails.PROCESS_METHODS.fixXMP:
+            case CacheThumbnails.PROCESS_METHODS.rebase:
                 processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, false);
                 logMessage = processed ? 'Changed the framerate of thumbnail.' : 'Error while changing the framerate of thumbnail.';
                 break;
-            case CacheThumbnails.PROCESS_METHODS.fixXMPErrorOnly:
+            case CacheThumbnails.PROCESS_METHODS.fixXMP:
                 processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, true);
                 logMessage = processed ? 'Corrected time format of \'faulty}\' thumbnail.' : 'Error while correcting thumbnail.';
                 break;

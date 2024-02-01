@@ -101,10 +101,10 @@ $(function () {
 function fixXMP(type) {
     let method = '';
     if (type) {
-        method = PROCESS_METHODS.fixXMPErrorOnly;
+        method = PROCESS_METHODS.fixXMP;
         logger.addLog("Fixing broken XMP timecode time format.", Logger.LOG_LEVELS.status);
     } else {
-        method = PROCESS_METHODS.fixXMP;
+        method = PROCESS_METHODS.rebase;
         logger.addLog("Update timecode time format.", Logger.LOG_LEVELS.status);
     }
 

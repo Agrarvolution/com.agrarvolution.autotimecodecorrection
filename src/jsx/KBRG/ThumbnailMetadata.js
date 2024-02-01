@@ -105,10 +105,7 @@ ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerat
         hasError = true;
     }
 
-    /**
-     * @Todo Check if this works as intended
-     */
-    if (hasError || !errorOnly) {
+    if (errorOnly && !hasError) {
         return false;
     }
 
