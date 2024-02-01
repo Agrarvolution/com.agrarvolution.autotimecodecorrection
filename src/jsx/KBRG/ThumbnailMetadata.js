@@ -232,7 +232,7 @@ ThumbnailMetadata.prototype.updateFromMetadataDate = function (targetFramerate, 
         default:
             return false;
     }
-    return this.updateTimecodeMetadata(new Timecode(dateUpdate, this.timecodeMetadata.framerate));
+    return this.updateTimecodeMetadata(new Timecode(dateUpdate, targetFramerate));
 }
 
 /**
@@ -310,7 +310,7 @@ ThumbnailMetadata.prototype.updateTimecodeMetadata = function (newStartTime) {
     this.xmp.setStructField(XMPConst.NS_DM, this.timecodeMetadata.timecodeStruct, XMPConst.NS_DM,
         ThumbnailMetadata.PREVIOUS_TIME_FORMAT, Timecode.createTimeFormat(this.timecodeMetadata.prevFramerate));
     this.xmp.setStructField(XMPConst.NS_DM, this.timecodeMetadata.timecodeStruct, XMPConst.NS_DM,
-        ThumbnailMetadata.PREVIOUS_TIME_FORMAT, this.timecodeMetadata.prevStartTime.toString());
+        ThumbnailMetadata.PREVIOUS_TIME_VALUE, this.timecodeMetadata.prevStartTime.toString());
 
     if (this.audioMetadata) {
         this.xmp.setProperty(XMPConst.NS_BWF, "timeReference",
