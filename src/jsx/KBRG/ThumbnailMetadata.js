@@ -1,4 +1,3 @@
-XMPConst.NS_BWF = "http://ns.adobe.com/bwf/bext/1.0/";
 ThumbnailMetadata.PREVIOUS_TIME_VALUE = 'previousTimeValue';
 ThumbnailMetadata.PREVIOUS_TIME_FORMAT = 'previousTimeFormat';
 ThumbnailMetadata.TIME_FORMAT = 'timeFormat';
@@ -68,7 +67,7 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
 ThumbnailMetadata.prototype.toString = function () {
     var text = this.filename + " ";
     if (this.timecodeMetadata) {
-        text += '[' + this.timecodeMetadata.startTime + '@' + this.timecodeMetadata.framerate + 'fps]\n'
+        text += '[' + this.timecodeMetadata.startTime.toString() + '@' + this.timecodeMetadata.framerate.toString() + 'fps]'
     }
     return text;
 }
@@ -341,7 +340,13 @@ ThumbnailMetadata.checkMetadataFramerate = function (framerate) {
     var parsedFramerate = framerate.match(/\d+/g);
 
     if (parsedFramerate && parsedFramerate.length) {
-        return Number(parsedFramerate[0]);
+        var newFramerate = Number(parsedFramerate[0]);
+
+        return newFramerate >= 1000 ?
+            newFramerate / 100 :
+            newFramerate === 23976 ?
+                23.976 :
+                newFramerate;
     }
     return 0;
 }

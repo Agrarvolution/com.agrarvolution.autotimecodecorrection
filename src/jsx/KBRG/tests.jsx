@@ -1,7 +1,15 @@
 #include 'KBRG_TimecodeCorrection.jsx';
 
 var timeCorrection = Agrarvolution.timecodeCorrection;
-timecodeCorrection;
+
+
+var cache = new CacheThumbnails({
+    searchTarget: Agrarvolution.timecodeCorrection.SCAN_TARGET,
+    logTarget: Agrarvolution.CEP_PANEL.correction,
+    logging: true
+});
+$.writeln(cache);
+$.writeln(cache.toTimecodeCSV());
 //timeCorrection.cacheMediaObjects();
 //timeCorrection.processInput(tcObject);
 //timeCorrection.updateTimeCodes();

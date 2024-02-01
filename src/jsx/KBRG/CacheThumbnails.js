@@ -18,25 +18,20 @@ CacheThumbnails.PROCESS_METHODS = {
 /**
  * Constructer for a thumbnail cache.
  * @param {object} parameters has to contain a search target, folder search and whether only erroneous thumbnails should be added 
- * @param {function} logCallback callback for logfunction where cache is created
  * @returns 
  */
-function CacheThumbnails(parameters, logCallback) {
+function CacheThumbnails(parameters) {
     this.mediaCache = [];
 
-    if (!(logCallback instanceof Function)) {
-        return {};
-    }
-
-    this.logCallback = logCallback;
+    this.logCallback = Agrarvolution.logToCEP;
 
     this.logTarget = parameters.logTarget || 0;
     this.logging = parameters.logging || false;
 
     if (this.cacheTimecodeOfThumbnails()) {
-        this.logCallback("Processing time strings was successfull.", Agrarvolution.logLevel.status, this.logTarget, this.logging);
+        this.logCallback("Processing time strings was successfull.", Agrarvolution.logLevels.status, this.logTarget, this.logging);
     } else {
-        this.logCallback("Processing time strings was unsuccessfull.", Agrarvolution.logLevel.error, this.logTarget, this.logging);
+        this.logCallback("Processing time strings was unsuccessfull.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
     }
 }
 
@@ -50,10 +45,10 @@ CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function (searchTarget, se
 
     var hasNoSelection = app.document.selectionLength === 0;
     if (hasNoSelection || searchTarget === Agrarvolution.timecodeCorrection.SCAN_TARGET.folder) { //process root - get all thumbnails if there is no selection
-        this.logCallback("Start searching for all media items.", Agrarvolution.logLevel.status);
+        this.logCallback("Start searching for all media items.", Agrarvolution.logLevels.status, this.logTarget, this.logging);
         app.document.selectAll();
     } else {
-        this.logCallback("Start searching for selected media items.", Agrarvolution.logLevel.status);
+        this.logCallback("Start searching for selected media items.", Agrarvolution.logLevels.status, this.logTarget, this.logging);
     }
 
     for (i = 0; i < app.document.selectionLength; i++) {
@@ -65,7 +60,7 @@ CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function (searchTarget, se
     }
 
     if (this.logging) {
-        this.logCallback(this.toString(), Agrarvolution.logLevel.info, this.logTarget, this.logging);
+        this.logCallback(this.toString(), Agrarvolution.logLevels.info, this.logTarget, this.logging);
     }
 
     if (this.mediaCache.length === 0) {
@@ -92,8 +87,8 @@ CacheThumbnails.prototype.toString = function (searchTarget) {
             break;
     }
 
-    //return `${this.mediaCache.length} thumbnails have been cached ${method}: ${this.toStringCache()}.` //Literals not supported
-    return this.mediaCache.length + " thumbnails have been cached ${method}: " + this.toStringCache() + ".";
+    //return `${this.mediaCache.length} thumbnails have been cached ${method}: ${this.toStringCache()}` //Literals not supported
+    return this.mediaCache.length + " thumbnails have been cached by " + method + ": " + this.toStringCache();
 }
 /**
  * Simple toString() function for the items in the media cache.
@@ -102,11 +97,10 @@ CacheThumbnails.prototype.toString = function (searchTarget) {
 CacheThumbnails.prototype.toStringCache = function () {
     var output = '[';
     for (var i = 0; i < this.mediaCache.length; i++) {
-        output += ' ' + this.mediaCache[i] + ',';
+        output += ' ' + this.mediaCache[i].toString() + ',';
     }
-    output.replace(/,$/, ' ]');
 
-    return output;
+    return output.replace(/,$/, '') + ' ]';
 }
 
 /**
@@ -130,7 +124,7 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
     var metaDataExtractionSuccessful = metaThumb.extractMetadata();
 
     if (!metaDataExtractionSuccessful) {
-        this.logCallback('Metadata extraction of' + metaThumb + ' was unsuccessful.', Agrarvolution.logLevel.info, this.logTarget, this.logging);
+        this.logCallback('Metadata extraction of' + metaThumb + ' was unsuccessful.', Agrarvolution.logLevels.info, this.logTarget, this.logging);
     }
 
     this.mediaCache.push(metaThumb);
@@ -153,13 +147,13 @@ CacheThumbnails.prototype.toTimecodeCSV = function () {
         'Framerate'
     ].join(',')];
     for (var i = 0; i < this.mediaCache.length; i++) {
-        var row = this.mediaCache[i].toCSV();
+        var row = this.mediaCache[i].toTimecodeCSV();
 
         if (row !== '') {
-            csv.push(this.mediaCache[i].toCSV());
+            csv.push(row);
         }
     }
-    return csv.join('\n');
+    return csv.join(',\n') + ',';
 }
 /**
  * General process function for cache thumbnails.
@@ -216,15 +210,15 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
 
         if (processed) {
             this.logCallback(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
-                this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
+                this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevelss.info, this.logTarget, this.logging);
+            this.logCallback(logMessage, Agrarvolution.logLevelss.info, this.logTarget, this.logging);
         } else {
-            this.logCallback(this.mediaCache[i].toString() + " - Error during update.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
-            this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
+            this.logCallback(this.mediaCache[i].toString() + " - Error during update.", Agrarvolution.logLevelss.error, this.logTarget, this.logging);
+            this.logCallback(logMessage, Agrarvolution.logLevelss.info, this.logTarget, this.logging);
             /**
              * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
              */
-            // this.logCallback(JSON.stringify(e), Agrarvolution.logLevels.error);
+            // this.logCallback(JSON.stringify(e), Agrarvolution.logLevelss.error);
         }
         processedMedia++;
     }
@@ -253,7 +247,7 @@ CacheThumbnails.validateTimecodeArray = function (timecodeUpdates, logCallback, 
             parsedUpdates.push(updateElement);
         }
     }
-    logCallback("Input times have been converted to numbers.", Agrarvolution.logLevels.status, logTarget, logging);
+    logCallback("Input times have been converted to numbers.", Agrarvolution.logLevelss.status, logTarget, logging);
     return parsedUpdates;
 }
 /**
@@ -268,31 +262,31 @@ CacheThumbnails.validateTimecodeInput = function (timecodeInput, logCallback, lo
     var output = {};
 
     if (!timecodeInput.name) {
-        logCallback("The name of the input is missing.", Agrarvolution.logLevels.status, logTarget, logging);
+        logCallback("The name of the input is missing.", Agrarvolution.logLevelss.status, logTarget, logging);
         return false;
     }
     output.name = timecodeInput.name;
 
     output.framerate = Timecode.validateFramerate(timecodeInput.framerate);
     if (output.framerate <= 0) {
-        logCallback(timecodeInput.name + " - Framerate " + timecodeInput.framerate + " is invalid.", Agrarvolution.logLevels.info, logTarget, logging);
+        logCallback(timecodeInput.name + " - Framerate " + timecodeInput.framerate + " is invalid.", Agrarvolution.logLevelss.info, logTarget, logging);
         return false;
     }
 
     if (!timecodeInput.duration) {
-        logCallback(timecodeInput.name + " - Data has no duration.", Agrarvolution.logLevels.info, logTarget, logging);
+        logCallback(timecodeInput.name + " - Data has no duration.", Agrarvolution.logLevelss.info, logTarget, logging);
         //return false; //This can't be easily used for processing in Bridge.
     }
     output.duration = new Timecode(timecodeInput.duration, output.framerate);
 
     if (!timecodeInput.fileTC) {
-        logCallback(timecodeInput.name + " - Couldn't parse file timecode. (" + timecodeInput.fileTC + ")", Agrarvolution.logLevels.info, logTarget, logging);
+        logCallback(timecodeInput.name + " - Couldn't parse file timecode. (" + timecodeInput.fileTC + ")", Agrarvolution.logLevelss.info, logTarget, logging);
         return false;
     }
     output.fileTC = new Timecode(timecodeInput.fileTC, output.framerate);
 
     if (!timecodeInput.audioTC) {
-        logCallback(timecodeInput.name + " - Couldn't parse audio timecode. (" + timecodeInput.audioTC + ")", Agrarvolution.logLevels.info, logTarget, logging);
+        logCallback(timecodeInput.name + " - Couldn't parse audio timecode. (" + timecodeInput.audioTC + ")", Agrarvolution.logLevelss.info, logTarget, logging);
         return false;
     }
     output.audioTC = new Timecode(timecodeInput.audioTC, output.framerate);

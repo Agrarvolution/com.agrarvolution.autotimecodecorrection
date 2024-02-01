@@ -192,9 +192,9 @@ Timecode.prototype.convertByFramerate = function (newFramerate) {
  * @param {string|number|object|Timecode} timecode
  * @returns {Timecode}
  */
-Timecode.prototype['+'] = function (timecode) {
-    return this.add(timecode);
-}
+// Timecode.prototype['+'] = function (timecode) { // possible but seems like a bad idea
+//     return this.add(timecode);
+// }
 /**
  * Adds timecode values. Creates a new Timecode object with the input.
  * This reuses the tests and vlaidation in the constructor.
@@ -217,9 +217,9 @@ Timecode.prototype.add = function (timecode) {
  * @param {string|number|object|Timecode} timecode
  * @returns {Timecode}
  */
-Timecode.prototype['-'] = function (timecode) {
-    return this.substract(timecode);
-}
+// Timecode.prototype['-'] = function (timecode) { // possible but seems like a bad idea
+//     return this.substract(timecode);
+// }
 /**
  * Substracts timecode values. Creates a new Timecode object with the input.
  * This reuses the tests and vlaidation in the constructor.
@@ -348,10 +348,6 @@ Timecode.createTimecodeFromSamples = function (samples, sampleFrequency, framera
  */
 Timecode.validateFramerate = function (framerate) {
     var correctedframerate = Number(framerate);
-
-    if (typeof framerate === 'string' && correctedframerate >= 1000) { //correct for timecode extraction from XMP.timeFormat
-        correctedframerate /= 100;
-    }
 
     if (//correctedframerate === 2397 || correctedframerate === 2398 ||
         correctedframerate === 23.98 || correctedframerate === 23.97) {

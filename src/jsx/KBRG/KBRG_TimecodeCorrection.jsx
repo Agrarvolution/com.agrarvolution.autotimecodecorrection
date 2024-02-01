@@ -32,6 +32,43 @@ Agrarvolution.CEP_PANEL = {
     correction: 0,
     repair: 1,
 };
+
+/**
+ *CSXSEvent wrapping function to send log messages to the gui.
+ *@param {string} text - text that should be sent to gui
+ *@param {string} logLevel - choose which log level to display in gui
+ *@param {number} parameters - selects which panel should receive the log messages
+ *@param {boolean} logging - enable logging
+ *@return {boolean}
+ */
+Agrarvolution.logToCEP = function(text, logLevel, targetPanel, logging) {
+    if (!xLib) {
+        return false;
+    }
+    if (!logging) {
+        return false;
+    }
+
+    var eventObj = new CSXSEvent();
+
+    targetPanel = targetPanel || Agrarvolution.CEP_PANEL.correction; //temp default
+    switch (targetPanel) {
+        case Agrarvolution.CEP_PANEL.correction:
+        default:
+            eventObj.type = "com.adobe.csxs.events.agrarvolution.timecodeCorrectionLog";
+            break;
+        case Agrarvolution.CEP_PANEL.repair:
+            eventObj.type = "com.adobe.csxs.events.agrarvolution.timecodeRepairLog";
+            break;
+    }
+    eventObj.data = JSON.stringify({
+        text: text,
+        logLevel: logLevel
+    });
+    eventObj.dispatch();
+    return true;
+}
+
 Agrarvolution.timecodeCorrection = {
     TIMECODE_SOURCE: {
         file: 0,
@@ -55,7 +92,7 @@ Agrarvolution.timecodeCorrection = {
         }
         this.logToCEP("Starting host script.", Agrarvolution.logLevels.info, parameter.logTarget, parameter.logging);
 
-        var thumbnailCache = new CacheThumbnails(parameters, this.logToCEP);
+        var thumbnailCache = new CacheThumbnails(parameters);
         if (thumbnailCache.mediaCache.length === 0) {
             this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
             return '';
@@ -76,7 +113,7 @@ Agrarvolution.timecodeCorrection = {
         }
         this.logToCEP("Starting host script.", Agrarvolution.logLevels.info, parameter.logTarget, parameter.logging);
 
-        var thumbnailCache = new CacheThumbnails(parameters, this.logToCEP);
+        var thumbnailCache = new CacheThumbnails(parameters);
         if (thumbnailCache.mediaCache.length === 0) {
             this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
             return false;
@@ -93,41 +130,5 @@ Agrarvolution.timecodeCorrection = {
         this.logToCEP("Time formats for " + processedMedia + " media thumbnails have been updated.",
             Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
         return true;
-    },
-
-    /**
-     *CSXSEvent wrapping function to send log messages to the gui.
-     *@param {string} text - text that should be sent to gui
-     *@param {string} logLevel - choose which log level to display in gui
-     *@param {number} parameters - selects which panel should receive the log messages
-     *@param {boolean} logging - enable logging
-     *@return {boolean}
-     */
-    logToCEP: function(text, logLevel, targetPanel, logging) {
-        if (!xLib) {
-            return false;
-        }
-        if (!logging) {
-            return false;
-        }
-
-        var eventObj = new CSXSEvent();
-
-        targetPanel = targetPanel || Agrarvolution.CEP_PANEL.correction; //temp default
-        switch (targetPanel) {
-            case Agrarvolution.CEP_PANEL.correction:
-            default:
-                eventObj.type = "com.adobe.csxs.events.agrarvolution.timecodeCorrectionLog";
-                break;
-            case Agrarvolution.CEP_PANEL.repair:
-                eventObj.type = "com.adobe.csxs.events.agrarvolution.timecodeRepairLog";
-                break;
-        }
-        eventObj.data = JSON.stringify({
-            text: text,
-            logLevel: logLevel
-        });
-        eventObj.dispatch();
-        return true;
-    },
+    }
 };
