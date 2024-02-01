@@ -41,6 +41,7 @@ Tested with:
 - Premiere Pro 14.5 (CC 2020)
 - Bridge 12.0.0.234 (CC 2022)
 - Bridge 13.0.0.562 (CC 2023)
+- Bridge 14.0.1.137 (CC 2024)
 
 ## Differences between Premiere and Bridge
 
@@ -173,6 +174,7 @@ in progess
 
 | Version    | Date      | Description
 |---------   |------     |------------
+| 0.3.0      | 01.02.2024 | Rework of processing code, small fixes, extra panel for repair
 | 0.2.2      | 13.11.2022 | Adds csv export of metadata, small fixes, updated style
 | 0.2.1      | 10.01.2022 | Rewrite of the extension to be compatible with Bridge
 | 0.2.0      | 15.01.2021 | Adds bridge as a plugin host
