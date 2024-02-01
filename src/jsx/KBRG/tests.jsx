@@ -1,6 +1,9 @@
 #include 'KBRG_TimecodeCorrection.jsx';
 
-tests();
+if (app.eventHandlers) { //uses the fact, that app.eventhandlers is only available if the script is directly called to guard the test scripts
+    tests();
+}
+
 
 function tests() {
     var cache = new CacheThumbnails({
@@ -10,9 +13,6 @@ function tests() {
     });
     $.writeln("Test cache toString():\n" + cache);
     $.writeln("Test cache toCSV():\n" + cache.toTimecodeCSV());
-
-    cache.updateCache({}, CacheThumbnails.PROCESS_METHODS.revertTimeCode);
-    $.writeln("Test revert time values stored in cache:\n" + cache);
 
     cache.updateCache({
         framerate: 25,
@@ -25,7 +25,21 @@ function tests() {
         overrideFramerate: true,
     }, CacheThumbnails.PROCESS_METHODS.fromLastChange);
     $.writeln("Test cache update by lastchange:\n" + cache);
-    
+
+    cache.updateCache({}, CacheThumbnails.PROCESS_METHODS.revertTimeCode);
+    $.writeln("Test revert time values stored in cache:\n" + cache);
+
+    cache.updateCache({
+        framerate: 29.97
+    }, CacheThumbnails.PROCESS_METHODS.rebase);
+    $.writeln("Test rebase time values:\n" + cache);
+
+    cache.updateCache({
+        framerate: 25
+    }, CacheThumbnails.PROCESS_METHODS.fixXMP);
+    $.writeln("Test fixing time values:\n" + cache);
+
+
 }
 
 //Check WAV not saving metadata
