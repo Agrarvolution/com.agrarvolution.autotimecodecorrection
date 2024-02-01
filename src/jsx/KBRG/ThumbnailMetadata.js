@@ -28,6 +28,30 @@ function ThumbnailMetadata(thumbnail) {
     this.filename = thumbnail.name;
     this.mimeType = thumbnail.mimeType;
 }
+
+/**
+ * Generates a shortened version of the Thumbnail metadata. For this use case only this.timecodeMetadata.startTime is really relevant.
+ * @returns {string}
+ */
+ThumbnailMetadata.prototype.toString = function () {
+    var text = this.filename + " ";
+    if (this.timecodeMetadata) {
+        text += '[' + this.timecodeMetadata.startTime.toString() + '@' + this.timecodeMetadata.framerate.toString() + 'fps]'
+    }
+    return text;
+}
+/**
+ * Generates a minimal csv row containing file name, start time and framerate.
+ * @returns {string}
+ */
+ThumbnailMetadata.prototype.toTimecodeCSV = function () {
+    if (this.timecodeMetadata == null) {
+        return '';
+    }
+    return [this.filename, this.timecodeMetadata.startTime, this.timecodeMetadata.framerate].join(',');
+}
+
+
 /**
  * Extracts timecode metadata from a thumbnails xmp data and sets these values for the object instance.
  * @return {boolean} on true, contains no errors, on false has values that errored / are invalid.
@@ -61,25 +85,80 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
 }
 
 /**
- * Generates a shortened version of the Thumbnail metadata. For this use case only this.timecodeMetadata.startTime is really relevant.
- * @returns {string}
+ * Extracts relevant audio metadata from a thumbnail's metadata.
+ * @param {XMPMetaInstance} xmp XMP object - see XMP specification 
+ * @returns {object} containing ending, samples, sample frequency and bitrate
  */
-ThumbnailMetadata.prototype.toString = function () {
-    var text = this.filename + " ";
-    if (this.timecodeMetadata) {
-        text += '[' + this.timecodeMetadata.startTime.toString() + '@' + this.timecodeMetadata.framerate.toString() + 'fps]'
+ThumbnailMetadata.extractAudioMetadata = function (xmp) {
+    var audioEncoding = xmp.getProperty(XMPConst.NS_BWF, "codingHistory").value || '';
+
+    var sampleFrequency = audioEncoding.match(/F=\d+/g);
+    if (sampleFrequency == null || sampleFrequency.length) {
+        sampleFrequency = 0;
+    } else {
+        sampleFrequency = Number(sampleFrequency[0].replace('F=', ''));
     }
-    return text;
+
+    var bitRate = audioEncoding.match(/W=\d+/g);
+    if (bitRate == null || !bitRate.length) {
+        bitRate = 0;
+    } else {
+        bitRate = Number(bitRate[0].replace('W=', ''));
+    }
+
+    var samples = xmp.getProperty(XMPConst.NS_BWF, "timeReference") || 0;
+
+    return {
+        audioEncoding: audioEncoding,
+        sampleFrequency: sampleFrequency,
+        bitRate: bitRate,
+        samples: samples
+    };
 }
+
 /**
- * Generates a minimal csv row containing file name, start time and framerate.
- * @returns {string}
+ * Extracts timecode metadata from xmp metadata.
+ * @param {XMPMetaInstance} xmp 
+ * @returns {object} containing start time, previous start time, framerate and whether the framerate is dropframe
  */
-ThumbnailMetadata.prototype.toTimecodeCSV = function () {
-    if (this.timecodeMetadata == null) {
-        return '';
+ThumbnailMetadata.extractTimecodeMetadata = function (xmp) {
+    var timecodeStruct = '';
+    if (xmp.doesPropertyExist(XMPConst.NS_DM, this.TIME_CODE_STRUCT.start)) { //prioritice start over alt timecode entries
+        timecodeStruct = this.TIME_CODE_STRUCT.start;
+    } else if (xmp.doesPropertyExist(XMPConst.NS_DM, this.TIME_CODE_STRUCT.alt)) {
+        timecodeStruct = this.TIME_CODE_STRUCT.alt;
     }
-    return [this.filename, this.timecodeMetadata.startTime, this.timecodeMetadata.framerate].join(',');
+
+    var framerate = 0;
+    if (timecodeStruct !== '' && xmp.doesStructFieldExist(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.TIME_FORMAT)) {
+        framerate = this.checkMetadataFramerate(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.TIME_FORMAT).value || '');
+    }
+
+    var startTime = new Timecode();
+    if (timecodeStruct !== '' && xmp.doesStructFieldExist(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.TIME_VALUE)) {
+        startTime = new Timecode(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.TIME_VALUE).value, framerate);
+    }
+
+
+    var prevFramerate = 0;
+    if (timecodeStruct !== '' && xmp.doesStructFieldExist(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_FORMAT)) {
+    prevFramerate = this.checkMetadataFramerate(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_FORMAT).value || '');
+    }
+
+    var prevStartTime = new Timecode();
+    if (timecodeStruct !== '' && xmp.doesStructFieldExist(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_VALUE)) {
+        prevStartTime = new Timecode(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_VALUE).value, prevFramerate);
+    }
+    var isDropFrame = Timecode.isDropFrame(framerate);
+
+    return {
+        startTime: startTime,
+        prevStartTime: prevStartTime,
+        framerate: framerate,
+        prevFramerate: prevFramerate,
+        isDropFrame: isDropFrame,
+        timecodeStruct: timecodeStruct
+    }
 }
 
 /**
@@ -119,7 +198,7 @@ ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerat
  * @returns {boolean} true on success
  */
 ThumbnailMetadata.prototype.revertTimecodeChange = function () {
-    if (this.timecodeMetadata.prevStartTime.toValue() === 0 && this.timecodeMetadata.prevFramerate === 0) {
+    if (this.timecodeMetadata.prevStartTime.toValue() === 0 || this.timecodeMetadata.prevFramerate === 0) {
         return false;
     }
     return this.updateTimecodeMetadata(this.timecodeMetadata.prevStartTime);
@@ -264,67 +343,6 @@ ThumbnailMetadata.prototype.updateThumbnailMetadata = function () {
         return false;
     }
     return true;
-}
-
-/**
- * Extracts relevant audio metadata from a thumbnail's metadata.
- * @param {XMPMetaInstance} xmp XMP object - see XMP specification 
- * @returns {object} containing ending, samples, sample frequency and bitrate
- */
-ThumbnailMetadata.extractAudioMetadata = function (xmp) {
-    var audioEncoding = xmp.getProperty(XMPConst.NS_BWF, "codingHistory").value || '';
-
-    var sampleFrequency = audioEncoding.match(/F=\d+/g);
-    if (sampleFrequency == null || sampleFrequency.length) {
-        sampleFrequency = 0;
-    } else {
-        sampleFrequency = Number(sampleFrequency[0].replace('F=', ''));
-    }
-
-    var bitRate = audioEncoding.match(/W=\d+/g);
-    if (bitRate == null || !bitRate.length) {
-        bitRate = 0;
-    } else {
-        bitRate = Number(bitRate[0].replace('W=', ''));
-    }
-
-    var samples = xmp.getProperty(XMPConst.NS_BWF, "timeReference") || 0;
-
-    return {
-        audioEncoding: audioEncoding,
-        sampleFrequency: sampleFrequency,
-        bitRate: bitRate,
-        samples: samples
-    };
-}
-
-/**
- * Extracts timecode metadata from xmp metadata.
- * @param {XMPMetaInstance} xmp 
- * @returns {object} containing start time, previous start time, framerate and whether the framerate is dropframe
- */
-ThumbnailMetadata.extractTimecodeMetadata = function (xmp) {
-    var timecodeStruct = '';
-    if (xmp.doesPropertyExist(XMPConst.NS_DM, this.TIME_CODE_STRUCT.start)) { //prioritice start over alt timecode entries
-        timecodeStruct = this.TIME_CODE_STRUCT.start;
-    } else if (xmp.doesPropertyExist(XMPConst.NS_DM, this.TIME_CODE_STRUCT.alt)) {
-        timecodeStruct = this.TIME_CODE_STRUCT.alt;
-    }
-    var framerate = this.checkMetadataFramerate(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.TIME_FORMAT).value || '');
-    var startTime = new Timecode(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.TIME_VALUE).value, framerate);
-
-    var prevFramerate = this.checkMetadataFramerate(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_FORMAT).value || '');
-    var prevStartTime = new Timecode(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_VALUE).value, prevFramerate);
-    var isDropFrame = Timecode.isDropFrame(framerate);
-
-    return {
-        startTime: startTime,
-        prevStartTime: prevStartTime,
-        framerate: framerate,
-        prevFramerate: prevFramerate,
-        isDropFrame: isDropFrame,
-        timecodeStruct: timecodeStruct
-    }
 }
 
 /**

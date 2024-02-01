@@ -177,38 +177,62 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
         return processedMedia;
     }
 
+    var validatedInput = [];
+    if (input.timecodes instanceof Array) {
+        validatedInput = CacheThumbnails.validateTimecodeArray(input.timecodes, this.logCallback, this.logTarget, this.logging);
+    }
+
+    var logMessage = '';
+    switch (method) {
+        case CacheThumbnails.PROCESS_METHODS.rebase:
+            logMessage = 'About to change the framerate of thumbnails.';
+            break;
+        case CacheThumbnails.PROCESS_METHODS.fixXMP:
+            logMessage = 'About to correct time format of \'faulty}\' thumbnails.';
+            break;
+        case CacheThumbnails.PROCESS_METHODS.revertTimeCode:
+            logMessage = 'About to revert start time from thumbnails.';
+            break;
+        case CacheThumbnails.PROCESS_METHODS.fromCreated:
+            logMessage = 'About to change start time of thumbnails to creation date.';
+            break;
+        case CacheThumbnails.PROCESS_METHODS.fromLastChange:
+            logMessage = 'About to change start time of thumbnails to last modification date.';
+            break;
+        case CacheThumbnails.PROCESS_METHODS.fromTimecodes:
+            logMessage = 'About to change start time by timecode inputs.';
+            break;
+        case CacheThumbnails.PROCESS_METHODS.fromTimecode:
+            logMessage = 'About to Change start time by timecode input.';
+            break;
+        default:
+            break;
+    }
+    this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
+
     for (var i = 0; i < this.mediaCache.length; i++) {
         var processed = false;
-        var logMessage = '';
         switch (method) {
             case CacheThumbnails.PROCESS_METHODS.rebase:
                 processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, false);
-                logMessage = processed ? 'Changed the framerate of thumbnail.' : 'Error while changing the framerate of thumbnail.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fixXMP:
                 processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, true);
-                logMessage = processed ? 'Corrected time format of \'faulty}\' thumbnail.' : 'Error while correcting thumbnail.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.revertTimeCode:
                 processed = this.mediaCache[i].revertTimecodeChange();
-                logMessage = processed ? 'Reverted start time from thumbnail.' : 'Error while reverting thumbnail.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromCreated:
                 processed = this.mediaCache[i].updateFromMetadataDate(input.framerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.created);
-                logMessage = processed ? 'Changed start time to creation date.' : 'Error while updating thumbnail by creation date.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromLastChange:
                 processed = this.mediaCache[i].updateFromMetadataDate(input.framerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.lastChanged);
-                logMessage = processed ? 'Changed start time to date of last change.' : 'Error while updating thumbnail by date of last change.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromTimecodes:
-                var validatedInput = CacheThumbnails.validateTimecodeArray(input.timecodes, this.logCallback, this.logTarget, this.logging);
                 processed = this.mediaCache[i].updateFromTimecodes(validatedInput, !input.ignoreMediaStart, input.overrideFramerate);
-                logMessage = processed ? 'Changed start time by timecode inputs.' : 'Error while updating thumbnail by thumbnail inputs.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromTimecode:
                 processed = this.mediaCache[i].updateFromTimecode(input.timecode, input.overrideFramerate);
-                logMessage = processed ? 'Changed start time by timecode input.' : 'Error while updating thumbnail by thumbnail input.';
                 break;
             default:
                 break;
@@ -217,17 +241,13 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
         if (processed) {
             this.logCallback(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
                 this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
+            
         } else {
             this.logCallback(this.mediaCache[i].toString() + " - Error during update.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
-            this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
-            /**
-             * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
-             */
-            // this.logCallback(JSON.stringify(e), Agrarvolution.logLevels.error);
         }
         processedMedia++;
     }
+
     return processedMedia;
 }
 

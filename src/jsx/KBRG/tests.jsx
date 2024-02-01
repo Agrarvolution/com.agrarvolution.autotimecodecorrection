@@ -1,9 +1,17 @@
 #include 'KBRG_TimecodeCorrection.jsx';
 
 if (app.eventHandlers) { //uses the fact, that app.eventhandlers is only available if the script is directly called to guard the test scripts
-    tests();
+    //tests();
+    testCache();
 }
 
+function testCache() {
+    var cache = new CacheThumbnails({
+        searchTarget: Agrarvolution.timecodeCorrection.SCAN_TARGET.folder,
+        logTarget: Agrarvolution.CEP_PANEL.correction,
+        logging: true
+    });
+}
 
 function tests() {
     var cache = new CacheThumbnails({

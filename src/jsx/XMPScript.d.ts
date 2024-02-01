@@ -26,6 +26,7 @@ interface XMPMetaInstance {
     setStructField(NS_DM: string, structName: string, NS_DM1: string, property: string, value: string): void;
 	getStructField(NS_DM: string, timecodeStruct: string, NS_DM1: string, arg3: string): XMPProperty
 	doesPropertyExist(namespace:string, value:string): boolean
+	doesStructFieldExist(NS_DM: string, timecodeStruct: string, NS_DM1: string, TIME_FORMAT: string): boolean;
 	getProperty(namespace:string, property:string): XMPProperty
 	setProperty(namespace:string, property:string, value:string): boolean
 	setProperty(namespace:string, property:string, value:string, flags: number): boolean

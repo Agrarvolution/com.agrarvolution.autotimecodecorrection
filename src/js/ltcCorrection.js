@@ -340,7 +340,7 @@ function checkCSV(csv, version) {
             if (rowResult !== false) {
                 timeCodes.push(rowResult);
                 logger.addLog(rowResult.filename + " - Parsed and staged at " + rowResult.framerate + " fps. [" +
-                    rowResult.fileTC.text + " -> " + rowResult.audioTC.text + "]", Logger.LOG_LEVELS.info);
+                    rowResult.fileTC + " -> " + rowResult.audioTC + "]", Logger.LOG_LEVELS.info);
             }
 
         }

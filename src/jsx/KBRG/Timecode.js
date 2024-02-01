@@ -20,11 +20,12 @@ Timecode.TIMEFORMATS = {
 
 /**
  * Creates a timecode object from a timecode string.
- * @param {Timecode|Date|object|array|number|string} timecode "hh:mm:ss:ff*"| [hh,mm,ss,ff] | {hours: hh, minutes: mm, seconds: ss, frames: ff}
- * @param {number} framerate 
+ * @param {void|Timecode|Date|object|array|number|string} timecode "hh:mm:ss:ff*"| [hh,mm,ss,ff] | {hours: hh, minutes: mm, seconds: ss, frames: ff}
+ * @param {void|number} framerate 
  */
 function Timecode(timecode, framerate) {
-    this.framerate = Timecode.validateFramerate(framerate);
+    framerate = Timecode.validateFramerate(framerate)
+    this.framerate = framerate;
     this.hours = 0;
     this.minutes = 0;
     this.seconds = 0;
@@ -37,7 +38,7 @@ function Timecode(timecode, framerate) {
         this.framerate = framerate;
     } else if (timecode instanceof Array) {
         this.setFromArray(timecode);
-    } else if (timecode instanceof Date || timecode.getHours) { //for some reason calling through CEP dates don't match Date
+    } else if (timecode instanceof Date || (timecode && timecode.getHours)) { //for some reason calling through CEP dates don't match Date
         this.setFromDate(timecode);
     } else if (timecode instanceof Object) {
         this.setFromGroup(timecode);
@@ -343,7 +344,7 @@ Timecode.createTimecodeFromSamples = function (samples, sampleFrequency, framera
 /**
  * Validate framerate replaces invalid inputs with 0.
  * @important The logic assumes that values given with string originate from XMP metadata and thus are 100x too large. This is a possible sideeffect.
- * @param {number|string} framerate 
+ * @param {void|number|string} framerate 
  * @returns {number}
  */
 Timecode.validateFramerate = function (framerate) {
