@@ -178,23 +178,23 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
         var logMessage = '';
         switch (method) {
             case CacheThumbnails.PROCESS_METHODS.fixXMP:
-                processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.targetFramerate, false);
+                processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, false);
                 logMessage = processed ? 'Changed the framerate of thumbnail.' : 'Error while changing the framerate of thumbnail.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fixXMPErrorOnly:
-                processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.targetFramerate, true);
+                processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, true);
                 logMessage = processed ? 'Corrected time format of \'faulty}\' thumbnail.' : 'Error while correcting thumbnail.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.revertTimeCode:
-                processed = this.mediaCache[i].revertTimecodeChanges();
+                processed = this.mediaCache[i].revertTimecodeChange();
                 logMessage = processed ? 'Reverted start time from thumbnail.' : 'Error while reverting thumbnail.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromCreated:
-                processed = this.mediaCache[i].updateFromMetadataDate(input.targetFramerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.created);
+                processed = this.mediaCache[i].updateFromMetadataDate(input.framerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.created);
                 logMessage = processed ? 'Changed start time to creation date.' : 'Error while updating thumbnail by creation date.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromLastChange:
-                processed = this.mediaCache[i].updateFromMetadataDate(input.targetFramerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.lastChanged);
+                processed = this.mediaCache[i].updateFromMetadataDate(input.framerate, input.overrideFramerate, ThumbnailMetadata.METADATA_DATE.lastChanged);
                 logMessage = processed ? 'Changed start time to date of last change.' : 'Error while updating thumbnail by date of last change.';
                 break;
             case CacheThumbnails.PROCESS_METHODS.fromTimecodes:
@@ -212,15 +212,15 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
 
         if (processed) {
             this.logCallback(this.mediaCache[i].filename + " - start time / timecode has been updated. (" + this.mediaCache[i].timecodeMetadata.prevStartTime + " -> " +
-                this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevelss.info, this.logTarget, this.logging);
-            this.logCallback(logMessage, Agrarvolution.logLevelss.info, this.logTarget, this.logging);
+                this.mediaCache[i].timecodeMetadata.startTime + ")", Agrarvolution.logLevels.info, this.logTarget, this.logging);
+            this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
         } else {
-            this.logCallback(this.mediaCache[i].toString() + " - Error during update.", Agrarvolution.logLevelss.error, this.logTarget, this.logging);
-            this.logCallback(logMessage, Agrarvolution.logLevelss.info, this.logTarget, this.logging);
+            this.logCallback(this.mediaCache[i].toString() + " - Error during update.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
+            this.logCallback(logMessage, Agrarvolution.logLevels.info, this.logTarget, this.logging);
             /**
              * @ToDo Exceptions got lost in process - maybe a thing to reimplement.
              */
-            // this.logCallback(JSON.stringify(e), Agrarvolution.logLevelss.error);
+            // this.logCallback(JSON.stringify(e), Agrarvolution.logLevels.error);
         }
         processedMedia++;
     }
@@ -249,7 +249,7 @@ CacheThumbnails.validateTimecodeArray = function (timecodeUpdates, logCallback, 
             parsedUpdates.push(updateElement);
         }
     }
-    logCallback("Input times have been converted to numbers.", Agrarvolution.logLevelss.status, logTarget, logging);
+    logCallback("Input times have been converted to numbers.", Agrarvolution.logLevels.status, logTarget, logging);
     return parsedUpdates;
 }
 /**
@@ -264,31 +264,31 @@ CacheThumbnails.validateTimecodeInput = function (timecodeInput, logCallback, lo
     var output = {};
 
     if (!timecodeInput.name) {
-        logCallback("The name of the input is missing.", Agrarvolution.logLevelss.status, logTarget, logging);
+        logCallback("The name of the input is missing.", Agrarvolution.logLevels.status, logTarget, logging);
         return false;
     }
     output.name = timecodeInput.name;
 
     output.framerate = Timecode.validateFramerate(timecodeInput.framerate);
     if (output.framerate <= 0) {
-        logCallback(timecodeInput.name + " - Framerate " + timecodeInput.framerate + " is invalid.", Agrarvolution.logLevelss.info, logTarget, logging);
+        logCallback(timecodeInput.name + " - Framerate " + timecodeInput.framerate + " is invalid.", Agrarvolution.logLevels.info, logTarget, logging);
         return false;
     }
 
     if (!timecodeInput.duration) {
-        logCallback(timecodeInput.name + " - Data has no duration.", Agrarvolution.logLevelss.info, logTarget, logging);
+        logCallback(timecodeInput.name + " - Data has no duration.", Agrarvolution.logLevels.info, logTarget, logging);
         //return false; //This can't be easily used for processing in Bridge.
     }
     output.duration = new Timecode(timecodeInput.duration, output.framerate);
 
     if (!timecodeInput.fileTC) {
-        logCallback(timecodeInput.name + " - Couldn't parse file timecode. (" + timecodeInput.fileTC + ")", Agrarvolution.logLevelss.info, logTarget, logging);
+        logCallback(timecodeInput.name + " - Couldn't parse file timecode. (" + timecodeInput.fileTC + ")", Agrarvolution.logLevels.info, logTarget, logging);
         return false;
     }
     output.fileTC = new Timecode(timecodeInput.fileTC, output.framerate);
 
     if (!timecodeInput.audioTC) {
-        logCallback(timecodeInput.name + " - Couldn't parse audio timecode. (" + timecodeInput.audioTC + ")", Agrarvolution.logLevelss.info, logTarget, logging);
+        logCallback(timecodeInput.name + " - Couldn't parse audio timecode. (" + timecodeInput.audioTC + ")", Agrarvolution.logLevels.info, logTarget, logging);
         return false;
     }
     output.audioTC = new Timecode(timecodeInput.audioTC, output.framerate);
