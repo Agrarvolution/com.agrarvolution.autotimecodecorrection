@@ -187,87 +187,66 @@ Agrarvolution.timecodeCorrection = {
         }
         return false;
     },
+    
     /**
-    *@Todo delete
-
-     *Calls timeValuesToInt(group) to convert time strings into numbers.
-     *Can only be called after the internal timeCodeUpdate array has been set. (setValues(tcObject))
-     *@returns {boolean} true on success | false on failure 
+     *Takes timecode inputs and validates every array item whether it contains valid timecode data.
+     *@returns {array} array containing parsed tiemcode updates 
      */
-    parseTimeGroups: function() {
+    parseTimecodeArray: function(timecodeUpdates, parameters) {
         var i = 0;
-        for (i = 0; i < this.timeCodeUpdates.length; i++) {
-            if (!this.timeValuesToInt(this.timeCodeUpdates[i].duration.groups)) {
-                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse duration. (" + this.timeCodeUpdates[i].duration.text + ")", Agrarvolution.logLevels.status);
-                return false;
-            }
-            if (!this.timeValuesToInt(this.timeCodeUpdates[i].fileTC.groups)) {
-                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse file timecode. (" + this.timeCodeUpdates[i].fileTC.text + ")", Agrarvolution.logLevels.status);
-                return false;
-            }
-            if (!this.timeValuesToInt(this.timeCodeUpdates[i].audioTC.groups)) {
-                this.logToCEP(this.timeCodeUpdates[i].name + " - Couldn't parse audio timecode. (" + this.timeCodeUpdates[i].audioTC.text + ")", Agrarvolution.logLevels.status);
-                return false;
+        var parsedUpdates = [];
+
+        for (i = 0; i < timeCodeUpdates.length; i++) {
+            var updateElement = this.validateTimecodeInput(timecodeUpdates[i]);
+
+            if (updateElement) {
+                parsedUpdates.push(updateElement);
             }
         }
-        this.logToCEP("Input times have been converted to numbers.", Agrarvolution.logLevels.status);
-        return true;
+        this.logToCEP("Input times have been converted to numbers.", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
+        return parsedUpdates;
     },
     /**
-     *@Todo delete
-     *Converts strings into numbers, custom made for a group object. 
-     *@param {Object} group - object created while looking for parts in a time string (e.g. hh:mm:ss:ff) -> groups.hour = hh, groups.minutes = mm, groups.seconds = ss, groups.frames = ff*
-     *@returns {boolean} true - on success | false if group did not exist
+     * Checks whether timecode input contains any timecode data and returns false if there is an error.
+     * @param {object} timecodeInput 
+     * @param {object} parameter log parameters 
+     * @returns {boolean}
      */
-    timeValuesToInt: function(group) {
-        if (group === undefined || group == null) {
+    validateTimecodeInput(timecodeInput, parameters) {
+        var output = {};
+
+        if (!timecodeInput.name) {
+            this.logToCEP("The name of the input is missing.", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
+            return false;
+        }
+        output.name = timecodeInput.name;
+
+        output.framerate = Timecode.validateFramerate(timecodeInput.framerate);
+        if (output.framerate <= 0) {
+            this.logToCEP(timecodeInput.name + " - Framerate " + timecodeInput.framerate + " is invalid.", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
             return false;
         }
 
-        if (group.hours) {
-            group.hours = Number(group.hours);
+        if (!timecodeInput.duration) {
+            this.logToCEP(timecodeInput.name + " - Data has no duration.", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
+            //return false; //This can't be easily used for processing in Bridge.
         }
-        if (group.minutes) {
-            group.minutes = Number(group.minutes);
-        }
-        if (group.seconds) {
-            group.seconds = Number(group.seconds);
-        }
-        if (group.frames) {
-            group.frames = Number(group.frames);
-        }
-        return true;
-    },
+        output.duration = new Timecode(timecodeInput.duration);
 
-    /**
-     *@Todo remove
-     *Process the matched values into numbers and stores it into a new object containing the text and the capture group.
-     *@param {string} timeText "hh:mm:ss:ff*"
-     *@param {number} framerate
-     *@returns {boolean|object} false on failure | matched group on success
-     */
-    validateTime: function(time, framerate) {
-        if (time === undefined || time == null) {
+        if (!timecodeInput.fileTC) {
+            this.logToCEP(timecodeInput.name + " - Couldn't parse file timecode. (" + timecodeInput.fileTC + ")", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
             return false;
         }
-        var groups = {};
-        groups.hours = Number(time[1]);
-        groups.minutes = Number(time[2]);
-        groups.seconds = Number(time[3]);
-        groups.frames = Number(time[4]);
+        output.fileTC = new Timecode(timecodeInput.fileTC);
 
-
-        if (groups.hour > 24 && groups.minutes > 60 && groups.seconds > 60 &&
-            !isNaN(groups.frames) && groups.frames > framerate) {
-            return false
+        if (!timecodeInput.audioTC) {
+            this.logToCEP(timecodeInput.name + " - Couldn't parse audio timecode. (" + timecodeInput.audioTC + ")", Agrarvolution.logLevels.status, parameter.logTarget, parameter.logging);
+            return false;
         }
+        output.audioTC = new Timecode(timecodeInput.audioTC);
 
-        return {
-            text: time[0],
-            groups: groups,
-        };
-    },
-
+        return output;
+    }
     /**
      * Compares all objects in media and timeCodeUpdates and calls changeStartTime if a match has been found.
      * Can't compare duration of files unlike the Premiere version.
