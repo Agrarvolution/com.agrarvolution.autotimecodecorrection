@@ -28,7 +28,7 @@ function CacheThumbnails(parameters) {
     this.logTarget = parameters.logTarget || 0;
     this.logging = parameters.logging || false;
 
-    if (this.cacheTimecodeOfThumbnails()) {
+    if (this.cacheTimecodeOfThumbnails(parameters.searchTarget, parameters.searchRecursive)) {
         this.logCallback("Processing time strings was successfull.", Agrarvolution.logLevels.status, this.logTarget, this.logging);
     } else {
         this.logCallback("Processing time strings was unsuccessfull.", Agrarvolution.logLevels.error, this.logTarget, this.logging);
@@ -36,15 +36,17 @@ function CacheThumbnails(parameters) {
 }
 
 /**
- *Loads media file / clips into a semipermanent cache. This avoids scraping through the app DOM everytime a match has to be found later.
+ *Loads media file / clips into a semipermanent cache. This avoids scraping through the app DOM everytime a match has to be found later. 
+ * @param {number} searchTarget 
+ * @param {boolean} searchRecursive
  *@returns {boolean} false - not processed times, thus useless for comparisons, true - everything worked
  */
 CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function (searchTarget, searchRecursive) {
     var i = 0;
     this.mediaCache = [];
 
-    var hasNoSelection = app.document.selectionLength === 0;
-    if (hasNoSelection || searchTarget === Agrarvolution.timecodeCorrection.SCAN_TARGET.folder) { //process root - get all thumbnails if there is no selection
+    var selection = searchTarget === Agrarvolution.timecodeCorrection.SCAN_TARGET.folder || app.document.selectionLength === 0;
+    if (selection) { //process root - get all thumbnails if there is no selection
         this.logCallback("Start searching for all media items.", Agrarvolution.logLevels.status, this.logTarget, this.logging);
         app.document.selectAll();
     } else {
@@ -55,7 +57,7 @@ CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function (searchTarget, se
         this.extractTimecodeFromThumbnail(app.document.selections[i], searchRecursive);
     }
 
-    if (hasNoSelection || searchTarget === Agrarvolution.timecodeCorrection.SCAN_TARGET.folder) { // remove selection if there was none before
+    if (selection) { // remove selection if there was none before
         app.document.deselectAll()
     }
 
@@ -112,7 +114,7 @@ CacheThumbnails.prototype.toStringCache = function () {
 CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, searchRecursive) {
     if (thumb.type === CacheThumbnails.THUMBNAIL_TYPES.folder && searchRecursive) {
         for (var i = 0; i < thumb.children.length; i++) {
-            this.extractTimecodeFromThumbnail(thumb.children[i]);
+            this.extractTimecodeFromThumbnail(thumb.children[i], searchRecursive);
         }
         return;
     }
