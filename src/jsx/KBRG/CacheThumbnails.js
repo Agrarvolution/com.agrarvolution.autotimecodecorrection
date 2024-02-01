@@ -110,7 +110,7 @@ CacheThumbnails.prototype.toStringCache = function () {
 }
 
 /**
- *Processes a single project item. 
+ *Processes a single thumbnail. 
  *If it is a folder, it will call this method for all its children (depending on the settings.)
  *If it is a clip it will store some informations about the thumbnail into this namespace's media array for quicker search later in the process.
  *@param {Thumbnail} thumb Bridge folder element, see CEP reference

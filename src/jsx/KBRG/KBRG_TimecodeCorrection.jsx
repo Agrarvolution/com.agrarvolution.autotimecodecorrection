@@ -43,22 +43,32 @@ Agrarvolution.timecodeCorrection = {
         selection: 1
     },
 
+    /**
+     * Caches thumbnails and exports any available timecodedata to an csv string.
+     * @param {object} parameters 
+     * @returns {string} boolean on error (false), string on success
+     */
     exportTimecodeData: function(parameters) {
         if (parameters === undefined) {
             this.logToCEP("Called without parameters.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
-            return false;
+            return '';
         }
         this.logToCEP("Starting host script.", Agrarvolution.logLevels.info, parameter.logTarget, parameter.logging);
 
         var thumbnailCache = new CacheThumbnails(parameters, this.logToCEP);
         if (thumbnailCache.mediaCache.length === 0) {
             this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
-            return false;
+            return '';
         }
 
         return thumbnailCache.toTimecodeCSV();
     },
-
+    /**
+     * Handles input from CEP UI.
+     * It caches thumbnails, and calls the generic update method with the specified method.
+     * @param {object} parameters 
+     * @returns {boolean} true on success
+     */
     processCEPInput: function(parameters) {
         if (parameters === undefined) {
             this.logToCEP("Called without parameters.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
@@ -71,6 +81,7 @@ Agrarvolution.timecodeCorrection = {
             this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
             return false;
         }
+
         var processedMedia = thumbnailCache.update(parameters, parameters.method);
 
         if (processedMedia === 0) {
