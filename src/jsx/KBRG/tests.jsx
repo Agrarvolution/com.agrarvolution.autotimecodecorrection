@@ -1,8 +1,8 @@
 #include 'KBRG_TimecodeCorrection.jsx';
 
 if (app.eventHandlers) { //uses the fact, that app.eventhandlers is only available if the script is directly called to guard the test scripts
-    //tests();
     testCache();
+    tests();
 }
 
 function testCache() {
@@ -88,4 +88,15 @@ function tests() {
         overrideFramerate: true
     });
     $.writeln("Test process input call:\n" + cache);
+
+    Agrarvolution.timecodeCorrection.processCEPInput({
+        framerate: "48",
+        searchTarget: 0,
+        searchRecursive: false,
+        logging: true,
+        method: "rebase",
+        logTarget: 1,
+        errorOnly: false
+    });
+    $.writeln("Test process rebase by CEP call:\n" + cache);
 }

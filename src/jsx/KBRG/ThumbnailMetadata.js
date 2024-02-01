@@ -232,7 +232,6 @@ ThumbnailMetadata.prototype.updateFromMetadataDate = function (targetFramerate, 
         default:
             return false;
     }
-    alert(dateUpdate.getHours());
     return this.updateTimecodeMetadata(new Timecode(dateUpdate, this.timecodeMetadata.framerate));
 }
 

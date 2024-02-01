@@ -188,7 +188,7 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
             logMessage = 'About to change the framerate of thumbnails.';
             break;
         case CacheThumbnails.PROCESS_METHODS.fixXMP:
-            logMessage = 'About to correct time format of \'faulty}\' thumbnails.';
+            logMessage = 'About to correct time format of \'faulty\' thumbnails.';
             break;
         case CacheThumbnails.PROCESS_METHODS.revertTimeCode:
             logMessage = 'About to revert start time from thumbnails.';
