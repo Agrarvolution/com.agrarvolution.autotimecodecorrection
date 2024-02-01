@@ -155,11 +155,12 @@ function exportCSV() {
     const csObject = {
         searchTarget: settings.searchTarget,
         recursive: settings.searchRecursive,
+        logTarget: CEP_PANEL.correction,
         logging: settings.logging
     };
 
     const csInterface = new CSInterface();
-    csInterface.evalScript('Agrarvolution.timecodeCorrection.gatherTimecodes(' + //accidentally deleted - needs incorporation
+    csInterface.evalScript('Agrarvolution.timecodeCorrection.exportTimecodeData(' + 
         JSON.stringify(csObject) + ');', async function (e) {
             logger.addLog("Timecodes arrived in frontend.", Logger.LOG_LEVELS.status);
             try {

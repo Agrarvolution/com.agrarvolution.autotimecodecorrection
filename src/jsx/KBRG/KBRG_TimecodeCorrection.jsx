@@ -1,6 +1,9 @@
 #include '../json2.js'
+
 #include 'CacheThumbnails.js'
+
 #include 'ThumbnailMetadata.js'
+
 #include 'Timecode.js'
 
 //add XMP context
@@ -40,12 +43,28 @@ Agrarvolution.timecodeCorrection = {
         selection: 1
     },
 
-    processCEPInput: function(parameters) { 
+    exportTimecodeData: function(parameters) {
         if (parameters === undefined) {
             this.logToCEP("Called without parameters.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
             return false;
         }
-        this.logToCEP("Starting host script.", Agrarvolution.logLevels.info,parameter.logTarget, parameter.logging);
+        this.logToCEP("Starting host script.", Agrarvolution.logLevels.info, parameter.logTarget, parameter.logging);
+
+        var thumbnailCache = new CacheThumbnails(parameters, this.logToCEP);
+        if (thumbnailCache.mediaCache.length === 0) {
+            this.logToCEP("No media was cached.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            return false;
+        }
+
+        return thumbnailCache.toTimecodeCSV();
+    },
+
+    processCEPInput: function(parameters) {
+        if (parameters === undefined) {
+            this.logToCEP("Called without parameters.", Agrarvolution.logLevels.error, parameter.logTarget, parameter.logging);
+            return false;
+        }
+        this.logToCEP("Starting host script.", Agrarvolution.logLevels.info, parameter.logTarget, parameter.logging);
 
         var thumbnailCache = new CacheThumbnails(parameters, this.logToCEP);
         if (thumbnailCache.mediaCache.length === 0) {
