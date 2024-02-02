@@ -90,13 +90,18 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
  * @returns {object} containing ending, samples, sample frequency and bitrate
  */
 ThumbnailMetadata.extractAudioMetadata = function (xmp) {
-    var audioEncoding = xmp.getProperty(XMPConst.NS_BWF, "codingHistory").value || '';
+    var sampleFrequency = 0;
+    if (xmp.doesPropertyExist(XMPConst.NS_DM, 'audioSampleRate')) {
+        sampleFrequency = xmp.getProperty(XMPConst.NS_DM, 'audioSampleRate').value || '';
+    } else if (xmp.doesPropertyExist(XMPConst.NS_BWF, 'codingHistory')) {
+        var audioEncoding = xmp.getProperty(XMPConst.NS_BWF, 'codingHistory').value || '';
+        audioEncoding = audioEncoding.match(/F=\d+/g).toString();
 
-    var sampleFrequency = audioEncoding.match(/F=\d+/g);
-    if (sampleFrequency == null || sampleFrequency.length) {
-        sampleFrequency = 0;
-    } else {
-        sampleFrequency = Number(sampleFrequency[0].replace('F=', ''));
+        if (audioEncoding.length === 0) {
+            sampleFrequency = 0;
+        } else {
+            sampleFrequency = Number(audioEncoding.replace('F=', ''));
+        }
     }
 
     var bitRate = audioEncoding.match(/W=\d+/g);
@@ -142,7 +147,7 @@ ThumbnailMetadata.extractTimecodeMetadata = function (xmp) {
 
     var prevFramerate = 0;
     if (timecodeStruct !== '' && xmp.doesStructFieldExist(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_FORMAT)) {
-    prevFramerate = this.checkMetadataFramerate(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_FORMAT).value || '');
+        prevFramerate = this.checkMetadataFramerate(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_FORMAT).value || '');
     }
 
     var prevStartTime = new Timecode();
@@ -313,8 +318,10 @@ ThumbnailMetadata.prototype.updateTimecodeMetadata = function (newStartTime) {
         ThumbnailMetadata.PREVIOUS_TIME_VALUE, this.timecodeMetadata.prevStartTime.toString());
 
     if (this.audioMetadata) {
+        this.audioMetadata.samples = this.timecodeMetadata.startTime.toSamples(this.audioMetadata.sampleFrequency);
+        
         this.xmp.setProperty(XMPConst.NS_BWF, "timeReference",
-            this.timecodeMetadata.startTime.toSamples(this.audioMetadata.sampleFrequency).toString(), XMPConst.STRING);
+            this.audioMetadata.samples.toString(), XMPConst.STRING);
     }
     if (this.updateThumbnailMetadata()) {
         return true;
