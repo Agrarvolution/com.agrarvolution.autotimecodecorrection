@@ -271,7 +271,7 @@ ThumbnailMetadata.prototype.updateFromTimecodes = function (updates, enableMedia
         return false;
     }
 
-    var update = this.compareTimecode(updates, enableMediaStartComparison);
+    var update = this.compareInTimecodeUpdates(updates, enableMediaStartComparison);
 
     if (update) {
         return this.updateFromTimecode(update.audioTC, overrideFramerate);
@@ -327,7 +327,7 @@ ThumbnailMetadata.prototype.updateTimecodeMetadata = function (newStartTime) {
  * @param {boolean} enableMediaStartComparison 
  * @returns {object|undefined} on successfull match returns the matching object in the timecodes array
  */
-ThumbnailMetadata.prototype.compareTimecode = function (timecodes, enableMediaStartComparison) {
+ThumbnailMetadata.prototype.compareInTimecodeUpdates = function (timecodes, enableMediaStartComparison) {
     for (var i = 0; i < timecodes.length; i++) {
         if (timecodes[i].fileTC
             && timecodes[i].fileTC instanceof Timecode
@@ -363,6 +363,26 @@ ThumbnailMetadata.prototype.updateThumbnailMetadata = function () {
         return false;
     }
     return true;
+}
+
+/**
+ * Checks the thumbnail metadata for matching timecodes. Returns an object if a matching filename is contained within the timecodes array.
+ * @param {array} timecodes 
+ * @returns {object} containing essential data for reprocessing
+ */
+ThumbnailMetadata.prototype.checkMatchingStartTimecodes = function (timecodes) {
+    var matchedTimecode = this.compareInTimecodeUpdates(timecodes, false); //enableMediaStartComparison has to be disabled, otherwise no errors will be detected
+
+    if (matchedTimecode === undefined) {
+        return undefined;
+    }
+
+    return {
+        filename: this.filename,
+        isMatching: matchedTimecode.fileTC === this.timecodeMetadata.startTime,
+        fileTC: this.timecodeMetadata.startTime,
+        audioTC: matchedTimecode.fileTC
+    }
 }
 
 /**

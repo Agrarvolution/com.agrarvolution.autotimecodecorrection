@@ -137,7 +137,22 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
     return true;
 }
 
+CacheThumbnails.prototype.compareTimecodes = function (timecodes) {
+    var result = {};
 
+    for (var i = 0; i < this.mediaCache.length; i++) {
+        var comparisonCache = this.mediaCache[i].updateThumbnailMetadata(timecodes);
+
+        if (comparisonCache && this.logging ?
+            true :
+            !comparisonCache.isMatching //error only
+        ) {
+            result.push(comparisonCache);
+        }
+    }
+
+    return result;
+}
 // -----------------
 // Process methods
 // -----------------
