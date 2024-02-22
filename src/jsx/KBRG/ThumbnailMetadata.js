@@ -379,9 +379,9 @@ ThumbnailMetadata.prototype.checkMatchingStartTimecodes = function (timecodes) {
 
     return {
         filename: this.filename,
-        isMatching: matchedTimecode.fileTC === this.timecodeMetadata.startTime,
+        isMatching: matchedTimecode.audioTC.toString() === this.timecodeMetadata.startTime.toString(),
         fileTC: this.timecodeMetadata.startTime,
-        audioTC: matchedTimecode.fileTC
+        audioTC: matchedTimecode.audioTC
     }
 }
 
