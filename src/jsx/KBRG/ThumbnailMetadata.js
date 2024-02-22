@@ -271,18 +271,10 @@ ThumbnailMetadata.prototype.updateFromTimecodes = function (updates, enableMedia
         return false;
     }
 
-    for (var i = 0; i < updates.length; i++) {
-        if (!updates[i].fileTC || !(updates[i].fileTC instanceof Timecode)) {
-            continue;
-        }
+    var update = this.compareTimecode(updates, enableMediaStartComparison);
 
-        if (updates[i].name.toUpperCase() === this.filename.toUpperCase() &&
-            (enableMediaStartComparison ?
-                updates[i].fileTC === this.timecodeMetadata.startTime :
-                true) &&
-            updates[i].audioTC instanceof Timecode) {
-            return this.updateFromTimecode(updates[i].audioTC, overrideFramerate);
-        }
+    if (update) {
+        return this.updateFromTimecode(update.audioTC, overrideFramerate);
     }
 
     return false;
@@ -319,7 +311,7 @@ ThumbnailMetadata.prototype.updateTimecodeMetadata = function (newStartTime) {
 
     if (this.audioMetadata) {
         this.audioMetadata.samples = this.timecodeMetadata.startTime.toSamples(this.audioMetadata.sampleFrequency);
-        
+
         this.xmp.setProperty(XMPConst.NS_BWF, "timeReference",
             this.audioMetadata.samples.toString(), XMPConst.STRING);
     }
@@ -327,6 +319,28 @@ ThumbnailMetadata.prototype.updateTimecodeMetadata = function (newStartTime) {
         return true;
     }
     return false;
+}
+
+/**
+ * Loops through every update entitiy until a matching filename and or mediastart is found and returns matching timecode structure (not object)
+ * @param {array} timecodes 
+ * @param {boolean} enableMediaStartComparison 
+ * @returns {object|undefined} on successfull match returns the matching object in the timecodes array
+ */
+ThumbnailMetadata.prototype.compareTimecode = function (timecodes, enableMediaStartComparison) {
+    for (var i = 0; i < timecodes.length; i++) {
+        if (timecodes[i].fileTC
+            && timecodes[i].fileTC instanceof Timecode
+            && timecodes[i].name
+            && timecodes[i].name.toUpperCase() === this.filename.toUpperCase()
+            && (enableMediaStartComparison ?
+                timecodes[i].fileTC === this.timecodeMetadata.startTime :
+                true) &&
+            timecodes[i].audioTC instanceof Timecode) {
+            return timecodes[i];
+        }
+    }
+    return undefined;
 }
 
 /**
