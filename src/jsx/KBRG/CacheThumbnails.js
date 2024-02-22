@@ -137,16 +137,23 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
     return true;
 }
 
+/**
+ * Compares all stored thumbnails with timecode udpates and returns the matching data.
+ * This is used to display changes from csv files in the UI without needing to check every single file.
+ * If this.logging is false, only the thumbnail data is added that has an error / is not matching.
+ * @param {array} timecodes 
+ * @returns 
+ */
 CacheThumbnails.prototype.compareTimecodes = function (timecodes) {
-    var result = {};
+    var result = [];
 
     for (var i = 0; i < this.mediaCache.length; i++) {
-        var comparisonCache = this.mediaCache[i].updateThumbnailMetadata(timecodes);
+        var comparisonCache = this.mediaCache[i].checkMatchingStartTimecodes(timecodes);
 
-        if (comparisonCache && this.logging ?
+        if (comparisonCache !== undefined && (this.logging ?
             true :
             !comparisonCache.isMatching //error only
-        ) {
+        )) {
             result.push(comparisonCache);
         }
     }

@@ -132,10 +132,15 @@ Agrarvolution.timecodeCorrection = {
             return false;
         }
 
-        //check processing
+        /*check processing
+         * This currently ignores changes to the thumbnails if they are not made with the array update / csv pipeline. 
+         * @Todo Add ability to check every time related type of thumbnail metadata change.
+         */
         var checkCache = new CacheThumbnails(parameters);
-        if (input.timecodes) {
-            return JSON.stringify(checkCache.compareTimecodes(input.timecodes));
+        if (parameters.timecodes) {
+            var validatedInput = CacheThumbnails.validateTimecodeArray(parameters.timecodes, Agrarvolution.logToCEP, parameters.logTarget, false);
+            var checkResults = checkCache.compareTimecodes(validatedInput);
+            return JSON.stringify(checkResults);
         }
 
         Agrarvolution.logToCEP("Time formats for " + processedMedia + " media thumbnails have been updated.",
