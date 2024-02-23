@@ -103,6 +103,7 @@ $(function () {
     function settingHandler() {
         if (storeSettings(readSettings())) {
             updateSourceInterface();
+            logger.updateLogVerbosity(settings.logging);
             logger.addLog("Settings successfully stored.", Logger.LOG_LEVELS.info);
         };
     }
@@ -575,6 +576,7 @@ function readSettings() {
     logger.addLog('Reading settings.', Logger.LOG_LEVELS.info);
 
     settings.logging = form[formIds.logging].checked;
+    
     settings.searchRecursive = form[formIds.recursion].checked;
 
     settings.ignoreMediaStart = form[formIds.mediaStart].checked;

@@ -105,6 +105,13 @@ class Logger {
         this.explainer.removeClass('hidden');
     }
 
+    updateLogVerbosity(verboseLogging) {
+        this.verboseLogging = verboseLogging;
+
+        if (!this.verboseLogging) {
+            this.hideLog();
+        }
+    }
     /**
      * Hides log area.
      */
