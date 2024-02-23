@@ -308,9 +308,10 @@ function timecodeFromArray(timecodes) {
         } else {
              $('#source')[0].value = "";
             try {
-                let status = JSON.parse(e);
+                const status = JSON.parse(e);
+                const processed = status?.processed + status?.results.filter((result) => result.isMatching).length;
                 
-                logger.addLog(`${status?.processed || 0} ${status.processed === 1 ? "file has" : "files have"} been updated. Process finished. Select the next file to be processed.`, Logger.LOG_LEVELS.status);
+                logger.addLog(`${processed || 0} ${processed === 1 ? "file has" : "files have"} been updated. Process finished. Select the next file to be processed.`, Logger.LOG_LEVELS.status);
                 
                 updateFileStatus(status?.results);
             } catch (e) {
