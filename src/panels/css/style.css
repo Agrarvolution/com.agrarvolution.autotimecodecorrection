@@ -1,6 +1,9 @@
 :root {
 	--dark-color: #232323;
 	--bright-color: #b9b9b9;
+	--table-color-bright: #3f3f3f;
+	--table-highlight-color: #555555;
+	--table-highlight-color-bright: #6e6e6e;
 	--form-background-color: darkgray;
 	--highlight-color: #0078d7;
 	--font-size: 9pt;
@@ -293,7 +296,8 @@ h3 {
 	margin: auto;
 	font-size: 0.7rem;
 	left: 0.3rem;
-	line-height: 2.1; /*not perfectly in center*/
+	line-height: 2.1;
+	/*not perfectly in center*/
 	color: var(--bright-color);
 	transition: all 0.25s;
 	width: 0.8rem;
@@ -322,6 +326,54 @@ select {
 
 select::after {
 	color: var(--dark-color);
+}
+
+/**
+Table layout
+*/
+table {
+	text-align: left;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+thead {
+	border-bottom: 0.2rem solid;
+}
+
+
+tr {
+	height: 2rem;
+	background-color: var(--dark-color);
+}
+
+
+
+tr:nth-child(2n) {
+	background-color: var(--table-color-bright);
+}
+tr:focus:not(:only-of-type), tr:hover:not(:only-of-type) {
+	background-color: var(--table-highlight-color);
+}
+tr:nth-child(2n):focus, tr:nth-child(2n):hover {
+	background-color: var(--table-highlight-color-bright);
+}
+
+td,
+th {
+	padding: 0.25rem 0.5rem;
+}
+td:not(:first-child),
+th:not(:first-child) {
+	text-align: right;
+}
+
+/* table error display */
+tr.misMatch {
+	--dark-color: rgb(100, 0, 0);
+	--table-color-bright: rgb(117, 0, 0);
+	--table-highlight-color: rgb(124, 45, 45);
+	--table-highlight-color-bright: rgb(160, 58, 58);
 }
 
 /**
