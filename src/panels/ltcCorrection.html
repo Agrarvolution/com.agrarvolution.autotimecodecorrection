@@ -29,11 +29,9 @@
 </head>
 
 <body class="autotc_gui">
+	<a id="refresh" href="javascript:history.go(0)">Refresh panel</a>
 	<main>
 		<section id="process">
-			<a id="refresh" href="javascript:history.go(0)">Refresh panel</a>
-
-
 			<form id="atc" name="atc" onsubmit="return 0" method="post">
 				<p id="explainer">Select .csv file to start.</p>
 				<p id="errorDisplay"></p>
@@ -111,6 +109,27 @@
 
 				</section>
 			</form>
+		</section>
+		<section class="hidden" id="statusSection">
+			<h3>Status display</h3>
+			<p>Elements that failed to update are marked with red.</p>
+			<table>
+				<thead>
+					<tr>
+						<th>Filename</th>
+						<th>File - Timecode</th>
+						<th>Update - Timecode</th>
+						<th>File - Framerate</th>
+						<th>Update - Framerate</th>
+					</tr>
+				</thead>
+				<tbody id="tableContent">
+				</tbody>
+			</table>
+			<section class="buttons-interface" id="statusButtons">
+				<button id="retryFailedUpdates">Retry failed</button>
+				<button id="backToMain">Back</button>
+			</section>
 		</section>
 		<section id="log" class="hidden">
 			<h3>Log</h3>

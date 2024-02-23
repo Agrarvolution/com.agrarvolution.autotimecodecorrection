@@ -140,11 +140,16 @@ Agrarvolution.timecodeCorrection = {
         if (parameters.timecodes) {
             var validatedInput = CacheThumbnails.validateTimecodeArray(parameters.timecodes, Agrarvolution.logToCEP, parameters.logTarget, false);
             var checkResults = checkCache.compareTimecodes(validatedInput);
-            return JSON.stringify(checkResults);
+            return JSON.stringify({
+                results: checkResults,
+                processed: processedMedia
+            });
         }
 
         Agrarvolution.logToCEP("Time formats for " + processedMedia + " media thumbnails have been updated.",
             Agrarvolution.logLevels.status, parameters.logTarget, parameters.logging);
-        return true;
+        return JSON.stringify({
+            processed: processedMedia
+        });
     }
 };

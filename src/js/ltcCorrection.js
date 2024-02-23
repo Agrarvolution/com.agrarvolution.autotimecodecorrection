@@ -46,6 +46,7 @@ const csvVersion = {
 };
 
 let lockForm = false;
+let failedUpdateCache = [];
 
 $(function () {
     onLoaded();
@@ -59,7 +60,7 @@ $(function () {
 
     const csInterface = new CSInterface();
     csInterface.addEventListener(CSInterface.THEME_COLOR_CHANGED_EVENT, onAppThemeColorChanged);
-    csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.timecodeCorrectionLog", function (e) {
+    csInterface.addEventListener("com.adobe.csxs.events.agrarvolution.timecodeCorrectionLog", e => {
         logger.addLog(e.data.text, e.data.logLevel);
     });
     csInterface.requestOpenExtension("com.agrarvolution.autoTimecodeCorrection.server", "");
@@ -69,16 +70,16 @@ $(function () {
     settings = loadSettings();
     changeSettings(settings);
 
-    $('#resetLog').on('click', function (e) {
+    $('#resetLog').on('click', e => {
         logger.clearLog();
     });
-    $('#hideLog').on('click', function (e) {
+    $('#hideLog').on('click', e => {
         $('#logging').prop('checked', false);
         settingHandler();
         logger.hideLog();
     });
 
-    $('#reset').on("click", function (e) {
+    $('#reset').on("click", e => {
         e.preventDefault();
         changeSettings(defaultSettings);
         $('#source')[0].value = "";
@@ -88,14 +89,14 @@ $(function () {
         this.blur();
     });
 
-    $('input:not(#source, #start)').on("click", function (e) {
+    $('input:not(#source, #start)').on("click", e => {
         if (this.id !== undefined && this.id === 'logging') {
             logger.verboseLogging = this.checked;
             logger.toggleLog('hidden');
         }
         settingHandler();
     });
-    $('select').on('change', function (e) {
+    $('select').on('change', e => {
         settingHandler();
     })
 
@@ -106,7 +107,7 @@ $(function () {
         };
     }
 
-    $('#start').on("click", function (e) {
+    $('#start').on("click", e => {
         e.preventDefault();
         if (lockForm) {
             return false;
@@ -127,7 +128,7 @@ $(function () {
         }
     });
 
-    $('#revert').on('click', function (e) {
+    $('#revert').on('click', e => {
         e.preventDefault();
         if (lockForm || host !== 'kbrg') {
             return false;
@@ -138,13 +139,27 @@ $(function () {
         revertTimecodechanges();
     });
 
-    $('#csv').on('click', function (e) {
+    $('#csv').on('click', e => {
         e.preventDefault();
         if (lockForm || host !== 'kbrg') {
             return false;
         }
         logger.addLog("Exporting timecodes stored in metadata.", Logger.LOG_LEVELS.status);
         exportCSV();
+    });
+
+    $('#backToMain').on('click', e => {
+        $('#statusSection').addClass('hidden');
+        $('#process').removeClass('hidden'); 
+    });
+
+    $('#retryFailedUpdates').on('click', e => {      
+        if (failedUpdateCache.length > 0 ) {
+            logger.addLog('Retrying files that failed to update metadata.', Logger.LOG_LEVELS.status);
+            timecodeFromArray(failedUpdateCache);
+        }
+        $('#backToMain').click();
+        return true;
     });
 });
 
@@ -160,8 +175,8 @@ function exportCSV() {
     };
 
     const csInterface = new CSInterface();
-    csInterface.evalScript('$.Agrarvolution.timecodeCorrection.exportTimecodeData(' + 
-        JSON.stringify(csObject) + ');', async function (e) {
+    csInterface.evalScript('$.Agrarvolution.timecodeCorrection.exportTimecodeData(' +
+        JSON.stringify(csObject) + ');', async e => {
             logger.addLog("Timecodes arrived in frontend.", Logger.LOG_LEVELS.status);
             try {
                 e = JSON.parse(e);
@@ -201,7 +216,7 @@ function revertTimecodechanges() {
 
     const csInterface = new CSInterface();
     csInterface.evalScript('$.Agrarvolution.timecodeCorrection.processCEPInput(' +
-        JSON.stringify(csObject) + ');', function (e) {
+        JSON.stringify(csObject) + ');', e => {
             if (e === 'true') {
                 logger.addLog("Timecode changes have been reverted. Old values were stored.", Logger.LOG_LEVELS.status);
             } else if (e === 'false') {
@@ -243,7 +258,7 @@ function timecodeFromMetadata() {
     };
 
     let csInterface = new CSInterface();
-    csInterface.evalScript('$.Agrarvolution.timecodeCorrection.processCEPInput(' + JSON.stringify(csObject) + ');', function (e) {
+    csInterface.evalScript('$.Agrarvolution.timecodeCorrection.processCEPInput(' + JSON.stringify(csObject) + ');', e => {
         if (e === 'true') {
             logger.addLog("Media has been updated. Process finished. Select the next file to be processed.", Logger.LOG_LEVELS.status);
         } else if (e === 'false') {
@@ -257,19 +272,19 @@ function timecodeFromMetadata() {
  * @param {*} file parsed csv
  */
 function handleFileLoad(file) {
-    let timeCodes = [];
-
     try {
-        timeCodes = checkCSV(file, csvVersion.ttc116);
+        const timecodes = checkCSV(file, csvVersion.ttc116);
+        timecodeFromArray(timecodes);
     } catch (e) {
         logger.addLog(e, Logger.LOG_LEVELS.error);
         lockForm = false;
         return false;
     }
+}
 
-
+function timecodeFromArray(timecodes) {
     const tcObject = {
-        timecodes: timeCodes,
+        timecodes: timecodes,
         searchRecursive: settings.searchRecursive,
         searchTarget: settings.searchTarget,
         ignoreMediaStart: settings.ignoreMediaStart,
@@ -279,23 +294,31 @@ function handleFileLoad(file) {
         logging: logger.verboseLogging
     };
 
-    logger.addLog("Media to be updated: " + JSON.stringify(timeCodes), Logger.LOG_LEVELS.info);
+    logger.addLog("Media to be updated: " + JSON.stringify(timecodes), Logger.LOG_LEVELS.info);
 
-    let csInterface = new CSInterface();
+    const csInterface = new CSInterface();
     csInterface.evalScript('$', function (result) {
         logger.addLog(result, Logger.LOG_LEVELS.info);
     });
 
-    csInterface.evalScript('$.Agrarvolution.timecodeCorrection.processCEPInput(' + JSON.stringify(tcObject) + ');', function (e) {
-        if (e === 'true') {
-            logger.addLog("Media has been updated. Process finished. Select the next file to be processed.", Logger.LOG_LEVELS.status);
-            $('#source')[0].value = "";
-        } else if (e === 'false') {
+    csInterface.evalScript('$.Agrarvolution.timecodeCorrection.processCEPInput(' + JSON.stringify(tcObject) + ');', e => {
+        if (e === 'false') {
             logger.addLog("Media hasn't been updated. Process stopped.", Logger.LOG_LEVELS.status);
+        } else {
+             $('#source')[0].value = "";
+            try {
+                let status = JSON.parse(e);
+                
+                logger.addLog(`${status?.processed || 0} ${status.processed === 1 ? "file has" : "files have"} been updated. Process finished. Select the next file to be processed.`, Logger.LOG_LEVELS.status);
+                
+                updateFileStatus(status?.results);
+            } catch (e) {
+                console.log(e);
+            }
         }
+
         lockForm = false;
     });
-    return true;
 }
 
 /**
@@ -433,7 +456,7 @@ function validateTimeCode(timeString, framerate, fileName, rowNumber, column) {
             Logger.LOG_LEVELS.info);
         return createZeroTimeCode(column !== csvColumnNumbers.duration, framerate);
     } else {
-       return timeString; 
+        return timeString;
     }
 }
 
@@ -509,6 +532,38 @@ function CSVToArray(strData, strDelimiter) {
     return (arrData);
 }
 
+function updateFileStatus(fileStatus) {
+    if (fileStatus === undefined) {
+        return;
+    }
+    const tableContent = $('tbody').empty();
+    failedUpdateCache = [];
+
+    for (const file of fileStatus) {
+        tableContent.append($(`<tr class=${file.isMatching ? 'dataMatch' : 'dataMismatch'}>
+            <th>${file.filename}</th>
+            <td>${file?.fileTC?.text}</td>
+            <td>${file?.audioTC?.text}</td>
+            <td>${file?.fileTC?.framerate}</td>
+            <td>${file?.audioTC?.framerate}</td>
+        </tr>`));
+
+        if (!file.isMatching) {
+            failedUpdateCache.append({
+                filename: file.filename,
+                fileTC: file.fileTC.text,
+                audioTC: file.audioTC.text,
+                duration: 0,
+                framerate: file.audioTC.framerate
+            });
+        }
+    }
+
+    if (fileStatus.length) {
+        $('#statusSection').removeClass('hidden');
+        $('#process').addClass('hidden');
+    }
+}
 /**
  * Reads settings from the gui.
  * @returns {{logging: boolean, searchRecursive: boolean, ignoreMediaStart: boolean, searchTarger: number}}

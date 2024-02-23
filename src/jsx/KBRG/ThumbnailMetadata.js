@@ -379,9 +379,15 @@ ThumbnailMetadata.prototype.checkMatchingStartTimecodes = function (timecodes) {
 
     return {
         filename: this.filename,
-        isMatching: matchedTimecode.audioTC.toString() === this.timecodeMetadata.startTime.toString(),
-        fileTC: this.timecodeMetadata.startTime,
-        audioTC: matchedTimecode.audioTC
+        isMatching: matchedTimecode.audioTC.convertByFramerate(this.timecodeMetadata.startTime.framerate).toString() === this.timecodeMetadata.startTime.toString(),
+        fileTC: {
+            text: this.timecodeMetadata.startTime.toString(),
+            framerate: this.timecodeMetadata.startTime.framerate
+        },
+        audioTC: {
+            text: matchedTimecode.audioTC.toString(),
+            framerate: matchedTimecode.audioTC.framerate
+        }
     }
 }
 

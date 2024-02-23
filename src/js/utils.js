@@ -214,6 +214,9 @@ function updateThemeWithAppSkinInfo(appSkinInfo) {
 
     let cssStyle = `:root {
         --dark-color: ${panelBackgroundColor};
+        --table-color-bright: ${lightenDarkenColor(panelBackgroundColor, 10)};
+        --table-highlight-color: ${lightenDarkenColor(panelBackgroundColor, 50)};
+        --table-highlight-color-bright: ${lightenDarkenColor(panelBackgroundColor, 60)};
         --bright-color: ${lightenDarkenColor(panelBackgroundColor, 150)};
         --highlight-color: ${toHex(appSkinInfo.systemHighlightColor)}; 
         --font-size: ${appSkinInfo.baseFontSize}px;  

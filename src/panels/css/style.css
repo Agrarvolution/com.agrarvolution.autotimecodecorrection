@@ -81,6 +81,10 @@ body.autotc_gui {
 	vertical-align: middle;
 }
 
+main>section.hidden+section {
+	border-top: none;
+}
+
 main>section:not(:first-child) {
 	border-top: 1px solid var(--bright-color);
 }
@@ -332,13 +336,14 @@ select::after {
 Table layout
 */
 table {
+	--table-border-size: 0.15rem;
 	text-align: left;
 	border-collapse: collapse;
 	width: 100%;
 }
 
 thead {
-	border-bottom: 0.2rem solid;
+	border-bottom: var(--table-border-size) solid;
 }
 
 
@@ -347,15 +352,22 @@ tr {
 	background-color: var(--dark-color);
 }
 
+tr>th:first-child {
+	border-right: var(--table-border-size) solid;
+}
 
 
 tr:nth-child(2n) {
 	background-color: var(--table-color-bright);
 }
-tr:focus:not(:only-of-type), tr:hover:not(:only-of-type) {
+
+tr:focus:not(:only-of-type),
+tr:hover:not(:only-of-type) {
 	background-color: var(--table-highlight-color);
 }
-tr:nth-child(2n):focus, tr:nth-child(2n):hover {
+
+tr:nth-child(2n):focus,
+tr:nth-child(2n):hover {
 	background-color: var(--table-highlight-color-bright);
 }
 
@@ -363,6 +375,7 @@ td,
 th {
 	padding: 0.25rem 0.5rem;
 }
+
 td:not(:first-child),
 th:not(:first-child) {
 	text-align: right;
@@ -375,6 +388,7 @@ tr.misMatch {
 	--table-highlight-color: rgb(124, 45, 45);
 	--table-highlight-color-bright: rgb(160, 58, 58);
 }
+
 
 /**
 * Host exclusive interface parts
