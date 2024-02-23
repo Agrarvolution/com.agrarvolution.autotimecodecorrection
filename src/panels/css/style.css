@@ -81,7 +81,7 @@ body.autotc_gui {
 	vertical-align: middle;
 }
 
-main>section.hidden+section {
+main>section:first-child.hidden+section {
 	border-top: none;
 }
 
