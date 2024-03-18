@@ -174,6 +174,7 @@ in progess
 
 | Version    | Date      | Description
 |---------   |------     |------------
+| 0.3.1      | 16.03.2024 | Improves handling of files with faulty metadata readings - they now display on the panel if the update failed
 | 0.3.0      | 01.02.2024 | Rework of processing code, small fixes, extra panel for repair
 | 0.2.2      | 13.11.2022 | Adds csv export of metadata, small fixes, updated style
 | 0.2.1      | 10.01.2022 | Rewrite of the extension to be compatible with Bridge
