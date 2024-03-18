@@ -15,7 +15,7 @@ CacheThumbnails.PROCESS_METHODS = {
     fromTimecode: 'updateFromTimecode',
     fromTimecodes: 'updateFromTimecodes'
 }
-
+CacheThumbnails.LIMIT_MIME_TYPES = true;
 /**
  * Constructer for a thumbnail cache.
  * @param {object} parameters has to contain a search target, folder search and whether only erroneous thumbnails should be added 
@@ -54,7 +54,7 @@ CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function (searchTarget, se
         this.logCallback("Start searching for selected media items.", Agrarvolution.logLevels.status, this.logTarget, this.logging);
     }
 
-    
+
     for (i = 0; i < app.document.selectionLength; i++) {
         this.extractTimecodeFromThumbnail(app.document.selections[i], searchRecursive);
     }
@@ -125,6 +125,14 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
         }
         return true;
     }
+
+    //exclude thumbnails that aren't audio or video files - might need an interface toggle
+    if (CacheThumbnails.LIMIT_MIME_TYPES && !(
+        thumb.mimeType.substring(0, 5) === 'audio' ||
+        thumb.mimeType.substring(0, 5) === 'video')) {
+        return false; //excluded mime types
+    }
+
     if (thumb.type !== CacheThumbnails.THUMBNAIL_TYPES.file) {
         return false;
     }
