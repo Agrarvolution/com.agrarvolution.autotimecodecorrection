@@ -3,6 +3,7 @@
 if (app.eventHandlers) { //uses the fact, that app.eventhandlers is only available if the script is directly called to guard the test scripts
     testCache();
     tests();
+    //wavTest();
 }
 
 function testCache() {
@@ -100,4 +101,55 @@ function tests() {
         errorOnly: false
     });
     $.writeln("Test process rebase by CEP call:\n" + cache);
+}
+
+function wavTest() {
+    app.synchronousMode = false;
+    $.writeln("Test processing empty wavs.");
+    Agrarvolution.timecodeCorrection.processCEPInput({
+        timecodes: [{
+            "filename": "240312_001.WAV",
+            "framerate": 25,
+            "duration": "00:03:24",
+            "fileTC": "00:00:00:00",
+            "audioTC": "09:53:00:23"
+        }, {
+            "filename": "240312_002.WAV",
+            "framerate": 25,
+            "duration": "00:46:36",
+            "fileTC": "00:00:00:00",
+            "audioTC": "09:57:03:12"
+        }, {
+            "filename": "240312_003.WAV",
+            "framerate": 25,
+            "duration": "00:46:36",
+            "fileTC": "00:00:00:00",
+            "audioTC": "10:43:39:12"
+        }, {
+            "filename": "240312_004.WAV",
+            "framerate": 25,
+            "duration": "00:46:36",
+            "fileTC": "00:00:00:00",
+            "audioTC": "11:30:15:12"
+        }, {
+            "filename": "240312_005.WAV",
+            "framerate": 25,
+            "duration": "00:46:36",
+            "fileTC": "00:00:00:00",
+            "audioTC": "12:16:51:12"
+        }, {
+            "filename": "240312_006.WAV",
+            "framerate": 25,
+            "duration": "00:04:01",
+            "fileTC": "00:00:00:00",
+            "audioTC": "13:03:27:12"
+        }],
+        searchRecursive: true,
+        searchTarget: 0,
+        ignoreMediaStart: true,
+        overrideFramerate: false,
+        method: "updateFromTimecodes",
+        logTarget: 0,
+        logging: false
+    });
 }
