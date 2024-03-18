@@ -119,12 +119,14 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
         return false;
     }
 
+    app.synchronousMode = true;
     if (thumb.type === CacheThumbnails.THUMBNAIL_TYPES.folder && searchRecursive) {
         for (var i = 0; i < thumb.children.length; i++) {
             this.extractTimecodeFromThumbnail(thumb.children[i], searchRecursive);
         }
         return true;
     }
+    app.synchronousMode = false;
 
     //exclude thumbnails that aren't audio or video files - might need an interface toggle
     if (CacheThumbnails.LIMIT_MIME_TYPES && !(
