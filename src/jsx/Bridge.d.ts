@@ -1,6 +1,7 @@
 //relates to Bridge Thumbnail objects
 declare class Application {
     readonly document: Document
+    synchronousMode: boolean
 }
 
 declare class Document {
