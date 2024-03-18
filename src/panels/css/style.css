@@ -382,7 +382,7 @@ th:not(:first-child) {
 }
 
 /* table error display */
-tr.misMatch {
+tr.dataMismatch {
 	--dark-color: rgb(100, 0, 0);
 	--table-color-bright: rgb(117, 0, 0);
 	--table-highlight-color: rgb(124, 45, 45);

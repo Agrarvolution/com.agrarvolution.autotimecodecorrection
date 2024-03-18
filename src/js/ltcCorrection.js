@@ -551,7 +551,7 @@ function updateFileStatus(fileStatus) {
         </tr>`));
 
         if (!file.isMatching) {
-            failedUpdateCache.append({
+            failedUpdateCache.push({
                 filename: file.filename,
                 fileTC: file.fileTC.text,
                 audioTC: file.audioTC.text,
