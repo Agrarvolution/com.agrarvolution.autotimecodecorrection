@@ -15,6 +15,7 @@ CacheThumbnails.PROCESS_METHODS = {
     fromTimecode: 'updateFromTimecode',
     fromTimecodes: 'updateFromTimecodes'
 }
+
 /**
  * Constructer for a thumbnail cache.
  * @param {object} parameters has to contain a search target, folder search and whether only erroneous thumbnails should be added 
@@ -53,6 +54,7 @@ CacheThumbnails.prototype.cacheTimecodeOfThumbnails = function (searchTarget, se
         this.logCallback("Start searching for selected media items.", Agrarvolution.logLevels.status, this.logTarget, this.logging);
     }
 
+    
     for (i = 0; i < app.document.selectionLength; i++) {
         this.extractTimecodeFromThumbnail(app.document.selections[i], searchRecursive);
     }
@@ -116,13 +118,14 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
     if (!(thumb instanceof Thumbnail)) {
         return false;
     }
+
     if (thumb.type === CacheThumbnails.THUMBNAIL_TYPES.folder && searchRecursive) {
         for (var i = 0; i < thumb.children.length; i++) {
             this.extractTimecodeFromThumbnail(thumb.children[i], searchRecursive);
         }
         return true;
     }
-    if (thumb.type !== CacheThumbnails.THUMBNAIL_TYPES.file || !thumb.hasMetadata) {
+    if (thumb.type !== CacheThumbnails.THUMBNAIL_TYPES.file) {
         return false;
     }
 

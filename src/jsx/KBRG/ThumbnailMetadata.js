@@ -21,7 +21,7 @@ ThumbnailMetadata.METADATA_DATE = {
  * @return {object} returns empty object if thumbnail is not a file or the file has no metadata.
  */
 function ThumbnailMetadata(thumbnail) {
-    if (thumbnail.type !== CacheThumbnails.THUMBNAIL_TYPES.file || !thumbnail.hasMetadata) {
+    if (thumbnail.type !== CacheThumbnails.THUMBNAIL_TYPES.file) {
         return {};
     }
     this.thumb = thumbnail;
@@ -57,6 +57,19 @@ ThumbnailMetadata.prototype.toTimecodeCSV = function () {
  * @return {boolean} on true, contains no errors, on false has values that errored / are invalid.
  */
 ThumbnailMetadata.prototype.extractMetadata = function () {
+    if (!this.thumb.hasMetadata) { //caches thumbnail with corrupt Metadata as well - this is needed so a later recheck actually shows failed changes
+        this.timecodeMetadata = {
+            startTime: new Timecode(),
+            framerate: 0,
+            prevStartTime: new Timecode(),
+            prevFramerate: 0,
+            isDropFrame: false,
+            timecodeStruct: ThumbnailMetadata.TIME_CODE_STRUCT.start
+        };
+        
+        return false;
+    }
+
     this.xmp = new XMPMeta(this.thumb.synchronousMetadata.serialize());
 
     if (this.xmp.doesPropertyExist(XMPConst.NS_BWF, "codingHistory")) {
