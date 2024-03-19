@@ -3,7 +3,7 @@
 if (app.eventHandlers) { //uses the fact, that app.eventhandlers is only available if the script is directly called to guard the test scripts
     testCache();
     tests();
-    //wavTest();
+    // wavTest();
 }
 
 function testCache() {

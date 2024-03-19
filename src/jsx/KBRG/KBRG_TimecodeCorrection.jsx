@@ -134,7 +134,7 @@ Agrarvolution.timecodeCorrection = {
 
         /*check processing
          * This currently ignores changes to the thumbnails if they are not made with the array update / csv pipeline. 
-         * @Todo Add ability to check every time related type of thumbnail metadata change.
+         * @Todo Add ability to check every time when a thumbnail metadata change happens.
          */
         var checkCache = new CacheThumbnails(parameters);
         if (parameters.timecodes) {
