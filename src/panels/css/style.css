@@ -174,9 +174,9 @@ input[type="file"]::-webkit-file-upload-button:active,
 	border-radius: 0.25rem;
 }
 
-.autotc_gui input {
+/* .autotc_gui input {
 	height: 1rem;
-}
+} */
 
 #content {
 	margin-right: auto;
@@ -322,8 +322,10 @@ input[type="checkbox"]:checked+label::after {
 	border: 2px solid var(--bright-color);
 }
 
-select {
+select,
+[type="number"] {
 	border-radius: 0.25rem;
+	outline: none;
 	color: var(--dark-color);
 	background-color: var(--bright-color);
 }
@@ -331,6 +333,16 @@ select {
 select::after {
 	color: var(--dark-color);
 }
+
+[type="number"] {
+	border: 0.075rem solid var(--bright-color);
+	box-sizing: border-box;
+	min-width: 7ch;
+	width: 10ch;
+	overflow-x: scroll;
+	overscroll-behavior: contain;
+}
+
 
 /**
 Table layout

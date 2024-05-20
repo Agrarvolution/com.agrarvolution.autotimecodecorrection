@@ -67,13 +67,15 @@ $(function () {
             logger.verboseLogging = this.checked;
             logger.toggleLog('hidden');
         }
-        settingHandler();
+        return settingHandler();
     });
 
     function settingHandler() {
         if (storeSettings(readSettings())) {
             logger.addLog("Settings successfully stored.", Logger.LOG_LEVELS.info);
+            return true;
         };
+        return false;
     }
     $('#rebase-xmp-timevalue').on('click', function (e) {
         e.preventDefault();
