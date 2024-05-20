@@ -8,7 +8,8 @@ const formIds = {
     source: 'source',
     fixFramerate: 'framerate',
     fixTarget: 'fix-target',
-    fixRecursion: 'fix-recursion'
+    fixRecursion: 'fix-recursion',
+    samplerate: 'samplerate'
 }
 
 let host = '';
@@ -19,6 +20,7 @@ const settingsKey = "autoTimecodeRepair.settings";
 const defaultSettings = {
     logging: false,
     framerate: 25,
+    samplerate: 48000,
     searchTarget: SELECTION.all,
     searchRecursive: false
 }
@@ -58,7 +60,7 @@ $(function () {
         logger.hideLog();
     });
 
-    $('select').on('change', function (e) {
+    $('select, input[type="number"]').on('change', function (e) {
         settingHandler();
     });
 
@@ -112,6 +114,7 @@ function fixXMP(type) {
 
     let csObject = {
         framerate: settings.framerate,
+        samplerate: settings.samplerate,
         searchTarget: settings.searchTarget,
         searchRecursive: settings.searchRecursive,
         logging: settings.logging,
@@ -149,8 +152,10 @@ function readSettings() {
             settings.searchTarget = i;
         }
     }
+    
     settings.searchRecursive = form[formIds.fixRecursion].checked;
     settings.framerate = form[formIds.fixFramerate].value;
+    settings.samplerate = form[formIds.samplerate].value;
     return settings;
 }
 /**
@@ -170,7 +175,7 @@ function changeSettings(settings) {
     }
     form[formIds.fixRecursion].checked = settings?.searchRecursive || false;
     form[formIds.fixFramerate].value = settings?.framerate || 25;
-
+    form[formIds.samplerate].value = settings?.samplerate || 48000;
 
     logger.verboseLogging = settings.logging;
     logger.addLog("Settings successfully updated.", Logger.LOG_LEVELS.info);
