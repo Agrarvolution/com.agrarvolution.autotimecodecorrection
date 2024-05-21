@@ -338,7 +338,7 @@ select::after {
 	border: 0.075rem solid var(--bright-color);
 	box-sizing: border-box;
 	min-width: 7ch;
-	width: 10ch;
+	width: 9ch;
 	overflow-x: scroll;
 	overscroll-behavior: contain;
 }
