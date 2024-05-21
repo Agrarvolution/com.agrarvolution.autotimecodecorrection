@@ -11,6 +11,11 @@ ThumbnailMetadata.ALLOWED_MEDIA_TYPES = [
     'mp4', 'av1', 'mov', 'ogg', 'ogv', 'mkv', 'webm',
     'wav', 'bwf', 'rf64', 'amb', 'acc', 'aif', 'aiff', 'aifc', 'mp2', 'mp3', '3gp', 'wma', 'flac', 'ape'
 ];
+
+ThumbnailMetadata.AUDIO_TYPES = [
+    'wav', 'bwf', 'rf64', 'amb', 'acc', 'aif', 'aiff', 'aifc', 'mp2', 'mp3', '3gp', 'wma', 'flac', 'ape'
+];
+
 ThumbnailMetadata.METADATA_DATE = {
     'created': 0,
     'lastChanged': 1
@@ -66,7 +71,7 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
             isDropFrame: false,
             timecodeStruct: ThumbnailMetadata.TIME_CODE_STRUCT.start
         };
-        
+
         return false;
     }
 
@@ -108,22 +113,22 @@ ThumbnailMetadata.extractAudioMetadata = function (xmp) {
         sampleFrequency = xmp.getProperty(XMPConst.NS_DM, 'audioSampleRate').value || '';
     } else if (xmp.doesPropertyExist(XMPConst.NS_BWF, 'codingHistory')) {
         var audioEncoding = xmp.getProperty(XMPConst.NS_BWF, 'codingHistory').value || '';
-        audioEncoding = audioEncoding.match(/F=\d+/g).toString();
+        sampleFrequency = audioEncoding.match(/F=\d+/g).toString();
 
         if (audioEncoding.length === 0) {
             sampleFrequency = 0;
         } else {
             sampleFrequency = Number(audioEncoding.replace('F=', ''));
         }
-    }
 
-    var bitRate = audioEncoding.match(/W=\d+/g);
-    if (bitRate == null || !bitRate.length) {
-        bitRate = 0;
-    } else {
-        bitRate = Number(bitRate[0].replace('W=', ''));
-    }
 
+        var bitRate = audioEncoding.match(/W=\d+/g);
+        if (bitRate == null || !bitRate.length) {
+            bitRate = 0;
+        } else {
+            bitRate = Number(bitRate[0].replace('W=', ''));
+        }
+    }
     var samples = xmp.getProperty(XMPConst.NS_BWF, "timeReference") || 0;
 
     return {
@@ -186,7 +191,7 @@ ThumbnailMetadata.extractTimecodeMetadata = function (xmp) {
  * @param {boolean} errorOnly 
  * @returns {boolean|string} true on success
  */
-ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerate, errorOnly) {
+ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerate, samplerate, errorOnly) {
     targetFramerate = Number(targetFramerate || '');
 
     if (isNaN(targetFramerate)) {
@@ -208,6 +213,9 @@ ThumbnailMetadata.prototype.fixFaultyTimecodeMetadata = function (targetFramerat
 
     this.timecodeMetadata.framerate = targetFramerate;
 
+    if (ThumbnailMetadata.mimeTypeIsAudio(this.mimeType)) {
+        this.updateAudioMetadata(samplerate);
+    }
     return this.updateTimecodeMetadata(this.timecodeMetadata.startTime.convertByFramerate(this.timecodeMetadata.framerate));
 }
 
@@ -291,6 +299,50 @@ ThumbnailMetadata.prototype.updateFromTimecodes = function (updates, enableMedia
     }
 
     return false;
+}
+
+ThumbnailMetadata.prototype.updateAudioMetadata = function (newSampleFrequency) {
+    if (isNaN(newSampleFrequency)) {
+        return false;
+    }
+
+    //clamp negative & 0 samplerates
+    if (newSampleFrequency < 1) {
+        newSampleFrequency = 1;
+    }
+    newSampleFrequency = Math.floor(newSampleFrequency);
+
+    //ToDo Maybe add support for more coding History elements like bitrate, sampling type etc.
+    if (this.xmp.doesPropertyExist(XMPConst.NS_BWF, 'codingHistory')) {
+        var codingHistory = this.xmp.getProperty(XMPConst.NS_BWF, 'codingHistory').value;
+        codingHistory.replace(/F=\d+/g, "F=" + newSampleFrequency);
+
+        this.xmp.setProperty(XMPConst.NS_BWF, 'codingHistory',
+            codingHistory, XMPConst.STRING);
+    } else {
+        this.xmp.setProperty(XMPConst.NS_BWF, 'codingHistory',
+            "F=" + newSampleFrequency, XMPConst.STRING);
+    }
+
+    this.xmp.setProperty(XMPConst.NS_DM, 'audioSampleRate',
+        newSampleFrequency, XMPConst.STRING);
+
+    var sampleFrequency = 0;
+    if (this.audioMetadata) {
+        sampleFrequency = this.audioMetadata.sampleFrequency;
+    } else {
+        this.audioMetadata = { 
+            bitRate: 0,
+            samples: 0,
+            audioencoding: '',
+            sampleFrequency: newSampleFrequency 
+        };
+    }
+
+    this.audioMetadata.samples = Math.floor(this.audioMetadata.samples / sampleFrequency * newSampleFrequency);
+
+    this.xmp.setProperty(XMPConst.NS_BWF, "timeReference",
+    this.audioMetadata.samples.toString(), XMPConst.STRING);
 }
 
 /**
@@ -425,4 +477,21 @@ ThumbnailMetadata.checkMetadataFramerate = function (framerate) {
         return newFramerate / 100;
     }
     return newFramerate;
+}
+
+/**
+ * Checks a mime type against a known audio media type list.
+ * @param {string} mimeType 
+ * @returns {boolean}
+ */
+ThumbnailMetadata.mimeTypeIsAudio = function (mimeType) {
+    for (var i = 0; i < ThumbnailMetadata.AUDIO_TYPES.length; i++) {
+        var match = mimeType.match(ThumbnailMetadata.AUDIO_TYPES[i]);
+
+        if (match) {
+            return true;
+        }
+    }
+
+    return false;
 }
