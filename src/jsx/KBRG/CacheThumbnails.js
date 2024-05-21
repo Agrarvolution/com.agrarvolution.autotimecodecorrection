@@ -249,10 +249,10 @@ CacheThumbnails.prototype.updateCache = function (input, method) {
         var processed = false;
         switch (method) {
             case CacheThumbnails.PROCESS_METHODS.rebase:
-                processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, false);
+                processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, input.samplerate, false);
                 break;
             case CacheThumbnails.PROCESS_METHODS.fixXMP:
-                processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, true);
+                processed = this.mediaCache[i].fixFaultyTimecodeMetadata(input.framerate, input.samplerate, true);
                 break;
             case CacheThumbnails.PROCESS_METHODS.revertTimeCode:
                 processed = this.mediaCache[i].revertTimecodeChange();
