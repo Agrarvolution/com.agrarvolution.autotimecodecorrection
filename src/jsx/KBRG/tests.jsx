@@ -110,7 +110,7 @@ function testWavRepair() {
     Agrarvolution.timecodeCorrection.processCEPInput({
         framerate: 25,
         samplerate: 96000,
-        searchTarget: 1,
+        searchTarget: 0,
         searchRecursive: false,
         logging: true,
         method: "rebase",
