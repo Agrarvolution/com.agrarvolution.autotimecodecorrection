@@ -62,16 +62,15 @@ ThumbnailMetadata.prototype.toTimecodeCSV = function () {
  * @return {boolean} on true, contains no errors, on false has values that errored / are invalid.
  */
 ThumbnailMetadata.prototype.extractMetadata = function () {
-    if (!this.thumb.hasMetadata) { //caches thumbnail with corrupt Metadata as well - this is needed so a later recheck actually shows failed changes
-        this.timecodeMetadata = {
-            startTime: new Timecode(),
-            framerate: 0,
-            prevStartTime: new Timecode(),
-            prevFramerate: 0,
-            isDropFrame: false,
-            timecodeStruct: ThumbnailMetadata.TIME_CODE_STRUCT.start
-        };
-
+    if (!this.thumb.hasMetadata) { 
+        // this.timecodeMetadata = {//caches thumbnail with corrupt Metadata as well - this is needed so a later recheck actually shows failed changes
+        //     startTime: new Timecode(),
+        //     framerate: 0,
+        //     prevStartTime: new Timecode(),
+        //     prevFramerate: 0,
+        //     isDropFrame: false,
+        //     timecodeStruct: ThumbnailMetadata.TIME_CODE_STRUCT.start
+        // };
         return false;
     }
 

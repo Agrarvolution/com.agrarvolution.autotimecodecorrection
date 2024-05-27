@@ -144,6 +144,7 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
 
     if (!metaDataExtractionSuccessful) {
         this.logCallback('Metadata extraction of ' + metaThumb + ' was unsuccessful.', Agrarvolution.logLevels.info, this.logTarget, this.logging);
+        return false; //guard clause - fixes missing xmp data, might exclude too many fiels -> needs more testing
     }
 
     this.mediaCache.push(metaThumb);
