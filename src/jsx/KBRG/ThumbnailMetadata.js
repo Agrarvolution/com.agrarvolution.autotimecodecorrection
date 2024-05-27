@@ -315,10 +315,11 @@ ThumbnailMetadata.prototype.updateAudioMetadata = function (newSampleFrequency) 
     //ToDo Maybe add support for more coding History elements like bitrate, sampling type etc.
     if (this.xmp.doesPropertyExist(XMPConst.NS_BWF, 'codingHistory')) {
         var codingHistory = this.xmp.getProperty(XMPConst.NS_BWF, 'codingHistory').value;
-        codingHistory.replace(/F=\d+/g, "F=" + newSampleFrequency);
+        codingHistory = codingHistory.replace(/F=\d+/g, "F=" + newSampleFrequency);
 
         this.xmp.setProperty(XMPConst.NS_BWF, 'codingHistory',
             codingHistory, XMPConst.STRING);
+            
     } else {
         this.xmp.setProperty(XMPConst.NS_BWF, 'codingHistory',
             "F=" + newSampleFrequency, XMPConst.STRING);
@@ -327,20 +328,18 @@ ThumbnailMetadata.prototype.updateAudioMetadata = function (newSampleFrequency) 
     this.xmp.setProperty(XMPConst.NS_DM, 'audioSampleRate',
         newSampleFrequency, XMPConst.STRING);
 
-    var sampleFrequency = 0;
     if (this.audioMetadata) {
-        sampleFrequency = this.audioMetadata.sampleFrequency;
+        this.audioMetadata.samples = Math.floor(this.audioMetadata.samples / this.audioMetadata.sampleFrequency * newSampleFrequency);
+        this.audioMetadata.sampleFrequency = newSampleFrequency;
     } else {
         this.audioMetadata = { 
             bitRate: 0,
-            samples: 0,
+            samples: this.timecodeMetadata.startTime.toSamples(newSampleFrequency),
             audioencoding: '',
             sampleFrequency: newSampleFrequency 
         };
     }
-
-    this.audioMetadata.samples = Math.floor(this.audioMetadata.samples / sampleFrequency * newSampleFrequency);
-
+    
     this.xmp.setProperty(XMPConst.NS_BWF, "timeReference",
     this.audioMetadata.samples.toString(), XMPConst.STRING);
 }

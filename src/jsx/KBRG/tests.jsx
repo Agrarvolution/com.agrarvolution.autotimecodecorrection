@@ -1,8 +1,10 @@
 #include 'KBRG_TimecodeCorrection.jsx';
 
 if (app.eventHandlers) { //uses the fact, that app.eventhandlers is only available if the script is directly called to guard the test scripts
-    testCache();
-    tests();
+    //testCache();
+    //tests();
+
+    testWavRepair();
     // wavTest();
 }
 
@@ -101,6 +103,21 @@ function tests() {
         errorOnly: false
     });
     $.writeln("Test process rebase by CEP call:\n" + cache);
+}
+
+function testWavRepair() {
+    $.writeln("Test wav repair.");
+    Agrarvolution.timecodeCorrection.processCEPInput({
+        framerate: 25,
+        samplerate: 96000,
+        searchTarget: 1,
+        searchRecursive: false,
+        logging: true,
+        method: "rebase",
+        logTarget: 1,
+        errorOnly: true
+    });
+
 }
 
 function wavTest() {
