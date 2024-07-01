@@ -117,9 +117,9 @@ ThumbnailMetadata.extractAudioMetadata = function (xmp) {
         if (audioEncoding.length === 0) {
             sampleFrequency = 0;
         } else {
-            sampleFrequency = Number(audioEncoding.replace('F=', ''));
+            sampleFrequency = Number(sampleFrequency.toString().replace('F=', ''));
         }
-
+        
 
         var bitRate = audioEncoding.match(/W=\d+/g);
         if (bitRate == null || !bitRate.length) {
@@ -374,7 +374,6 @@ ThumbnailMetadata.prototype.updateTimecodeMetadata = function (newStartTime) {
 
     if (this.audioMetadata) {
         this.audioMetadata.samples = this.timecodeMetadata.startTime.toSamples(this.audioMetadata.sampleFrequency);
-
         this.xmp.setProperty(XMPConst.NS_BWF, "timeReference",
             this.audioMetadata.samples.toString(), XMPConst.STRING);
     }
