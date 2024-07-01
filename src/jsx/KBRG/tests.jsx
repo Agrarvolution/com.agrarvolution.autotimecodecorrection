@@ -4,8 +4,8 @@ if (app.eventHandlers) { //uses the fact, that app.eventhandlers is only availab
     //testCache();
     //tests();
 
-    testWavRepair();
-    // wavTest();
+    //testWavRepair();
+    wavTest();
 }
 
 function testCache() {
@@ -125,11 +125,11 @@ function wavTest() {
     $.writeln("Test processing empty wavs.");
     Agrarvolution.timecodeCorrection.processCEPInput({
         timecodes: [{
-            "filename": "240312_001.WAV",
+            "filename": "240701_001.WAV",
             "framerate": 25,
-            "duration": "00:03:24",
+            "duration": "00:22:52",
             "fileTC": "00:00:00:00",
-            "audioTC": "09:53:00:23"
+            "audioTC": "09:56:59:21"
         }, {
             "filename": "240312_002.WAV",
             "framerate": 25,
