@@ -76,7 +76,7 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
 
     this.xmp = new XMPMeta(this.thumb.synchronousMetadata.serialize());
 
-    if (this.xmp.doesPropertyExist(XMPConst.NS_BWF, "codingHistory")) {
+    if (this.xmp.doesPropertyExist(XMPConst.NS_BWF, "version")) {
         this.audioMetadata = ThumbnailMetadata.extractAudioMetadata(this.xmp);
     }
 
