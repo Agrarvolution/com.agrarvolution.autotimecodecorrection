@@ -131,7 +131,8 @@ CacheThumbnails.prototype.extractTimecodeFromThumbnail = function (thumb, search
     //exclude thumbnails that aren't audio or video files - might need an interface toggle
     if (CacheThumbnails.LIMIT_MIME_TYPES && !(
         thumb.mimeType.substring(0, 5) === 'audio' ||
-        thumb.mimeType.substring(0, 5) === 'video')) {
+        thumb.mimeType.substring(0, 5) === 'video' ||
+        thumb.mimeType.substring(thumb.mimeType.length - 3) === 'mp4')) {
         return false; //excluded mime types
     }
 
