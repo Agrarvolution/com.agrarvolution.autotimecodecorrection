@@ -94,9 +94,10 @@ ThumbnailMetadata.prototype.extractMetadata = function () {
         this.timecodeMetadata.framerate = ThumbnailMetadata.DEFAULT_FRAMERATE;
     }
 
-    if (this.timecodeMetadata.framerate === 0) {
-        return false;
-    }
+
+    // if (this.timecodeMetadata.framerate === 0) {
+    //     return false;
+    // }
 
     return true;
 }
@@ -145,7 +146,7 @@ ThumbnailMetadata.extractAudioMetadata = function (xmp) {
  */
 ThumbnailMetadata.extractTimecodeMetadata = function (xmp) {
     var timecodeStruct = '';
-    if (xmp.doesPropertyExist(XMPConst.NS_DM, this.TIME_CODE_STRUCT.start)) { //prioritice start over alt timecode entries
+    if (xmp.doesPropertyExist(XMPConst.NS_DM, this.TIME_CODE_STRUCT.start)) { //prioritize start over alt timecode entries
         timecodeStruct = this.TIME_CODE_STRUCT.start;
     } else if (xmp.doesPropertyExist(XMPConst.NS_DM, this.TIME_CODE_STRUCT.alt)) {
         timecodeStruct = this.TIME_CODE_STRUCT.alt;
@@ -166,13 +167,11 @@ ThumbnailMetadata.extractTimecodeMetadata = function (xmp) {
     if (timecodeStruct !== '' && xmp.doesStructFieldExist(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_FORMAT)) {
         prevFramerate = this.checkMetadataFramerate(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_FORMAT).value || '');
     }
-
     var prevStartTime = new Timecode();
     if (timecodeStruct !== '' && xmp.doesStructFieldExist(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_VALUE)) {
         prevStartTime = new Timecode(xmp.getStructField(XMPConst.NS_DM, timecodeStruct, XMPConst.NS_DM, this.PREVIOUS_TIME_VALUE).value, prevFramerate);
     }
     var isDropFrame = Timecode.isDropFrame(framerate);
-
     return {
         startTime: startTime,
         prevStartTime: prevStartTime,
@@ -462,6 +461,9 @@ ThumbnailMetadata.prototype.checkMatchingStartTimecodes = function (timecodes) {
 ThumbnailMetadata.checkMetadataFramerate = function (framerate) {
     var parsedFramerate = framerate.toString().match(/\d+/g);
 
+    // if (framerate === "InvalidTimecode") {
+    //     return -1;
+    // }
     if (parsedFramerate == null || parsedFramerate.length < 1) {
         return 0;
     }
